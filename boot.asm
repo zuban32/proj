@@ -24,6 +24,9 @@ KERN_OFF equ 0x1000
     mov dh, 15
     mov dl, [boot_drive]
     call disk_load
+    mov ah, 0x3
+    mov al, 0x0
+    int 0x10
     ret
     
 [bits 32]

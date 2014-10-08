@@ -6,7 +6,10 @@
 int
 main(void)
 {
-	print("Kernel loaded\n");
+	// char *mem = VGA_MEM;
+	// *mem = 'X';
+	clear_screen();
+	print("Kernel loaded");
 	return 0;
 }
 
@@ -16,8 +19,19 @@ print(char *str)
 	char *mem = VGA_MEM;
 	while(*str)
 	{
-		*mem = VGA_MODE, *(mem + 1) = *str;
+		*mem = *str, *(mem + 1) = VGA_MODE;
 		mem += 2;
 		str++;
+	}
+}
+
+void
+clear_screen(void)
+{
+	int sz = 4000;
+	char *mem = VGA_MEM;
+	while(sz--)
+	{
+		*mem++ = 0;
 	}
 }
