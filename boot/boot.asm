@@ -13,10 +13,10 @@ KERN_OFF equ 0x1000
     
     jmp $
     
-    %include "disk_read.asm"
-    %include "gdt.asm"
-    %include "video.asm"
-    %include "switch_pm.asm"
+    %include "boot/disk_read.asm"
+    %include "boot/gdt.asm"
+    %include "boot/video.asm"
+    %include "boot/switch_pm.asm"
 
 [bits 16]
     load_ker:
