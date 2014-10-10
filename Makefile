@@ -3,7 +3,7 @@ all:
 	ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary
 	nasm boot.asm -fbin -o boot.bin
 	cat boot.bin kernel.bin > os.disk
-	qemu -fda os.disk --vga cirrus
+	qemu -fda os.disk
 	
 clean:
 	rm -f *.o *~ *.disk *.bin
