@@ -5,6 +5,11 @@
 #define DISPLAY_WIDTH 80
 #define DISPLAY_HEIGHT 25
 
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned uint32_t;
+typedef unsigned uintptr_t;
+
 enum keys
 {
 	KEY_A = 0x1e,
@@ -45,6 +50,44 @@ enum keys
 	KEY_9 = 0xa
 };
 
+static unsigned cur_pos = 0;
+
+uint8_t
+inb(int port)
+{
+	uint8_t data;
+	__asm __volatile("inb %w1,%0" : "=a" (data) : "d" (port));
+	return data;
+}
+
+void
+outb(int port, uint8_t data)
+{
+	__asm __volatile("outb %0,%w1" : : "a" (data), "d" (port));
+}
+
+void 
+kbd_ack(void)
+{
+	prints("ACKing ");
+	while(inb(0x64) != 0xfa);
+}
+
+void
+kbd_init(void)
+{
+	prints("init ");
+	//outb(0x64, 0xf4);
+	//kbd_ack();
+}
+
+char 
+get_key()
+{
+	prints("getting key ");
+	return inb(0x60);
+}
+
 void
 clear_screen(void)
 {
@@ -52,23 +95,47 @@ clear_screen(void)
 	char *mem = VGA_MEM;
 	while(sz--)
 		*mem++ = 0;
+	cur_pos = 0;
 }
 
 void
-print(char *str)
+prints(char *str)
 {
-	char *mem = VGA_MEM;
+	char *mem = VGA_MEM + cur_pos;
 	while(*str)
 	{
 		*mem++ = *str, *mem++ = VGA_MODE;
 		str++;
 	}
+	cur_pos = mem - VGA_MEM;
+}
+
+void 
+printint(char c)
+{
+	char *mem = VGA_MEM + cur_pos;
+	int res = c > 0 ? c : -c;
+	putc(res / 16 + 0x30);
+	putc(res % 16 + 0x30);
+}
+
+void
+putc(char c)
+{
+	char *mem = VGA_MEM + cur_pos;
+	*mem++ = c;
+	*mem++ = VGA_MODE;
+	cur_pos += 2;
 }
 
 int
 kernel_main(void)
 {
 	clear_screen();
-	print("Kernel loaded");
+	prints("Kernel loaded ");
+	kbd_init();
+	int i;
+	while(1)
+	printint(get_key());
 	return 0;
 }
