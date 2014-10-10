@@ -1,7 +1,7 @@
 [bits 32]
 
 VIDEO_MEMORY equ 0xb8000
-WHITE_ON_BLACK equ 0x7
+WHITE_ON_BLACK equ 0xf
 
 print_string_pm:
     pusha
