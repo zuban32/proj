@@ -1,5 +1,6 @@
 #include "idt.h"
 #include "kbd.h"
+#include "pic.h"
 
 void 
 fpexc(void)
@@ -13,8 +14,15 @@ kbd_hndl(void)
 {
 	prints("kbd");
 	uint8_t scancode = inb(0x60);
-	out(PIC_M_CMD, PIC_EOI);
+	outb(PIC_M_CMD, PIC_EOI);
 	// printint(scancode);
+}
+
+void
+df_hndl(void)
+{
+	prints("Double fault");
+	while(1);
 }
 
 struct idt_entry idt_tbl[IDTSIZE];
@@ -30,11 +38,17 @@ load_idt(void)
 	idt_tbl->type = 0x8e;
 	idt_tbl->offset2 = 0;
 
-	idt_tbl[0x21].offset1 = (uint16_t)(&kbd_hndl & 0xff);
-	idt_tbl[0x21].selector = 0x8;
-	idt_tbl[0x21].zero = 0;
-	idt_tbl[0x21].type = 0x8e;
-	idt_tbl[0x21].offset2 = (uint16_t)((&kbd_hndl >> 8) & 0xff);
+	idt_tbl[0x8].offset1 = ((uint16_t)&df_hndl & 0xffff);
+	idt_tbl[0x8].selector = 0x8;
+	idt_tbl[0x8].zero = 0;
+	idt_tbl[0x8].type = 0x8e;
+	idt_tbl[0x8].offset2 = (((uint16_t)&df_hndl >> 8) & 0xffff);
+
+	idt_tbl[0x20].offset1 = ((uint16_t)&kbd_hndl & 0xffff);
+	idt_tbl[0x20].selector = 0x8;
+	idt_tbl[0x20].zero = 0;
+	idt_tbl[0x20].type = 0x8e;
+	idt_tbl[0x20].offset2 = (((uint16_t)&kbd_hndl >> 8) & 0xffff);
 
 	uint32_t p = (uint32_t)&idtr;
 	__asm__ __volatile__("lidt (%0)"::"p"(p) );

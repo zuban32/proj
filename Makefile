@@ -18,7 +18,7 @@ all: boot.bin kernel.bin
 
 gdb: boot.bin kernel.bin
 	cat $^ > os.disk
-	qemu-system-i386 -fda os.disk -S -gdb tcp::1234
+	gdb "qemu-system-i386 -fda os.disk -S -gdb tcp::1234"
 
 boot.bin: $(BOOT_SRCS)
 	$(AS) $(ASBOOTFLAGS) $< -o $@

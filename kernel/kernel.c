@@ -34,14 +34,30 @@ prints(char *str)
 }
 
 void 
-printint(char c, int base)
+printint(int c, int base)
 {
 	char *mem = VGA_MEM + cur_pos; 	//TODO
 	int res = c > 0 ? c : -c;
-	if(res > 9)
-		putc(res / base + 0x30);
-	putc(res % base + 0x30);
-	putc(20);
+	int mult = 1, tmp = res;
+
+	do 
+		mult *= base;
+	while(tmp /= base);
+	mult /= base;
+
+	do
+	{
+		putc(res / mult + 0x30);
+		res %= mult;
+	}
+	while (mult /= base);	
+
+	cur_pos = (DISPLAY_WIDTH << 1) * (cur_pos / (DISPLAY_WIDTH << 1) + 1);
+
+	// if(res > 9)
+	// 	putc(res / base + 0x30);
+	// putc(res % base + 0x30);
+	// putc(20);
 }
 
 void
@@ -57,13 +73,34 @@ putc(char c)
 int
 kernel_main(void)
 {
+	__asm__ volatile("sti\t\n");
 	clear_screen();
+
+	// printint(723, 10);
 	
-	load_idt();
+	// outb(0x64, 0xf4);
+	// int x = 5 / 0;
 
 	prints("Remap started");
 	pic_remap(0x20, 0x28);
 	prints("Remap ended");
+	load_idt();
+	__asm__("sti");
+	printint(10, 10);
+
+	// outb(0x64, 0xAE);
+
+	// outb(0x64, 0x20);
+	// uint8_t ccb = inb(0x60);
+	// printint(ccb, 2);
+	// ccb |= 1;
+
+	// outb(0x64, 0x60);
+	// outb(0x60, ccb);
+
+	// outb(0x64, 0xff);
+
+
 	while(1);
 	// prints("Kernel loaded");
 	// int x = 5 / 0;
