@@ -17,7 +17,7 @@ switch_pm:
     
 [bits 32]
 prot_mode:
-
+    
     mov ax, DATA_SEG
     mov ds, ax
     mov es, ax
@@ -27,7 +27,7 @@ prot_mode:
     
     mov ebp, 0x90000
     mov esp, ebp
-    
+     
     call begin_PM
     
-    
+
