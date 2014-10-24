@@ -47,7 +47,8 @@ printint(int c, int base)
 
 	do
 	{
-		putc(res / mult + 0x30);
+		int tmp = res / mult + 0x30;
+		putc(res / mult + ((tmp > 0x39) ? 0x57 : 0x30));
 		res %= mult;
 	}
 	while (mult /= base);	
@@ -73,7 +74,7 @@ putc(char c)
 int
 kernel_main(void)
 {
-	__asm__ volatile("sti\t\n");
+	// __asm__ volatile("sti\t\n");
 	clear_screen();
 
 	// printint(723, 10);
@@ -81,33 +82,14 @@ kernel_main(void)
 	// outb(0x64, 0xf4);
 	// int x = 5 / 0;
 
-	prints("Remap started");
+	printint(0xfffaa, 16);
+
 	pic_remap(0x20, 0x28);
-	prints("Remap ended");
 	load_idt();
-	__asm__("sti");
-	printint(10, 10);
 
-	// outb(0x64, 0xAE);
-
-	// outb(0x64, 0x20);
-	// uint8_t ccb = inb(0x60);
-	// printint(ccb, 2);
-	// ccb |= 1;
-
-	// outb(0x64, 0x60);
-	// outb(0x60, ccb);
-
-	// outb(0x64, 0xff);
-
+	prints("PIC inited");
 
 	while(1);
-	// prints("Kernel loaded");
-	// int x = 5 / 0;
-	// while(1);
-	// kbd_init();
-	// int i;
-	// while(1)
-	// 	printint(get_key());
+	
 	return 0;
 }

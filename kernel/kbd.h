@@ -41,8 +41,4 @@ enum scancode
 	KEY_9 = 0xa
 };
 
-void kbd_ack(void);
-void kbd_init(void);
-char get_key(void);
-
 #endif

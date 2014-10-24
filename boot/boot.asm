@@ -28,6 +28,7 @@ KERN_OFF equ 0x1000
     
 [bits 32]
 begin_PM:
+    sti
     
     mov ebx, pm_str
     call print_string_pm
