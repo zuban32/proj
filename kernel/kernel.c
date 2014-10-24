@@ -47,8 +47,8 @@ printint(int c, int base)
 
 	do
 	{
-		int tmp = res / mult + 0x30;
-		putc(res / mult + ((tmp > 0x39) ? 0x57 : 0x30));
+		int tmp = res / mult + '0';
+		putc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'));
 		res %= mult;
 	}
 	while (mult /= base);	

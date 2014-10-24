@@ -22,6 +22,7 @@ prot_mode:
     mov gs, ax
     mov ss, ax
     
+    
     mov ebp, 0x90000
     mov esp, ebp
      

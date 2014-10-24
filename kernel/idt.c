@@ -12,10 +12,9 @@ fpexc(void)
 void
 kbd_hndl(void)
 {
-	prints("kbd");
-	uint8_t scancode = inb(0x60);
-	// outb(PIC_M_CMD, PIC_EOI);
-	printint(scancode, 16);
+	uint8_t sc = inb(0x60);
+	if(sc == 0x21)
+		putc('f');
 	pic_sendEOI(1);
 }
 
@@ -42,9 +41,9 @@ set_IDTentry(uint8_t ind, uint32_t addr, uint16_t selector, uint8_t type)
 void
 load_idt(void)
 {
-	set_IDTentry(0x0, &fpexc, 0x8, 0x8e);
-	set_IDTentry(0x8, &df_hndl, 0x8, 0x8e);
-	set_IDTentry(0x21, &kbd_hndl, 0x8, 0x8f);
+	set_IDTentry(0x0, &fpexc, 0x8, i386_GATE);
+	set_IDTentry(0x8, &df_hndl, 0x8, i386_GATE);
+	set_IDTentry(0x21, &kbd_hndl, 0x8, i386_TRAP);
 
 	uint32_t p = (uint32_t)&idtr;
 	__asm__ __volatile__("lidt (%0)"::"p"(p) );

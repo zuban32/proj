@@ -1,11 +1,12 @@
 [bits 32]
 
 VIDEO_MEMORY equ 0xb8000
-WHITE_ON_BLACK equ 0xf
+WHITE_ON_BLACK equ 0x7
 
 print_string_pm:
     pusha
     mov edx, VIDEO_MEMORY
+    
     .print_string_pm_loop:
     mov al, [ebx] 
     mov ah, WHITE_ON_BLACK
