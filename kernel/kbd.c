@@ -1,23 +1,15 @@
 #include "common.h"
 #include "kbd.h"
 
-void
-fill_scancodes(void)
-{
-	// char *tmp = scancode + 1;
-	// tmp = {
-		
-	// };
-	// tmp = scancode + 0x10;
-	// tmp = {
-	// 	'q','w','e','r','t','y','u','i','o','p'
-	// };
-	// tmp = scancode + 0x1e;
-	// tmp = {
-	// 	'a','s','d','f','g','h','j','k','l'
-	// };
-	// tmp = scancode + 0x2c;
-	// tmp = {
-	// 	'z','x','c','v','b','n','m'
-	// };
-}
+#define NO 0
+
+const char scancodes[KEY_NUM] = { 
+	NO,   0x1B, '1',  '2',  '3',  '4',  '5',  '6',	// 0x00
+	'7',  '8',  '9',  '0',  '-',  '=',  '\b', '\t',
+	'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',	// 0x10
+	'o',  'p',  '[',  ']',  '\n', NO,   'a',  's',
+	'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',	// 0x20
+	'\'', '`',  NO,   '\\', 'z',  'x',  'c',  'v',
+	'b',  'n',  'm',  ',',  '.',  '/'
+
+};

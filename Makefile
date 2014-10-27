@@ -26,6 +26,7 @@ boot.bin: $(BOOT_SRCS)
 kernel.bin:	$(KERNEL_ASM) $(KERNEL_C)
 	$(AS) $(KERNEL_ASM) $(ASKERNFLAGS) -o $(KERNEL_OBJ1)
 	$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(var:.c=.o);)
+	# $(CC) $(CFLAGS) $(KERNEL_C)
 	$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) -o $@
 
 clean:

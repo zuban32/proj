@@ -2,6 +2,8 @@
 #include "kbd.h"
 #include "pic.h"
 
+extern const char scancodes[];
+
 void 
 fpexc(void)
 {
@@ -13,8 +15,13 @@ void
 kbd_hndl(void)
 {
 	uint8_t sc = inb(0x60);
-	if(sc == 0x21)
-		putc('f');
+	if(sc > 0 && sc < 0x36)
+	{
+		if(sc == 0xe)
+			backspace();
+		else
+			putc(scancodes[sc]);
+	}
 	pic_sendEOI(1);
 }
 
