@@ -8,6 +8,7 @@
 #define i386_GATE 0x8e
 #define i386_TRAP 0x8f
 
+void create_IDTentry(uint8_t, void *, uint16_t, uint8_t);
 void load_idt(void);
 
 struct idt_entry
@@ -24,5 +25,6 @@ struct idt_descr
 	uint16_t size;
 	uint32_t start;
 } __attribute__ ((packed));
+
 
 #endif

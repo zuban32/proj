@@ -1,4 +1,5 @@
 #include "pic.h"
+#include "console.h"
 
 void
 pic_sendEOI(uint8_t irq)
@@ -9,10 +10,9 @@ pic_sendEOI(uint8_t irq)
 }
 
 void 
-pic_remap(uint8_t off1, uint8_t off2)
+pic_init(uint8_t off1, uint8_t off2)
 {
 	// __asm__("cli");
-	prints("Remap started");
 	uint8_t m1, m2;
 	m1 = inb(PIC_M_DATA);
 	m2 = inb(PIC_S_DATA);
@@ -37,11 +37,9 @@ pic_remap(uint8_t off1, uint8_t off2)
 
 	m1 |= 0x1;
 
-	printint(m1, 2);
-	printint(m2, 2);
+	printf("%b %b\n", m1, m2);
 
 	outb(PIC_M_DATA, m1);
 	outb(PIC_S_DATA, m2);
-	prints("Remap ended");
 	// __asm__("sti");
 }

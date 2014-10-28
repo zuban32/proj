@@ -1,7 +1,7 @@
 CC = gcc
 LD = ld
 AS = nasm
-CFLAGS = -m32 -c
+CFLAGS = -m32 -c -std=gnu99
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary
 ASBOOTFLAGS = -fbin
 ASKERNFLAGS = -felf32

@@ -13,12 +13,12 @@
 #define PIC_INIT 0x11
 #define ICW4_80386 0x1
 
-#define ISR_dbz 0x0
-#define ISR_df 0x8
-#define ISR_kbd 0x21
+#define ISR_ZERO 0x0
+#define ISR_DFAULT 0x8
+#define ISR_KBD 0x21
 #define ISR_PIT 0x20
 
 void pic_sendEOI(uint8_t);
-void pic_remap(uint8_t, uint8_t);
+void pic_init(uint8_t, uint8_t);
 
 #endif
