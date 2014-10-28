@@ -37,7 +37,7 @@ pic_init(uint8_t off1, uint8_t off2)
 
 	m1 |= 0x1;
 
-	printf("%b %b\n", m1, m2);
+	kprintf("Masks: %b %b\n", m1, m2);
 
 	outb(PIC_M_DATA, m1);
 	outb(PIC_S_DATA, m2);

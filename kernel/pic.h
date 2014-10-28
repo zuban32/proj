@@ -15,6 +15,7 @@
 
 #define ISR_ZERO 0x0
 #define ISR_DFAULT 0x8
+#define ISR_PFAULT 0xe
 #define ISR_KBD 0x21
 #define ISR_PIT 0x20
 

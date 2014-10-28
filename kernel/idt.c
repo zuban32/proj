@@ -1,13 +1,16 @@
 #include "idt.h"
 #include "kbd.h"
 #include "pic.h"
+#include "console.h"
 
+extern char *cur_buf;
 extern const char scancodes[];
+extern char input_on;
 
 void 
 fpexc(void)
 {
-	printf("Division by zero");
+	kprintf("Division by zero");
 	while(1);
 }
 
@@ -18,6 +21,14 @@ kbd_hndl(void)
 	// printf("sc = %d\n", sc);
 	if(sc > 0 && sc < 0x36)
 	{
+		if(input_on)
+		{
+			if(sc != 0x1c)
+				*cur_buf++ = scancodes[sc];
+			else
+				input_on = 0;
+		}
+
 		switch(sc)
 		{
 			case 0x1c:
@@ -37,7 +48,14 @@ kbd_hndl(void)
 void
 df_hndl(void)
 {
-	printf("Double fault");
+	kprintf("Double fault\n");
+	while(1);
+}
+
+void
+pf_hndl(void)
+{
+	kprintf("Page fault\n");
 	while(1);
 }
 
@@ -61,6 +79,11 @@ load_idt(void)
 	create_IDTentry(ISR_ZERO, &fpexc, 0x8, i386_GATE);
 	create_IDTentry(ISR_DFAULT, &df_hndl, 0x8, i386_GATE);
 	create_IDTentry(ISR_KBD, &kbd_hndl, 0x8, i386_TRAP);
+	create_IDTentry(ISR_PFAULT, &pf_hndl, 0x8, i386_GATE);
+	// for(int i = 0; i < 0x1f; i++)
+	// {
+	// 	create_IDTentry(i, &pf_hndl, 0x8, i386_GATE);
+	// }
 
 	uint32_t p = (uint32_t)&idtr;
 	__asm__ __volatile__("lidt (%0)"::"p"(p) );

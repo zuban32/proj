@@ -61,7 +61,7 @@ printint(int c, int base)
 	while (mult /= base);
 }
 
-void printf(const char *fstr, ...)
+void kprintf(const char *fstr, ...)
 {
 	va_list p;
 	va_start(p, fstr);
@@ -85,6 +85,7 @@ void printf(const char *fstr, ...)
 					break;
 				case 'x':
 					x = va_arg(p, uint32_t);
+					kprintf("0x");
 					printint(x, 16);
 					break;
 				case 's':

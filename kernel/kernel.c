@@ -4,20 +4,35 @@
 #include "idt.h"
 #include "pic.h"
 
+void 
+init_pages(void)
+{
+	__asm__ __volatile__(
+		"mov $0, %eax\n"
+		 "mov %eax, %cr3\n"
+		 "mov %cr0, %eax\n"
+		 "or $0x10, %eax\n"
+		 "mov %eax, %cr0\n"
+		);
+}
 
 int
 kernel_main(void)
 {
 	// __asm__ volatile("sti\t\n");
 	clear_screen();
-	printf("%d %x\n", -500, 0xfffaa);
+	kprintf("%d %x\n", -500, 0xfffaa);
 
 	pic_init(0x20, 0x28);
-	printf("PIC inited\n");
+	kprintf("PIC inited\n");
 
 	load_idt();
 
-	while(1);
+	// init_pages();
+	kprintf("Pages inited\n");
+
+	while(1)
+		cmd();
 	
 	return 0;
 }

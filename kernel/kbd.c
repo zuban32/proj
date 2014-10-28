@@ -1,5 +1,12 @@
 #include "common.h"
+#include "console.h"
 #include "kbd.h"
+
+#define BUF_SIZE 4096
+
+char input_on = 0;
+char kbd_buf[BUF_SIZE];
+char *cur_buf = kbd_buf;
 
 #define NO 0
 
@@ -11,5 +18,15 @@ const char scancodes[KEY_NUM] = {
 	'd',  'f',  'g',  'h',  'j',  'k',  'l',  ';',	// 0x20
 	'\'', '`',  NO,   '\\', 'z',  'x',  'c',  'v',
 	'b',  'n',  'm',  ',',  '.',  '/'
-
 };
+
+
+void 
+clear_buf(void)
+{
+	char *p = kbd_buf;
+	while(p <= cur_buf)
+		*p++ = 0;
+	cur_buf = kbd_buf;
+	// printf("Buffer cleared\n");
+}
