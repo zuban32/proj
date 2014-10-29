@@ -14,14 +14,12 @@ typedef __builtin_va_list va_list;
 #define DISPLAY_WIDTH 80
 #define DISPLAY_HEIGHT 25
 
-static unsigned cur_pos = 0;
-
-void endline(void);
-void clear_screen(void);
-void backspace(void);
-void prints(char *str);
-void printint(int c, int base);
-void putc(char c);
-void printf(const char *, ...);
+void kendline(void);
+void kclear_screen(void);
+void kbackspace(void);
+void kprints(char *, char );
+void kprintint(int , int , char);
+void kputc(char , char);
+void kprintf(char ,const char *, ...);
 
 #endif

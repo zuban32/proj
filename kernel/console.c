@@ -1,49 +1,56 @@
 #include "console.h"
 #include "common.h"
 
+static unsigned cur_pos = 0;
+static unsigned cur_bound = 0;
+
 void 
-endline(void)
+kendline(void)
 {
-	cur_pos = (DISPLAY_WIDTH << 1) * (cur_pos / (DISPLAY_WIDTH << 1) + 1);
+	cur_pos = DISPLAY_WIDTH * (cur_pos / DISPLAY_WIDTH + 1);
 }
 
 void
-clear_screen(void)
+kclear_screen(void)
 {
 	int sz = DISPLAY_WIDTH * DISPLAY_HEIGHT;
 	char *mem = VGA_MEM;
 	while(sz--)
 		*mem++ = 0;
-	cur_pos = 0;
+	cur_pos = 0, cur_bound = 0;
 }
 
 void 
-backspace(void)
+kbackspace(void)
 {
-	if(!cur_pos)
+	// kprintf("move bound %s\n", move_bound ? "enabled" : "disabled");
+	// kprintf("cur_pos = %d, cur_bound = %d\n", cur_pos, cur_bound);
+	if(!cur_pos || cur_pos <= cur_bound)
 		return;
-	char *mem = VGA_MEM + (cur_pos -= 2);
+	char *mem = VGA_MEM + ((cur_pos -= 1) << 1);
 	*mem++ = 0, *mem = 0;
 }
 
 void
-prints(char *str)
+kprints(char *str, char move_bound)
 {
-	char *mem = VGA_MEM + cur_pos;
+	char *mem = VGA_MEM + (cur_pos << 1);
 	while(*str)
 	{
 		*mem++ = *str, *mem++ = VGA_MODE;
 		str++;
 	}
-	cur_pos = mem - VGA_MEM;
+	cur_pos = (mem - VGA_MEM) >> 1;
+	if(move_bound)
+		cur_bound = cur_pos;
 }
 
 void 
-printint(int c, int base)
+kprintint(int c, int base, char move_bound)
 {
 	if(c < 0)
-		putc('-'), c = -c;
-	char *mem = VGA_MEM + cur_pos; 	//TODO
+		kputc('-', move_bound), c = -c;
+	char *mem = VGA_MEM + (cur_pos << 1);
 	int res = c > 0 ? c : -c;
 	int mult = 1, tmp = res;
 
@@ -55,13 +62,14 @@ printint(int c, int base)
 	do
 	{
 		int tmp = res / mult + '0';
-		putc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'));
+		kputc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'), move_bound);
 		res %= mult;
 	}
 	while (mult /= base);
 }
 
-void kprintf(const char *fstr, ...)
+void 
+kprintf(char move_bound, const char *fstr, ...)
 {
 	va_list p;
 	va_start(p, fstr);
@@ -77,42 +85,44 @@ void kprintf(const char *fstr, ...)
 			{
 				case 'b':
 					x = va_arg(p, uint32_t);
-					printint(x, 2);
+					kprintint(x, 2, move_bound);
 					break;
 				case 'd':
 					d = va_arg(p, int);
-					printint(d, 10);
+					kprintint(d, 10, move_bound);
 					break;
 				case 'x':
 					x = va_arg(p, uint32_t);
-					kprintf("0x");
-					printint(x, 16);
+					kprintf(move_bound, "0x");
+					kprintint(x, 16, move_bound);
 					break;
 				case 's':
 					s = va_arg(p, char *);
-					prints(s);
+					kprints(s, move_bound);
 					break;
 				case 'c':
 					c  = va_arg(p, char);
-					putc(c);
+					kputc(c, move_bound);
 					break;
 				default:
 					break;
 			}
 		}
 		else if(*str == '\n')
-			endline();
+			kendline();
 		else
-			putc(*str);
+			kputc(*str, move_bound);
 	}
 	va_end(p);
 }
 
 void
-putc(char c)
+kputc(char c, char move_bound)
 {
-	char *mem = VGA_MEM + cur_pos;
+	char *mem = VGA_MEM + (cur_pos << 1);
 	*mem++ = c;
 	*mem++ = VGA_MODE;
-	cur_pos += 2;
+	cur_pos ++;
+	if(move_bound)
+		cur_bound = cur_pos;
 }

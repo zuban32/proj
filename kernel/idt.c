@@ -10,7 +10,7 @@ extern char input_on;
 void 
 fpexc(void)
 {
-	kprintf("Division by zero");
+	kprintf(1, "Division by zero");
 	while(1);
 }
 
@@ -32,13 +32,13 @@ kbd_hndl(void)
 		switch(sc)
 		{
 			case 0x1c:
-				endline();
+				kendline();
 				break;
 			case 0xe:
-				backspace();
+				kbackspace();
 				break;
 			default:
-				putc(scancodes[sc]);
+				kputc(scancodes[sc], 0);
 
 		}
 	}
@@ -48,14 +48,14 @@ kbd_hndl(void)
 void
 df_hndl(void)
 {
-	kprintf("Double fault\n");
+	kprintf(1, "Double fault\n");
 	while(1);
 }
 
 void
 pf_hndl(void)
 {
-	kprintf("Page fault\n");
+	kprintf(1, "Page fault\n");
 	while(1);
 }
 

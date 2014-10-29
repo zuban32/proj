@@ -20,16 +20,15 @@ int
 kernel_main(void)
 {
 	// __asm__ volatile("sti\t\n");
-	clear_screen();
-	kprintf("%d %x\n", -500, 0xfffaa);
+	kclear_screen();
+	kprintf(1, "%d %x\n", -500, 0xfffaa);
 
 	pic_init(0x20, 0x28);
-	kprintf("PIC inited\n");
+	kprintf(1, "PIC inited\n");
 
 	load_idt();
-
 	// init_pages();
-	kprintf("Pages inited\n");
+	kprintf(1, "Pages inited\n");
 
 	while(1)
 		cmd();
