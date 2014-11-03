@@ -22,7 +22,7 @@ cmd(void)
 	if(kstrcmp(cmd_name, "isr") == 0)
 	{
 		kprintf(1, "isr #%d will be created\n", params[0]);
-		create_IDTentry()
+		// create_IDTentry()
 	}
 	else if(kstrcmp(kbd_buf, "clear") == 0)
 		kclear_screen();
