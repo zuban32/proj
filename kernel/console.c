@@ -71,6 +71,8 @@ kprintint(int c, int base, char move_bound)
 void 
 kprintf(char move_bound, const char *fstr, ...)
 {
+	if(!fstr)
+		kprintf(1, "String empty\n");
 	va_list p;
 	va_start(p, fstr);
 	int d;
@@ -101,7 +103,7 @@ kprintf(char move_bound, const char *fstr, ...)
 					kprints(s, move_bound);
 					break;
 				case 'c':
-					c  = va_arg(p, char);
+					c  = va_arg(p, int);
 					kputc(c, move_bound);
 					break;
 				default:

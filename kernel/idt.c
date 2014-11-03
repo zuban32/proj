@@ -17,16 +17,21 @@ fpexc(void)
 void
 kbd_hndl(void)
 {
-	uint8_t sc = inb(0x60);
-	// printf("sc = %d\n", sc);
-	if(sc > 0 && sc < 0x36)
+	uint8_t sc = inb(0x60);	load_idt();
+
+	// for(int i = 0x30; i < 0x39; i++)
+	// 	kprintf(1, "sc[%x] = %c\n", i, scancodes[i]);
+	if(sc > 0 && sc < 0x40)
 	{
 		if(input_on)
 		{
 			if(sc != 0x1c)
 				*cur_buf++ = scancodes[sc];
 			else
+			{
+				*cur_buf++ = 0;
 				input_on = 0;
+			}
 		}
 
 		switch(sc)

@@ -3,6 +3,8 @@
 #include "console.h"
 #include "idt.h"
 #include "pic.h"
+#include "string.h"
+#include "cmd.h"
 
 void 
 init_pages(void)
@@ -27,8 +29,10 @@ kernel_main(void)
 	kprintf(1, "PIC inited\n");
 
 	load_idt();
+	
+	kstoi("112515");
 	// init_pages();
-	kprintf(1, "Pages inited\n");
+	// kprintf(1, "Pages inited\n");
 
 	while(1)
 		cmd();

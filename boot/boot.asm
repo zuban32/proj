@@ -21,7 +21,7 @@ KERN_OFF equ 0x1000
 [bits 16]
     load_ker:
     mov bx, KERN_OFF
-    mov dh, 15
+    mov dh, 50
     mov dl, [boot_drive]
     call disk_load
     ret

@@ -4,6 +4,8 @@
 #include "common.h"
 
 int kstrcmp(char *, char *);
-void memset(void *, int, uint32_t);
+void kmemset(void *, int, uint32_t);
+uint32_t kstoi(const char *);
+int k_isspace(char);
 
 #endif

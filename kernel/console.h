@@ -20,6 +20,6 @@ void kbackspace(void);
 void kprints(char *, char );
 void kprintint(int , int , char);
 void kputc(char , char);
-void kprintf(char ,const char *, ...);
+void kprintf(char , const char *, ...);
 
 #endif
