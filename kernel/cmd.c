@@ -7,7 +7,7 @@
 extern char input_on;
 extern char kbd_buf[];
 
-char cmd_name[81];
+char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];
 
 void 
@@ -22,7 +22,7 @@ cmd(void)
 	if(kstrcmp(cmd_name, "isr") == 0)
 	{
 		kprintf(1, "isr #%d will be created\n", params[0]);
-		// create_IDTentry()
+		addISR(params[0], 0x8, i386_GATE);
 	}
 	else if(kstrcmp(kbd_buf, "clear") == 0)
 		kclear_screen();
@@ -42,6 +42,6 @@ parse_cmd(void)
 		*nm++ = *s++;
 	*nm++ = 0;
 	kprintf(1, "nm = %s\n", cmd_name);
-
-	params[0] = kstoi(++s);
+	while(k_isspace(*s) && *s) s++;
+	params[0] = kstoi(s);
 }

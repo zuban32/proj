@@ -29,6 +29,8 @@ kernel_main(void)
 	kprintf(1, "PIC inited\n");
 
 	load_idt();
+
+	// int x = 5 / 0;
 	
 	kstoi("112515");
 	// init_pages();

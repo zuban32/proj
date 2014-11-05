@@ -3,12 +3,12 @@
 
 #include "common.h"
 
-#define IDTSIZE 256
+#define IDTSIZE 0x40
 
 #define i386_GATE 0x8e
 #define i386_TRAP 0x8f
 
-void create_IDTentry(uint8_t, void *, uint16_t, uint8_t);
+void addISR(uint8_t, uint16_t, uint8_t);
 void load_idt(void);
 
 struct idt_entry
