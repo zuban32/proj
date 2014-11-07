@@ -26,7 +26,7 @@ kmemset(void *s0, int val, uint32_t size)
 uint32_t 
 kstoi(const char *s)
 {
-	kprintf(1, "kstoi started: %s\n", s);
+	// kprintf(1, "kstoi started: %s\n", s);
 	char *str = s;
 	while(*str++);
 	str -= 2;
@@ -37,6 +37,6 @@ kstoi(const char *s)
 		res += mult * (*str-- - '0');
 		mult *= 10;
 	}
-	kprintf(1, "%s -> %d\n", s, res);
+	// kprintf(1, "%s -> %d\n", s, res);
 	return res;
 }

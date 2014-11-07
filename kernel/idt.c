@@ -27,6 +27,7 @@ load_idt(void)
 	// addISR(ISR_ZERO, 0x8, i386_GATE);
 	addISR(ISR_DFAULT, 0x8, i386_GATE);
 	addISR(ISR_KBD, 0x8, i386_TRAP);
+	addISR(ISR_COM1, 0x8, i386_TRAP);
 	// addISR(ISR_PFAULT, 0x8, i386_GATE);
 
 	// for(int i = 0; i < 0x1f; i++)

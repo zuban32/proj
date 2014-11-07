@@ -1,19 +1,25 @@
 #include "console.h"
 #include "common.h"
+#include "serial.h"
 
 static unsigned cur_pos = 0;
 static unsigned cur_bound = 0;
+
+extern char kbd_buf[];
+extern char *cur_buf;
 
 void 
 kendline(void)
 {
 	cur_pos = DISPLAY_WIDTH * (cur_pos / DISPLAY_WIDTH + 1);
+
+	write_serial('\n');
 }
 
 void
 kclear_screen(void)
 {
-	int sz = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+	int sz = 2 * DISPLAY_WIDTH * DISPLAY_HEIGHT;
 	char *mem = VGA_MEM;
 	while(sz--)
 		*mem++ = 0;
@@ -29,20 +35,22 @@ kbackspace(void)
 		return;
 	char *mem = VGA_MEM + ((cur_pos -= 1) << 1);
 	*mem++ = 0, *mem = 0;
+	write_serial('\b');
+	*(cur_buf -= (cur_buf > kbd_buf) ? 1 : 0) = 0;
 }
 
 void
 kprints(char *str, char move_bound)
 {
-	char *mem = VGA_MEM + (cur_pos << 1);
+	// char *mem = VGA_MEM + (cur_pos << 1);
 	while(*str)
 	{
-		*mem++ = *str, *mem++ = VGA_MODE;
-		str++;
+		// *mem++ = *str, *mem++ = VGA_MODE;
+		kputc(*str++, 1);
 	}
-	cur_pos = (mem - VGA_MEM) >> 1;
-	if(move_bound)
-		cur_bound = cur_pos;
+	// cur_pos = (mem - VGA_MEM) >> 1;
+	// if(move_bound)
+	// 	cur_bound = cur_pos;
 }
 
 void 
@@ -127,4 +135,5 @@ kputc(char c, char move_bound)
 	cur_pos ++;
 	if(move_bound)
 		cur_bound = cur_pos;
+	write_serial(c);
 }

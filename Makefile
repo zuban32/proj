@@ -15,11 +15,11 @@ KERNEL_OBJ2 = $(addprefix $(OBJDIR), $(notdir $(KERNEL_C:.c=.o)))
 
 all: boot.bin kernel.bin
 	cat $^ > os.disk
-	qemu-system-i386 -fda os.disk
+	qemu-system-i386 -fda os.disk -serial stdio
 
 gdb: boot.bin kernel.bin
 	cat $^ > os.disk
-	qemu-system-i386 -fda os.disk -S -gdb tcp::1234
+	qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio
 
 boot.bin: $(BOOT_SRCS)
 	$(AS) $(ASBOOTFLAGS) $< -o $@

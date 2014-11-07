@@ -16,7 +16,7 @@ divz_hndl(void)
 void
 kbd_hndl(void)
 {
-	uint8_t sc = inb(0x60);	load_idt();
+	uint8_t sc = inb(0x60);
 
 	// for(int i = 0x30; i < 0x39; i++)
 	// 	kprintf(1, "sc[%x] = %c\n", i, scancodes[i]);
@@ -25,7 +25,10 @@ kbd_hndl(void)
 		if(input_on)
 		{
 			if(sc != 0x1c)
-				*cur_buf++ = scancodes[sc];
+			{
+				if(sc != 0xe)
+					*cur_buf++ = scancodes[sc];
+			}
 			else
 			{
 				*cur_buf++ = 0;
@@ -61,4 +64,39 @@ pf_hndl(void)
 {
 	kprintf(1, "Page fault\n");
 	while(1);
+}
+
+void
+com_hndl(void)
+{
+	// asm("cli");
+	char c = read_serial();
+	if(input_on)
+		{
+			if(c != '\n' && c != '\r')
+			{
+				if(c != 0x7f)
+					*cur_buf++ = c;
+			}
+			else
+			{
+				*cur_buf++ = 0;
+				input_on = 0;
+			}
+		}
+	switch(c)
+		{
+			case '\r':
+			case '\n':
+				kendline();
+				break;
+			case 0x7f:
+				kbackspace();
+				break;
+			default:
+				kputc(c, 0);
+
+		}
+	pic_sendEOI(1);
+	// asm("sti");
 }

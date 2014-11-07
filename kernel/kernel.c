@@ -27,8 +27,8 @@ kernel_main(void)
 
 	pic_init(0x20, 0x28);
 	kprintf(1, "PIC inited\n");
-
 	load_idt();
+	init_serial();
 
 	// int x = 5 / 0;
 	
