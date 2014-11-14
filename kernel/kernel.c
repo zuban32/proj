@@ -5,6 +5,7 @@
 #include "pic.h"
 #include "string.h"
 #include "cmd.h"
+#include "serial.h"
 
 void 
 init_pages(void)

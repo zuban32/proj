@@ -9,13 +9,15 @@ extern char *cmd_names[];
 extern struct idt_entry idt_tbl[];
 extern uint32_t params[];
 
-
 const char *cmd_helps[CMD_NUM] = 
 {"create ISR #param0", 
  "list all existing ISRs", 
- "equal to asm int #param0", 
+ "interrupts with #param0", 
  "clear screen", 
- "show this help"};
+ "show this help"
+};
+
+#define INT_INSTR 0xCD
 
 void
 cmd_isr(void)
@@ -36,8 +38,8 @@ cmd_listisr(void)
 void
 cmd_int(void)
 {
-	char *test = TESTBASE;
-	*test++ = 0xCD;
+	char *test = (char *)TESTBASE;
+	*test++ = INT_INSTR;
 	*test++ = (char)params[0];
 	asm volatile("jmp %0\n"::"r"(test - 2));
 }

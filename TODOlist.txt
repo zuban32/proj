@@ -1,6 +1,0 @@
-1) PAGING  !!!
-2) commands(add isr, del isr, ...)
-3) correct headers, extern vars, static vars, etc.
-4) gcc warnings
-5) screen pages !!
-6) change clearbuf() for kmemset()

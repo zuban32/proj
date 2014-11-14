@@ -12,6 +12,13 @@ pic_sendEOI(uint8_t irq)
 	outb(PIC_M_CMD, PIC_EOI);
 }
 
+void
+pic_set_mask(uint8_t mask_m, uint8_t mask_s)
+{
+	outb(PIC_M_DATA, mask_m);
+	outb(PIC_S_DATA, mask_s);
+}
+
 void 
 pic_init(uint8_t off1, uint8_t off2)
 {
@@ -47,7 +54,6 @@ pic_init(uint8_t off1, uint8_t off2)
 
 	kprintf(1, "Masks: %b %b\n", m1, m2);
 
-	outb(PIC_M_DATA, m1);
-	outb(PIC_S_DATA, m2);
+	pic_set_mask(m1, m2);
 	// __asm__("sti");
 }

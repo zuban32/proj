@@ -1,6 +1,7 @@
 #include "isr.h"
 #include "pic.h"
 #include "console.h"
+#include "serial.h"
 
 extern char *cur_buf;
 extern const char scancodes[];

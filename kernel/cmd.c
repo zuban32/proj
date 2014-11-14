@@ -36,7 +36,7 @@ cmd(void)
 		}
 	}
 	if(i == CMD_NUM)
-		kprintf(1, "Unknown command\n");
+		kprintf(1, "Unknown command '%s'\n", cmd_name);
 }
 
 void
