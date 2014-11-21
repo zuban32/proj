@@ -7,6 +7,7 @@
 
 #define ISR_ZERO 0x0
 #define ISR_DFAULT 0x8
+#define ISR_GPFAULT 0xd
 #define ISR_PFAULT 0xe
 #define ISR_KBD 0x21
 #define ISR_PIT 0x20
@@ -15,6 +16,7 @@
 void divz_hndl(void);
 void kbd_hndl(void);
 void df_hndl(void);
+void gpf_hndl(void);
 void pf_hndl(void);
 void com_hndl(void);
 

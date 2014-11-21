@@ -68,6 +68,13 @@ pf_hndl(void)
 }
 
 void
+gpf_hndl(void)
+{
+	kprintf(1, "GP fault\n");
+	while(1);
+}
+
+void
 com_hndl(void)
 {
 	// asm("cli");
