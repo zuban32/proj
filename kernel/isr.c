@@ -7,7 +7,7 @@ extern char *cur_buf;
 extern const char scancodes[];
 extern char input_on;
 
-void 
+void
 divz_hndl(void)
 {
 	kprintf(1, "Division by zero\n");

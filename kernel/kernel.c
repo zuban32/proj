@@ -15,7 +15,7 @@
 uint32_t pgdir[PGS_NUM];
 uint32_t pgtbl[PGS_NUM][PGS_NUM];
 
-void 
+void
 init_pages(void)
 {
 	uintptr_t addr = 0;
@@ -54,7 +54,7 @@ kernel_main(void)
 	init_serial();
 
 	// int x = 5 / 0;
-	
+
 	kstoi("112515");
 	kprintf(1, "All inited exc pages\n");
 	init_pages();
@@ -62,6 +62,6 @@ kernel_main(void)
 
 	while(1)
 		cmd();
-	
+
 	return 0;
 }

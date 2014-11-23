@@ -20,8 +20,6 @@ void gpf_hndl(void);
 void pf_hndl(void);
 void com_hndl(void);
 
-// void real_kbd(int);
-
 static uintptr_t isr[MAX_ISR] = 
 {
 	(uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0, 					//0x0
