@@ -9,6 +9,63 @@ extern uintptr_t isr[];
 struct idt_entry idt_tbl[IDTSIZE];
 struct idt_descr idtr = {IDTSIZE * sizeof(struct idt_entry), (uint32_t)idt_tbl};
 
+uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE)));
+uint32_t pgdir[PGS_NUM] __attribute__ ((aligned (PGSIZE)));
+
+void
+init_pages(void)
+{
+    unsigned long long addr = 0;
+    uint32_t i, j;
+    for (i = 0; i < 2; i++)
+    {
+        if ((uint32_t)pgdir % PGSIZE)
+            kprintf(1, "pgdir isn't aligned\n");
+        if ((uint32_t)&pgtbl[i][0] % PGSIZE)
+            kprintf(1, "pgtbl addr in entry #%d isn't aligned\n", i);
+        // kprintf(1, "%x\n", &pgtbl);
+        pgdir[i] = ((uint32_t)&pgtbl[i] & ~(PGSIZE - 1));
+        kprintf(1, "pgdir[%d] = %x\n", i, pgdir[i]);
+
+        pgdir[i] |= 3;
+        for (j = 0; j < PGS_NUM; j++)
+        {
+            // if (addr == 0x405000)
+                kprintf(1, "addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
+            pgtbl[i][j] = (addr & ~(PGSIZE - 1));
+            addr += PGSIZE;
+            pgtbl[i][j] |= 3;
+        }
+    }
+
+    uint32_t x = 0x1802;
+    uint32_t dir_ind = (x & (0x3ff << 22))>>22;
+	uint32_t tbl_ind = (x & (0x3ff << 12))>>12;
+	// eff = pgdir[eff] & (~(PGSIZE - 1));
+	uint32_t *tbl_addr = (uint32_t *)(pgdir[dir_ind] & ~(PGSIZE - 1));
+	kprintf(1, "&pgtbl[%d] = %x\n", dir_ind, tbl_addr);
+	tbl_addr += tbl_ind;
+
+	uint32_t res = (*tbl_addr) & (~(PGSIZE - 1));
+	res += x & 4095;
+    // eff &= 
+    kprintf(1, "%x -> %x\n", x, res);
+
+    // kprintf(1, "pgtbl end = %x\n", &pgtbl[0] + 2);
+    // while(1);
+
+    kprintf(1, "pgdir addr = %x\n", &pgdir[0]);
+    kprintf(1, "Pages inited\n");
+
+    __asm__ __volatile__(
+        "mov %0, %%eax\t\n"
+        "mov %%eax, %%cr3\t\n"
+        "mov %%cr0, %%eax\t\n"
+        "or $0x80000000, %%eax\t\n"
+        "mov %%eax, %%cr0\t\n"
+        ::"g"(pgdir): "eax");
+}
+
 void
 addISR(uint8_t ind, uint16_t selector, uint8_t type)
 {
@@ -23,7 +80,7 @@ addISR(uint8_t ind, uint16_t selector, uint8_t type)
 void
 load_idt(void)
 {
-    // addISR(ISR_ZERO, 0x8, i386_GATE);
+    addISR(ISR_ZERO, 0x8, i386_GATE);
     addISR(ISR_DFAULT, 0x8, i386_GATE);
     addISR(ISR_KBD, 0x8, i386_TRAP);
     addISR(ISR_COM1, 0x8, i386_TRAP);

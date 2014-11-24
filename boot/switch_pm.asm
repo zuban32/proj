@@ -23,7 +23,7 @@ prot_mode:
     mov ss, ax
     
     
-    mov ebp, 0x90000
+    mov ebp, 0x900000
     mov esp, ebp
      
     call begin_PM

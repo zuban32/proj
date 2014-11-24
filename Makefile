@@ -29,16 +29,16 @@ boot.bin: $(BOOT_SRCS)
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@echo $@
+	@mkdir -p $(OBJDIR) 2>/dev/null
 	$(AS) $(KERNEL_ASM) $(ASKERNFLAGS) -o $(KERNEL_OBJ1)
 	@echo 'Compiling kernel'
-	@mkdir -p $(OBJDIR) 2>/dev/null
-	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o)) 2>/dev/null;)
+	$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o));)
 
 kernel.asm: kernel.obj
 	@echo $@
 	$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) -o $(OBJDIR)$<
 	objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
-	@echo "target remote :1234\nsymbol-file $^" > .gdbinit
+	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
 
 kernel.bin: kernel.obj kernel.asm
 	@echo $@

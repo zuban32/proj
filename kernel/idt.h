@@ -8,6 +8,9 @@
 #define i386_GATE 0x8e
 #define i386_TRAP 0x8f
 
+#define PGS_NUM 1024
+#define PGSIZE 4096
+
 void addISR(uint8_t, uint16_t, uint8_t);
 void load_idt(void);
 
