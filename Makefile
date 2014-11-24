@@ -29,6 +29,7 @@ boot.bin: $(BOOT_SRCS)
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@echo $@
+	@echo $(KERNEL_OBJ1)
 	@mkdir -p $(OBJDIR) 2>/dev/null
 	$(AS) $(KERNEL_ASM) $(ASKERNFLAGS) -o $(KERNEL_OBJ1)
 	@echo 'Compiling kernel'

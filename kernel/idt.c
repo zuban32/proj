@@ -6,18 +6,18 @@
 
 extern uintptr_t isr[];
 
-struct idt_entry idt_tbl[IDTSIZE];
-struct idt_descr idtr = {IDTSIZE * sizeof(struct idt_entry), (uint32_t)idt_tbl};
-
 uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE)));
 uint32_t pgdir[PGS_NUM] __attribute__ ((aligned (PGSIZE)));
+
+struct idt_entry idt_tbl[IDTSIZE] __attribute__ ((aligned (16 * PGSIZE)));
+struct idt_descr idtr = {IDTSIZE * sizeof(struct idt_entry), (uint32_t)idt_tbl};
 
 void
 init_pages(void)
 {
     unsigned long long addr = 0;
     uint32_t i, j;
-    for (i = 0; i < 2; i++)
+    for (i = 0; i < 10; i++)
     {
         if ((uint32_t)pgdir % PGSIZE)
             kprintf(1, "pgdir isn't aligned\n");
@@ -31,7 +31,7 @@ init_pages(void)
         for (j = 0; j < PGS_NUM; j++)
         {
             // if (addr == 0x405000)
-                kprintf(1, "addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
+                // kprintf(1, "addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
             pgtbl[i][j] |= 3;
@@ -54,7 +54,7 @@ init_pages(void)
     // kprintf(1, "pgtbl end = %x\n", &pgtbl[0] + 2);
     // while(1);
 
-    kprintf(1, "pgdir addr = %x\n", &pgdir[0]);
+    kprintf(1, "pgdir addr = %x\n", pgdir);
     kprintf(1, "Pages inited\n");
 
     __asm__ __volatile__(
@@ -64,6 +64,9 @@ init_pages(void)
         "or $0x80000000, %%eax\t\n"
         "mov %%eax, %%cr0\t\n"
         ::"g"(pgdir): "eax");
+
+    kprintf(1, "IDT addr = %x\n", idt_tbl);
+    // while(1);
 }
 
 void
@@ -84,7 +87,7 @@ load_idt(void)
     addISR(ISR_DFAULT, 0x8, i386_GATE);
     addISR(ISR_KBD, 0x8, i386_TRAP);
     addISR(ISR_COM1, 0x8, i386_TRAP);
-    addISR(ISR_PFAULT, 0x8, i386_GATE);
+    addISR(ISR_PFAULT, 0x8, i386_TRAP);
     addISR(ISR_GPFAULT, 0x8, i386_GATE);
 
     // for(int i = 0; i < 0x1f; i++)

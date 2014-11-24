@@ -130,10 +130,13 @@ void
 kputc(char c, char move_bound)
 {
     char *mem = VGA_MEM + (cur_pos << 1);
-    *mem++ = c;
-    *mem++ = VGA_MODE;
-    cur_pos ++;
-    if (move_bound)
-        cur_bound = cur_pos;
+    // if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT)
+    {
+        *mem++ = c;
+        *mem++ = VGA_MODE;
+        cur_pos ++;
+        if (move_bound)
+            cur_bound = cur_pos;
+    }
     write_serial(c);
 }
