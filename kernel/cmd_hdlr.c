@@ -14,7 +14,8 @@ const char *cmd_helps[CMD_NUM] =
  "list all existing ISRs", 
  "interrupts with #param0", 
  "clear screen", 
- "show this help"
+ "show this help",
+ "check pagefault"
 };
 
 #define INT_INSTR 0xCD
@@ -55,4 +56,15 @@ cmd_help(void)
 {
 	for(int i = 0; i < CMD_NUM; i++)
 		kprintf(1, "%s - %s\n", cmd_names[i], cmd_helps[i]);
+}
+
+extern uint32_t pgtbl[][PGS_NUM];
+
+void
+cmd_check(void)
+{
+	pgtbl[9][PGS_NUM - 1] &= ~1; 
+	kprintf(1, "Checking pagefault\n");
+	char *x = (char *)CHECKADDR;
+	*x = 0;
 }

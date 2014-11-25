@@ -11,8 +11,8 @@ extern char kbd_buf[];
 char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];
 
-const char *cmd_names[CMD_NUM] = {"isr", "listisr", "int", "clear", "help"};
-void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_int, &cmd_clear, &cmd_help};
+const char *cmd_names[CMD_NUM] = {"isr", "listisr", "int", "clear", "help", "check"};
+void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_int, &cmd_clear, &cmd_help, &cmd_check};
 
 
 void 

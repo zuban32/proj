@@ -34,7 +34,10 @@ init_pages(void)
                 // kprintf(1, "addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
-            pgtbl[i][j] |= 3;
+            if(addr == 0x27ff000)
+                pgtbl[i][j] |= 3;
+            else
+                pgtbl[i][j] |= 3;
         }
     }
 
