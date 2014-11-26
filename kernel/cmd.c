@@ -18,7 +18,7 @@ void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_int, &cmd_clear, &cm
 void 
 cmd(void)
 {
-	kprintf(1, "K> ");
+	kprintf("K> ");
 	clear_buf();
 	input_on = 1;
 	while(input_on);
@@ -36,7 +36,7 @@ cmd(void)
 		}
 	}
 	if(i == CMD_NUM)
-		kprintf(1, "Unknown command '%s'\n", cmd_name);
+		kprintf("Unknown command '%s'\n", cmd_name);
 }
 
 void

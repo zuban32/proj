@@ -17,10 +17,10 @@ typedef __builtin_va_list va_list;
 void kendline(void);
 void kclear_screen(void);
 void kbackspace(void);
-void kprints(char *, char );
-void kprintint(int , int , char);
+void kprints(char *);
+void kprintint(int , int);
 void kputc(char , char);
-void kprintf(char , const char *, ...);
+void kprintf(const char *, ...);
 
 
 #endif

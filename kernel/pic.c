@@ -52,7 +52,7 @@ pic_init(uint8_t off1, uint8_t off2)
 	UNMASK(1, 4);
 
 
-	kprintf(1, "Masks: %b %b\n", m1, m2);
+	kprintf("Masks: %b %b\n", m1, m2);
 
 	pic_set_mask(m1, m2);
 	// __asm__("sti");

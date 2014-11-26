@@ -20,18 +20,18 @@ init_pages(void)
     for (i = 0; i < 10; i++)
     {
         if ((uint32_t)pgdir % PGSIZE)
-            kprintf(1, "pgdir isn't aligned\n");
+            kprintf("pgdir isn't aligned\n");
         if ((uint32_t)&pgtbl[i][0] % PGSIZE)
-            kprintf(1, "pgtbl addr in entry #%d isn't aligned\n", i);
-        // kprintf(1, "%x\n", &pgtbl);
+            kprintf("pgtbl addr in entry #%d isn't aligned\n", i);
+        // kprintf("%x\n", &pgtbl);
         pgdir[i] = ((uint32_t)&pgtbl[i] & ~(PGSIZE - 1));
-        kprintf(1, "pgdir[%d] = %x\n", i, pgdir[i]);
+        kprintf("pgdir[%d] = %x\n", i, pgdir[i]);
 
         pgdir[i] |= 3;
         for (j = 0; j < PGS_NUM; j++)
         {
             // if (addr == 0x405000)
-                // kprintf(1, "addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
+                // kprintf("addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
             if(addr == 0x27ff000)
@@ -46,19 +46,19 @@ init_pages(void)
 	uint32_t tbl_ind = (x & (0x3ff << 12))>>12;
 	// eff = pgdir[eff] & (~(PGSIZE - 1));
 	uint32_t *tbl_addr = (uint32_t *)(pgdir[dir_ind] & ~(PGSIZE - 1));
-	kprintf(1, "&pgtbl[%d] = %x\n", dir_ind, tbl_addr);
+	kprintf("&pgtbl[%d] = %x\n", dir_ind, tbl_addr);
 	tbl_addr += tbl_ind;
 
 	uint32_t res = (*tbl_addr) & (~(PGSIZE - 1));
 	res += x & 4095;
     // eff &= 
-    kprintf(1, "%x -> %x\n", x, res);
+    kprintf("%x -> %x\n", x, res);
 
-    // kprintf(1, "pgtbl end = %x\n", &pgtbl[0] + 2);
+    // kprintf("pgtbl end = %x\n", &pgtbl[0] + 2);
     // while(1);
 
-    kprintf(1, "pgdir addr = %x\n", pgdir);
-    kprintf(1, "Pages inited\n");
+    kprintf("pgdir addr = %x\n", pgdir);
+    kprintf("Pages inited\n");
 
     __asm__ __volatile__(
         "mov %0, %%eax\t\n"
@@ -68,7 +68,7 @@ init_pages(void)
         "mov %%eax, %%cr0\t\n"
         ::"g"(pgdir): "eax");
 
-    kprintf(1, "IDT addr = %x\n", idt_tbl);
+    kprintf("IDT addr = %x\n", idt_tbl);
     // while(1);
 }
 

@@ -23,7 +23,7 @@ const char *cmd_helps[CMD_NUM] =
 void
 cmd_isr(void)
 {
-	kprintf(1, "isr #%d will be created\n", params[0]);
+	kprintf("isr #%d will be created\n", params[0]);
 	addISR(params[0], 0x8, i386_GATE);
 }
 
@@ -32,7 +32,7 @@ cmd_listisr(void)
 {
 	for(int i = 0; i < IDTSIZE; i++)
 		if(idt_tbl[i].offset1 || idt_tbl[i].offset2)
-			kprintf(1, "%d ", i);
+			kprintf("%d ", i);
 	kendline();
 }
 
@@ -55,7 +55,7 @@ void
 cmd_help(void)
 {
 	for(int i = 0; i < CMD_NUM; i++)
-		kprintf(1, "%s - %s\n", cmd_names[i], cmd_helps[i]);
+		kprintf("%s - %s\n", cmd_names[i], cmd_helps[i]);
 }
 
 extern uint32_t pgtbl[][PGS_NUM];
@@ -64,7 +64,7 @@ void
 cmd_check(void)
 {
 	pgtbl[9][PGS_NUM - 1] &= ~1; 
-	kprintf(1, "Checking pagefault\n");
+	kprintf("Checking pagefault\n");
 	char *x = (char *)CHECKADDR;
 	*x = 0;
 }

@@ -10,7 +10,7 @@ extern char input_on;
 void
 divz_hndl(void)
 {
-	kprintf(1, "Division by zero\n");
+	kprintf("Division by zero\n");
 	while(1);
 }
 
@@ -20,7 +20,7 @@ kbd_hndl(void)
 	uint8_t sc = inb(0x60);
 
 	// for(int i = 0x30; i < 0x39; i++)
-	// 	kprintf(1, "sc[%x] = %c\n", i, scancodes[i]);
+	// 	kprintf("sc[%x] = %c\n", i, scancodes[i]);
 	if(sc > 0 && sc < 0x40)
 	{
 		if(input_on)
@@ -56,21 +56,21 @@ kbd_hndl(void)
 void
 df_hndl(void)
 {
-	kprintf(1, "Double fault\n");
+	kprintf("Double fault\n");
 	while(1);
 }
 
 void
 pf_hndl(void)
 {
-	kprintf(1, "Page fault\n");
+	kprintf("Page fault\n");
 	while(1);
 }
 
 void
 gpf_hndl(void)
 {
-	kprintf(1, "GP fault\n");
+	kprintf("GP fault\n");
 	while(1);
 }
 

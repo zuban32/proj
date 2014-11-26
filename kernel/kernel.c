@@ -18,19 +18,19 @@ kernel_main(void)
 {
     // __asm__ volatile("sti\t\n");
     kclear_screen();
-    kprintf(1, "%d %x\n", -500, 0xfffaa);
+    kprintf("%d %x\n", -500, 0xfffaa);
 
     pic_init(0x20, 0x28);
-    kprintf(1, "PIC inited\n");
+    kprintf("PIC inited\n");
     load_idt();
     init_serial();
 
     // int x = 5 / 0;
 
     kstoi("112515");
-    kprintf(1, "All inited exc pages\n");
+    kprintf("All inited exc pages\n");
     init_pages();
-    kprintf(1, "All inited\n");
+    kprintf("All inited\n");
 
     while (1)
         cmd();

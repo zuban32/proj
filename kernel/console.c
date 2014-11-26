@@ -40,7 +40,7 @@ kbackspace(void)
 }
 
 void
-kprints(char *str, char move_bound)
+kprints(char *str)
 {
     // char *mem = VGA_MEM + (cur_pos << 1);
     while (*str)
@@ -54,10 +54,10 @@ kprints(char *str, char move_bound)
 }
 
 void
-kprintint(int c, int base, char move_bound)
+kprintint(int c, int base)
 {
     if (c < 0)
-        kputc('-', move_bound), c = -c;
+        kputc('-', 1), c = -c;
     char *mem = VGA_MEM + (cur_pos << 1);
     int res = c > 0 ? c : -c;
     int mult = 1, tmp = res;
@@ -70,17 +70,17 @@ kprintint(int c, int base, char move_bound)
     do
     {
         int tmp = res / mult + '0';
-        kputc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'), move_bound);
+        kputc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'), 1);
         res %= mult;
     }
     while (mult /= base);
 }
 
 void
-kprintf(char move_bound, const char *fstr, ...)
+kprintf(const char *fstr, ...)
 {
     if (!fstr)
-        kprintf(1, "String empty\n");
+        kprintf("String empty\n");
     va_list p;
     va_start(p, fstr);
     int d;
@@ -95,24 +95,24 @@ kprintf(char move_bound, const char *fstr, ...)
             {
             case 'b':
                 x = va_arg(p, uint32_t);
-                kprintint(x, 2, move_bound);
+                kprintint(x, 2);
                 break;
             case 'd':
                 d = va_arg(p, int);
-                kprintint(d, 10, move_bound);
+                kprintint(d, 10);
                 break;
             case 'x':
                 x = va_arg(p, uint32_t);
-                kprintf(move_bound, "0x");
-                kprintint(x, 16, move_bound);
+                kprintf("0x");
+                kprintint(x, 16);
                 break;
             case 's':
                 s = va_arg(p, char *);
-                kprints(s, move_bound);
+                kprints(s);
                 break;
             case 'c':
                 c  = va_arg(p, int);
-                kputc(c, move_bound);
+                kputc(c, 1);
                 break;
             default:
                 break;
@@ -121,7 +121,7 @@ kprintf(char move_bound, const char *fstr, ...)
         else if (*str == '\n')
             kendline();
         else
-            kputc(*str, move_bound);
+            kputc(*str, 1);
     }
     va_end(p);
 }
