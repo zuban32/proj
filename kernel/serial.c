@@ -1,5 +1,6 @@
 #include "serial.h"
 #include "common.h"
+#include "console.h"
 
 void 
 init_serial() 
@@ -12,6 +13,8 @@ init_serial()
    	outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
    	outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
    	outb(COM1 + 1, 0x1);
+
+      kprintf("Serial inited\n");
 }
 
 int 
@@ -23,12 +26,10 @@ serial_received()
 char 
 read_serial() 
 {
-	// kprintf(1, "Reading from serial\n");
    	if (serial_received() == 0)
    		return -1;
  
    	char res = inb(COM1);
-   	// kprintf(1, "Got %d from serial\n", res);
    	return res;
 }
 
@@ -42,6 +43,5 @@ void
 write_serial(char a) 
 {
    	while (is_transmit_empty() == 0);
- 
    	outb(COM1, a);
 }

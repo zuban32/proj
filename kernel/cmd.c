@@ -46,6 +46,7 @@ parse_cmd(void)
 	uint32_t num = 0;
 	char *s = kbd_buf;
 	char *nm = cmd_name;
+	while(k_isspace(*s) && *s) s++;
 	while(!k_isspace(*s) && *s)
 		*nm++ = *s++;
 	*nm++ = 0;

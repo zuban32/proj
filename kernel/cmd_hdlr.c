@@ -1,9 +1,9 @@
 #include "console.h"
 #include "cmd.h"
 #include "string.h"
-#include "kbd.h"
 #include "idt.h"
 #include "isr.h"
+#include "paging.h"
 
 extern char *cmd_names[];
 extern struct idt_entry idt_tbl[];

@@ -45,15 +45,13 @@ pic_init(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6b);
 	outb(PIC_S_CMD, 0x6b);
 
-	// m1 |= 0x1;
-	// m1 = 0xff;
-	// m2 |= 0xff;
 	MASK(1, 0);
 	UNMASK(1, 4);
-
 
 	kprintf("Masks: %b %b\n", m1, m2);
 
 	pic_set_mask(m1, m2);
+
+	kprintf("PIC inited\n");
 	// __asm__("sti");
 }

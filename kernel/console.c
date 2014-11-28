@@ -29,8 +29,6 @@ kclear_screen(void)
 void
 kbackspace(void)
 {
-    // kprintf("move bound %s\n", move_bound ? "enabled" : "disabled");
-    // kprintf("cur_pos = %d, cur_bound = %d\n", cur_pos, cur_bound);
     if (!cur_pos || cur_pos <= cur_bound)
         return;
     char *mem = VGA_MEM + ((cur_pos -= 1) << 1);
@@ -42,15 +40,8 @@ kbackspace(void)
 void
 kprints(char *str)
 {
-    // char *mem = VGA_MEM + (cur_pos << 1);
     while (*str)
-    {
-        // *mem++ = *str, *mem++ = VGA_MODE;
         kputc(*str++, 1);
-    }
-    // cur_pos = (mem - VGA_MEM) >> 1;
-    // if(move_bound)
-    //  cur_bound = cur_pos;
 }
 
 void
@@ -80,7 +71,7 @@ void
 kprintf(const char *fstr, ...)
 {
     if (!fstr)
-        kprintf("String empty\n");
+        kprintf("Format string empty\n");
     va_list p;
     va_start(p, fstr);
     int d;
@@ -130,7 +121,7 @@ void
 kputc(char c, char move_bound)
 {
     char *mem = VGA_MEM + (cur_pos << 1);
-    // if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT)
+    if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT)
     {
         *mem++ = c;
         *mem++ = VGA_MODE;

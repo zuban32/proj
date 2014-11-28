@@ -11,7 +11,6 @@ void
 divz_hndl(void)
 {
 	kprintf("Division by zero\n");
-	while(1);
 }
 
 void
@@ -19,8 +18,6 @@ kbd_hndl(void)
 {
 	uint8_t sc = inb(0x60);
 
-	// for(int i = 0x30; i < 0x39; i++)
-	// 	kprintf("sc[%x] = %c\n", i, scancodes[i]);
 	if(sc > 0 && sc < 0x40)
 	{
 		if(input_on)
@@ -47,7 +44,6 @@ kbd_hndl(void)
 				break;
 			default:
 				kputc(scancodes[sc], 0);
-
 		}
 	}
 	pic_sendEOI(1);
@@ -56,6 +52,7 @@ kbd_hndl(void)
 void
 df_hndl(void)
 {
+	// asm volatile ("cli\n\t");
 	kprintf("Double fault\n");
 	while(1);
 }
@@ -63,15 +60,15 @@ df_hndl(void)
 void
 pf_hndl(void)
 {
+	asm volatile ("cli\n\t");
 	kprintf("Page fault\n");
-	while(1);
 }
 
 void
 gpf_hndl(void)
 {
+	asm volatile ("cli\n\t");
 	kprintf("GP fault\n");
-	while(1);
 }
 
 void

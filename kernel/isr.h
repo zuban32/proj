@@ -22,9 +22,9 @@ void com_hndl(void);
 
 static uintptr_t isr[MAX_ISR] = 
 {
-	(uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0, 					//0x0
-	(uintptr_t)&df_hndl, 0, 0, 0, 0, 0, (uintptr_t)&pf_hndl, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,										//0x10
+	(uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0, 									//0x0
+	(uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_hndl, (uintptr_t)&pf_hndl, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,															//0x10
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, (uintptr_t)&kbd_hndl, 0, 0, (uintptr_t)&com_hndl
 };
