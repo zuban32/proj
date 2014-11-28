@@ -1,6 +1,6 @@
-#include "paging.h"
-#include "console.h"
-#include "common.h"
+#include <inc/paging.h>
+#include <inc/console.h>
+#include <inc/common.h>
 
 uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE)));
 uint32_t pgdir[PGS_NUM] __attribute__ ((aligned (PGSIZE)));

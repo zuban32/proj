@@ -1,9 +1,9 @@
-#include "console.h"
-#include "cmd.h"
-#include "string.h"
-#include "idt.h"
-#include "isr.h"
-#include "paging.h"
+#include <inc/console.h>
+#include <inc/cmd.h>
+#include <inc/string.h>
+#include <inc/idt.h>
+#include <inc/isr.h>
+#include <inc/paging.h>
 
 extern char *cmd_names[];
 extern struct idt_entry idt_tbl[];
@@ -12,13 +12,10 @@ extern uint32_t params[];
 const char *cmd_helps[CMD_NUM] = 
 {"create ISR #param0", 
  "list all existing ISRs", 
- "interrupts with #param0", 
+ "run test with #param0", 
  "clear screen", 
- "show this help",
- "check pagefault"
+ "show this help"
 };
-
-#define INT_INSTR 0xCD
 
 void
 cmd_isr(void)
@@ -37,12 +34,11 @@ cmd_listisr(void)
 }
 
 void
-cmd_int(void)
+cmd_test(void)
 {
-	char *test = (char *)TESTBASE;
-	*test++ = INT_INSTR;
-	*test++ = (char)params[0];
-	asm volatile("jmp %0\n"::"r"(test - 2));
+	// void test();
+	// asm volatile("jmp %0\n"::"r"(&test));
+	test(params[0]);
 }
 
 void
@@ -56,15 +52,4 @@ cmd_help(void)
 {
 	for(int i = 0; i < CMD_NUM; i++)
 		kprintf("%s - %s\n", cmd_names[i], cmd_helps[i]);
-}
-
-extern uint32_t pgtbl[][PGS_NUM];
-
-void
-cmd_check(void)
-{
-	pgtbl[9][PGS_NUM - 1] &= ~1; 
-	kprintf("Checking pagefault\n");
-	char *x = (char *)CHECKADDR;
-	*x = 0;
 }

@@ -1,6 +1,6 @@
-#include "console.h"
-#include "common.h"
-#include "serial.h"
+#include <inc/console.h>
+#include <inc/common.h>
+#include <inc/serial.h>
 
 static unsigned cur_pos = 0;
 static unsigned cur_bound = 0;

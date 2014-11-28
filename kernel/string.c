@@ -1,5 +1,6 @@
-#include "string.h"
-#include "console.h"
+#include <inc/string.h>
+#include <inc/console.h>
+#include <inc/common.h>
 
 int k_isspace(char c)
 {

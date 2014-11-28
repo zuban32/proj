@@ -1,9 +1,9 @@
-#include "console.h"
-#include "cmd.h"
-#include "string.h"
-#include "kbd.h"
-#include "idt.h"
-#include "isr.h"
+#include <inc/console.h>
+#include <inc/cmd.h>
+#include <inc/string.h>
+#include <inc/kbd.h>
+#include <inc/idt.h>
+#include <inc/isr.h>
 
 extern char input_on;
 extern char kbd_buf[];
@@ -11,8 +11,8 @@ extern char kbd_buf[];
 char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];
 
-const char *cmd_names[CMD_NUM] = {"isr", "listisr", "int", "clear", "help", "check"};
-void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_int, &cmd_clear, &cmd_help, &cmd_check};
+const char *cmd_names[CMD_NUM] = {"isr", "listisr", "test", "clear", "help"};
+void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_test, &cmd_clear, &cmd_help};
 
 
 void 

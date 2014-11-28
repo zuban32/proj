@@ -1,9 +1,9 @@
-#include "console.h"
-#include "idt.h"
-#include "pic.h"
-#include "cmd.h"
-#include "serial.h"
-#include "paging.h"
+#include <inc/console.h>
+#include <inc/idt.h>
+#include <inc/pic.h>
+#include <inc/cmd.h>
+#include <inc/serial.h>
+#include <inc/paging.h>
 
 int
 kernel_main(void)

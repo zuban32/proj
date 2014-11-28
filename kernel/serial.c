@@ -1,6 +1,6 @@
-#include "serial.h"
-#include "common.h"
-#include "console.h"
+#include <inc/serial.h>
+#include <inc/common.h>
+#include <inc/console.h>
 
 void 
 init_serial() 

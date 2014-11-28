@@ -1,7 +1,7 @@
-#include "isr.h"
-#include "pic.h"
-#include "console.h"
-#include "serial.h"
+#include <inc/isr.h>
+#include <inc/pic.h>
+#include <inc/console.h>
+#include <inc/serial.h>
 
 extern char *cur_buf;
 extern const char scancodes[];
@@ -62,6 +62,7 @@ pf_hndl(void)
 {
 	asm volatile ("cli\n\t");
 	kprintf("Page fault\n");
+	while(1);
 }
 
 void
@@ -69,6 +70,7 @@ gpf_hndl(void)
 {
 	asm volatile ("cli\n\t");
 	kprintf("GP fault\n");
+	while(1);
 }
 
 void

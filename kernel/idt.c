@@ -1,8 +1,8 @@
-#include "idt.h"
-#include "pic.h"
-#include "isr.h"
-#include "console.h"
-#include "paging.h"
+#include <inc/idt.h>
+#include <inc/pic.h>
+#include <inc/isr.h>
+#include <inc/console.h>
+#include <inc/paging.h>
 
 extern uintptr_t isr[];
 
@@ -28,7 +28,7 @@ load_idt(void)
     addISR(ISR_KBD, 0x8, i386_TRAP);
     addISR(ISR_COM1, 0x8, i386_TRAP);
     addISR(ISR_PFAULT, 0x8, i386_GATE);
-    // addISR(ISR_GPFAULT, 0x8, i386_GATE);
+    addISR(ISR_GPFAULT, 0x8, i386_GATE);
 
 
     uint32_t p = (uint32_t)&idtr;

@@ -1,5 +1,5 @@
-#include "pic.h"
-#include "console.h"
+#include <inc/pic.h>
+#include <inc/console.h>
 
 #define MASK(i, n) m##i |= 1 << n
 #define UNMASK(i, n) m##i &= ~(1 << n)

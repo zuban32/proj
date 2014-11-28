@@ -1,7 +1,7 @@
 #ifndef PIC_H_INCLUDED
 #define PIC_H_INCLUDED
 
-#include "common.h"
+#include "inc/common.h"
 
 #define PIC_M_CMD 0x20
 #define PIC_M_DATA 0x21

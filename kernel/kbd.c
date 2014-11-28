@@ -1,5 +1,5 @@
-#include "console.h"
-#include "kbd.h"
+#include <inc/console.h>
+#include <inc/kbd.h>
 
 #define BUF_SIZE 4096
 
