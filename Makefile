@@ -23,7 +23,7 @@ all: boot.bin kernel.bin
 
 gdb: boot.bin kernel.bin
 	@cat $^ > os.disk
-	@qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio -d int
+	@qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio
 
 boot.bin: $(BOOT_SRCS)
 	@echo "Compiling bootloader"
@@ -55,4 +55,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@qemu-system-i386 -fda os.disk -serial stdio
+	@qemu-system-i386 -fda os.disk -serial stdio -d exec

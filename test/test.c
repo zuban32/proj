@@ -16,8 +16,7 @@ test(uint32_t type)
         asm("int $13\n\t");
         break;
     case 1:
-		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~1; 
-
+		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_R | PAGE_U); 
 		kprintf("Checking pagefault\n");
 		char *x = (char *)CHECKADDR;
 		char p = *x;
@@ -26,10 +25,15 @@ test(uint32_t type)
 		p = *x;
 		kprintf("End\n");
 		break;
-	case 2:
-		asm volatile("int $14\n\t"
-			"maskmovq %%mm1, %%mm2\n\t":::"cc", "memory");
-
+	case 2: 
+		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_R | PAGE_U); 
+		kprintf("1\n");
+		int res;
+		asm volatile("movd %%mm2, %%eax\n\t":"=a"(res));
+		kprintf("mm2 = %x\n", res);
+		// while(1);
+		asm volatile("movl $0x27ff010, %%edi\n\tmaskmovq %%mm2, %%mm1\n\t"::"g"(CHECKADDR):"memory");
+		kprintf("2\n");
 		break;
     default:
         break;
