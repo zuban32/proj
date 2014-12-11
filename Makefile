@@ -1,9 +1,9 @@
 CC = gcc
 LD = @ld
-AS = @nasm
+AS = nasm
 CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc
-LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary
-DLDFLAGS = -melf_i386 -Ttext 0x1000
+LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
+DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
@@ -23,7 +23,7 @@ all: boot.bin kernel.bin
 
 gdb: boot.bin kernel.bin
 	@cat $^ > os.disk
-	@qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio
+	@qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio -d int
 
 boot.bin: $(BOOT_SRCS)
 	@echo "Compiling bootloader"
@@ -31,14 +31,15 @@ boot.bin: $(BOOT_SRCS)
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@mkdir -p $(OBJDIR) 2>/dev/null
-	$(AS) $(KERNEL_ASM) $(ASKERNFLAGS) -o $(KERNEL_OBJ1)
+	@echo $(KERNEL_OBJ1)
+	@$(foreach var, $(KERNEL_ASM), $(AS) $(ASKERNFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.asm=.o));)
 	@echo 'Compiling kernel'
-	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o)) 2> /dev/null;)
+	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o));)
 	@echo 'Compiling test' 
 	@$(CC) $(CFLAGS) $(TEST_C) -o $(TEST_OBJ)
 
 kernel.asm: kernel.obj
-	$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $(OBJDIR)$< 2>/dev/null
+	$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $(OBJDIR)$<
 	@echo "Dumping kernel"
 	@objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
@@ -49,7 +50,7 @@ kernel.bin: kernel.obj kernel.asm
 
 clean:
 	@rm -r -f $(OBJDIR)
-	@cd test && rm -f *.o
+	@cd test && rm -f *.o *.bin *.asm
 	@rm -f *.o *~ *.disk *.bin *.elf .gdbinit
 
 run: all

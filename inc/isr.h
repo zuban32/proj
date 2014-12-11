@@ -20,10 +20,13 @@ void gpf_hndl(void);
 void pf_hndl(void);
 void com_hndl(void);
 
+extern void pf_start(void);
+extern void gpf_start(void);
+
 static uintptr_t isr[MAX_ISR] = 
 {
 	(uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0, 									//0x0
-	(uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_hndl, (uintptr_t)&pf_hndl, 0,
+	(uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_start, (uintptr_t)&pf_start, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,															//0x10
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, (uintptr_t)&kbd_hndl, 0, 0, (uintptr_t)&com_hndl

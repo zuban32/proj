@@ -50,7 +50,7 @@ kprintint(int c, int base)
     if (c < 0)
         kputc('-', 1), c = -c;
     char *mem = VGA_MEM + (cur_pos << 1);
-    int res = c > 0 ? c : -c;
+    int res = c;
     int mult = 1, tmp = res;
 
     do

@@ -8,6 +8,7 @@
 int
 kernel_main(void)
 {
+	kprintf("%x\n", 0x0);
     kclear_screen();
 
     pic_init(0x20, 0x28);

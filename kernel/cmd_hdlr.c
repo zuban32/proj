@@ -21,7 +21,7 @@ void
 cmd_isr(void)
 {
 	kprintf("isr #%d will be created\n", params[0]);
-	addISR(params[0], 0x8, i386_GATE);
+	addISR(params[0], 0x8, i386_INT);
 }
 
 void

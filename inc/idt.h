@@ -5,7 +5,7 @@
 
 #define IDTSIZE 0x40
 
-#define i386_GATE 0x8e
+#define i386_INT 0x8e
 #define i386_TRAP 0x8f
 
 void addISR(uint8_t, uint16_t, uint8_t);

@@ -23,12 +23,12 @@ addISR(uint8_t ind, uint16_t selector, uint8_t type)
 void
 load_idt(void)
 {
-    addISR(ISR_ZERO, 0x8, i386_GATE);
-    addISR(ISR_DFAULT, 0x8, i386_GATE);
+    addISR(ISR_ZERO, 0x8, i386_INT);
+    addISR(ISR_DFAULT, 0x8, i386_INT);
     addISR(ISR_KBD, 0x8, i386_TRAP);
     addISR(ISR_COM1, 0x8, i386_TRAP);
-    addISR(ISR_PFAULT, 0x8, i386_GATE);
-    addISR(ISR_GPFAULT, 0x8, i386_GATE);
+    addISR(ISR_PFAULT, 0x8, i386_INT);
+    addISR(ISR_GPFAULT, 0x8, i386_INT);
 
 
     uint32_t p = (uint32_t)&idtr;
