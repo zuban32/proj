@@ -10,7 +10,7 @@ init_pages(void)
 {
     unsigned long long addr = 0;
     uint32_t i, j;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 20; i++)
     {
         if ((uint32_t)pgdir % PGSIZE)
             kprintf("pgdir isn't aligned\n");
@@ -31,7 +31,7 @@ init_pages(void)
         }
     }
 
-    // kprintf("pgdir addr = %x\n", pgdir);
+    kprintf("pgdir addr = %x\n", pgdir);
     kprintf("Pages inited\n");
 
     __asm__ __volatile__(
