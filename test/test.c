@@ -26,14 +26,11 @@ test(uint32_t type)
 		kprintf("End\n");
 		break;
 	case 2: 
-		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_R | PAGE_U); 
-		kprintf("1\n");
-		int res;
-		asm volatile("movd %%mm2, %%eax\n\t":"=a"(res));
-		kprintf("mm2 = %x\n", res);
-		// while(1);
-		asm volatile("movl $0x27ff010, %%edi\n\tmaskmovq %%mm2, %%mm1\n\t"::"g"(CHECKADDR):"memory");
-		kprintf("2\n");
+		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P); 
+		// int res;
+		// asm volatile("movd %%mm2, %%eax\n\t":"=a"(res));
+		// kprintf("mm2 = %x\n", res);
+		asm volatile("movl $0x27ff010, %%edi\n\tmaskmovdqu %%xmm2, %%xmm1\n\t":::"memory");
 		break;
     default:
         break;
