@@ -37,8 +37,10 @@ test(uint32_t type)
         // kprintf("mm2 = %x\n", res);
         asm volatile("add $1, %0\n\t"
         			 "mov $0x27ff010, %%edi\n\t"
-        			 "maskmovdqu %%xmm2, %%xmm1\n\t"::
-        			 "m"(res):"memory"
+        			 "maskmovq %%mm2, %%mm1\n\t"
+        			 "maskmovdqu %%xmm2, %%xmm1\n\t"
+        			 // "mov (%%edi), %%eax\n\t"
+        			 ::"m"(res):"memory", "%eax"
         			 );
 
         kprintf("res = %d\n", res);
