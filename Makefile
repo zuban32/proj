@@ -59,4 +59,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@qemu-system-i386 -fda os.disk -serial stdio -d out_asm,in_asm 2> dump.asm
+	@qemu-system-i386 -fda os.disk -serial stdio

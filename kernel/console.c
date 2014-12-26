@@ -29,10 +29,13 @@ kclear_screen(void)
 void
 kbackspace(void)
 {
-    if (!cur_pos || cur_pos <= cur_bound)
+    if(cur_pos <= cur_bound)
         return;
-    char *mem = VGA_MEM + ((cur_pos -= 1) << 1);
-    *mem++ = 0, *mem = 0;
+    if (cur_pos >= 0 && cur_pos < DISPLAY_HEIGHT * DISPLAY_WIDTH)
+    {
+        char *mem = VGA_MEM + ((cur_pos -= 1) << 1);
+        *mem++ = 0, *mem = 0;
+    }
     write_serial('\b');
     *(cur_buf -= (cur_buf > kbd_buf) ? 1 : 0) = 0;
 }
@@ -121,7 +124,7 @@ void
 kputc(char c, char move_bound)
 {
     char *mem = VGA_MEM + (cur_pos << 1);
-    if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT)
+    if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT && cur_pos >= 0)
     {
         *mem++ = c;
         *mem++ = VGA_MODE;
