@@ -29,7 +29,7 @@ kclear_screen(void)
 void
 kbackspace(void)
 {
-    if(cur_pos <= cur_bound)
+    if (cur_pos <= cur_bound)
         return;
     if (cur_pos >= 0 && cur_pos < DISPLAY_HEIGHT * DISPLAY_WIDTH)
     {
@@ -74,7 +74,7 @@ void
 kprintf(const char *fstr, ...)
 {
     if (!fstr)
-        kprintf("Format string empty\n");
+        kprintf("Format string empty\n");       //return error code
     va_list p;
     va_start(p, fstr);
     int d;
@@ -123,9 +123,9 @@ kprintf(const char *fstr, ...)
 void
 kputc(char c, char move_bound)
 {
-    char *mem = VGA_MEM + (cur_pos << 1);
     if (cur_pos < DISPLAY_WIDTH * DISPLAY_HEIGHT && cur_pos >= 0)
     {
+        char *mem = VGA_MEM + (cur_pos << 1);
         *mem++ = c;
         *mem++ = VGA_MODE;
         cur_pos ++;

@@ -18,10 +18,18 @@ void (*cmds[CMD_NUM])(void) = {&cmd_isr, &cmd_listisr, &cmd_test, &cmd_clear, &c
 void 
 cmd(void)
 {
+	// int res;
+
+	// asm volatile("movl %%esp, %%eax\n\t":"=a"(res));
+	// kprintf("esp = %x\n", res);
+
+	// asm volatile("movl %%ebp, %%eax\n\t":"=a"(res));
+	// kprintf("ebp = %x\n", res);
 	kprintf("K> ");
 	clear_buf();
 	input_on = 1;
 	while(input_on);
+
 
 	// kprintf(1, "Cmd got: %s\n", kbd_buf);
 	parse_cmd();
@@ -37,6 +45,12 @@ cmd(void)
 	}
 	if(i == CMD_NUM)
 		kprintf("Unknown command '%s'\n", cmd_name);
+
+	// asm volatile("movl %%esp, %%eax\n\t":"=a"(res));
+	// kprintf("esp = %x\n", res);
+
+	// asm volatile("movl %%ebp, %%eax\n\t":"=a"(res));
+	// kprintf("ebp = %x\n", res);
 }
 
 void

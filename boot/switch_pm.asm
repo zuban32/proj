@@ -2,7 +2,6 @@
 switch_pm:
 
     cli
-
     
     lgdt [gdt_descriptor]
   
@@ -23,7 +22,7 @@ prot_mode:
     mov ss, ax
     
     
-    mov ebp, 0x900000
+    mov ebp, 0x900000       ;kernel stack top
     mov esp, ebp
      
     call begin_PM

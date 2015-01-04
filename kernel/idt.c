@@ -32,7 +32,7 @@ load_idt(void)
 
 
     uint32_t p = (uint32_t)&idtr;
-    // __asm__ __volatile__("lidt (%0)"::"p"(p) );
-    asm volatile("lidt (%%eax)\n\t"::"a"(p));
+    __asm__ __volatile__("lidt (%0)"::"p"(p) );
+    // asm volatile("lidt (%%eax)\n\t"::"a"(p));
 
 }

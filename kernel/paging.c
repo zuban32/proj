@@ -20,16 +20,18 @@ init_pages(void)
         pgdir[i] = ((uint32_t)&pgtbl[i] & ~(PGSIZE - 1));
         // kprintf("pgdir[%d] = %x\n", i, pgdir[i]);
 
-        pgdir[i] |= PAGE_R | PAGE_P;
+        pgdir[i] |= PAGE_W | PAGE_P;
         for (j = 0; j < PGS_NUM; j++)
         {
             // if (addr == 0x405000)
                 // kprintf("addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
-            pgtbl[i][j] |= PAGE_R | PAGE_P;
+            pgtbl[i][j] |= PAGE_W | PAGE_P;
         }
     }
+
+    kprintf("last_addr = %x\n", addr);
 
     kprintf("pgdir addr = %x\n", pgdir);
     kprintf("Pages inited\n");

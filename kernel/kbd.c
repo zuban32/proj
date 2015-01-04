@@ -1,8 +1,6 @@
 #include <inc/console.h>
 #include <inc/kbd.h>
 
-#define BUF_SIZE 4096
-
 char input_on = 0;
 char kbd_buf[BUF_SIZE];
 char *cur_buf = kbd_buf;

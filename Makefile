@@ -1,7 +1,7 @@
 CC = gcc
 LD = @ld
 AS = nasm
-CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc
+CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc -fno-builtin
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin

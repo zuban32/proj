@@ -5,7 +5,7 @@ pf_start:
 	extern pf_hndl
 	call pf_hndl
 	popad
-	add esp, 4
+	add esp, 4 		;skip errno
 	iret
 
 global gpf_start

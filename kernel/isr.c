@@ -3,8 +3,10 @@
 #include <inc/console.h>
 #include <inc/serial.h>
 #include <inc/paging.h>
+#include <inc/kbd.h>
 
 extern char *cur_buf;
+extern char kbd_buf[];
 extern const char scancodes[];
 extern char input_on;
 
@@ -27,10 +29,14 @@ kbd_hndl(void)
             {
                 if (sc != 0xe)
                     *cur_buf++ = scancodes[sc];
+                if(cur_buf - kbd_buf == BUF_SIZE)
+                    cur_buf = kbd_buf;
             }
             else
             {
                 *cur_buf++ = 0;
+                if(cur_buf - kbd_buf == BUF_SIZE)
+                    cur_buf = kbd_buf;
                 input_on = 0;
             }
         }
@@ -58,7 +64,6 @@ df_hndl(void)
 }
 
 extern uint32_t pgtbl[][PGS_NUM];
-#define CHECKADDR 0x27ff010
 
 static int gpf_count = 0;
 
@@ -66,13 +71,24 @@ void
 pf_hndl(void)
 {
     gpf_count = 0;
-    kprintf("Page fault\n");
-    int res1, res2;
-    asm volatile("movl 80(%%esp), %%eax\n\t":"=a"(res1));
-    asm volatile("movl 84(%%esp), %%eax\n\t":"=a"(res2));
-    kprintf("error (or ret_eip) = %x, ret_eip(or ret_cs) = %x\n", res1, res2);
-    pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= 1;
-    kprintf("Returning\n");
+    kprintf("\nPage fault\n");
+    int err_code = 0, ret_eip = 0, err_addr = 0;
+
+    asm volatile("movl 80(%%esp), %%eax\n\t":"=a"(err_code));
+    asm volatile("movl 84(%%esp), %%eax\n\t":"=a"(ret_eip));
+
+    kprintf("error: ");
+
+    kprintf((!(err_code & PAGE_U)) ? "kernel "       : "user ");
+    kprintf((!(err_code & PAGE_W)) ? "read "         : "write ");
+    kprintf((!(err_code & PAGE_P)) ? "non-present "  : "present ");
+
+    kprintf("\n");
+
+    asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
+    kprintf("fault addr = %x\n\n", err_addr);
+
+    pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
 }
 
 void
@@ -80,13 +96,6 @@ gpf_hndl(void)
 {
 	gpf_count++;
     kprintf("GP fault\n");
-    int res1, res2;
-    asm volatile("movl 80(%%esp), %%eax\n\t":"=a"(res1));
-    asm volatile("movl 84(%%esp), %%eax\n\t":"=a"(res2));
-    kprintf("error (or ret_eip) = %x, ret_eip(or ret_cs) = %x\n", res1, res2);
-    kprintf("Returning\n");
-    if (gpf_count >= 3)
-        while (1);
 }
 
 void
