@@ -30,6 +30,14 @@ cmd(void)
 	input_on = 1;
 	while(input_on);
 
+	uint32_t ret_addr = 0;
+
+	asm volatile (
+		"mov 0x1c(%%esp), %%eax\n\t"
+		:"=a"(ret_addr)
+	);
+
+	kprintf("ret_addr = %x\n", ret_addr);
 
 	// kprintf(1, "Cmd got: %s\n", kbd_buf);
 	parse_cmd();
@@ -45,6 +53,13 @@ cmd(void)
 	}
 	if(i == CMD_NUM)
 		kprintf("Unknown command '%s'\n", cmd_name);
+
+	asm volatile (
+		"mov 0x1c(%%esp), %%eax\n\t"
+		:"=a"(ret_addr)
+	);
+
+	kprintf("ret_addr = %x\n", ret_addr);
 
 	// asm volatile("movl %%esp, %%eax\n\t":"=a"(res));
 	// kprintf("esp = %x\n", res);

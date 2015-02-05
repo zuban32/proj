@@ -29,13 +29,13 @@ kbd_hndl(void)
             {
                 if (sc != 0xe)
                     *cur_buf++ = scancodes[sc];
-                if(cur_buf - kbd_buf == BUF_SIZE)
+                if (cur_buf - kbd_buf == BUF_SIZE)
                     cur_buf = kbd_buf;
             }
             else
             {
                 *cur_buf++ = 0;
-                if(cur_buf - kbd_buf == BUF_SIZE)
+                if (cur_buf - kbd_buf == BUF_SIZE)
                     cur_buf = kbd_buf;
                 input_on = 0;
             }
@@ -70,6 +70,7 @@ static int gpf_count = 0;
 void
 pf_hndl(void)
 {
+    // asm volatile("pushal\n\t");
     gpf_count = 0;
     kprintf("\nPage fault\n");
     int err_code = 0, ret_eip = 0, err_addr = 0;
@@ -89,19 +90,21 @@ pf_hndl(void)
     kprintf("fault addr = %x\n\n", err_addr);
 
     pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
+    // asm volatile("add $4, %esp\n\t"
+    //     "popal\n\t"
+    //     "iret\n\t");
 }
 
 void
 gpf_hndl(void)
 {
-	gpf_count++;
+    gpf_count++;
     kprintf("GP fault\n");
 }
 
 void
 com_hndl(void)
 {
-    // asm("cli");
     char c = read_serial();
     if (input_on)
     {
@@ -109,11 +112,15 @@ com_hndl(void)
         {
             if (c != 0x7f)
                 *cur_buf++ = c;
+            if (cur_buf - kbd_buf == BUF_SIZE)
+                cur_buf = kbd_buf;
         }
         else
         {
             *cur_buf++ = 0;
             input_on = 0;
+            if (cur_buf - kbd_buf == BUF_SIZE)
+                cur_buf = kbd_buf;
         }
     }
     switch (c)
@@ -129,6 +136,5 @@ com_hndl(void)
         kputc(c, 0);
 
     }
-    pic_sendEOI(1);
-    // asm("sti");
+    pic_sendEOI(4);
 }

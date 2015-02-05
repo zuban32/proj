@@ -11,6 +11,7 @@ kernel_main(void)
 	kprintf("%x\n", 0x0);
     kclear_screen();
 
+    init_kbd();
     pic_init(0x20, 0x28);
     load_idt();
     init_serial();

@@ -1,17 +1,19 @@
 [bits 32]
-global pf_start
-pf_start:
-	pushad
-	extern pf_hndl
-	call pf_hndl
-	popad
-	add esp, 4 		;skip errno
-	iret
 
-global gpf_start
-gpf_start:
+%macro isr_entry 2
+global %1_start
+%1_start:
 	pushad
-	extern gpf_hndl
-	call gpf_hndl
+	extern %1_hndl
+	call %1_hndl
 	popad
+	%if %2 = 1
+	add esp, 4
+	%endif
 	iret
+%endmacro
+
+isr_entry pf, 1
+isr_entry gpf, 0
+isr_entry kbd, 0
+isr_entry com, 0

@@ -2,7 +2,7 @@
 #include <inc/console.h>
 #include <inc/common.h>
 
-uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE)));
+uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE << 7)));
 uint32_t pgdir[PGS_NUM] __attribute__ ((aligned (PGSIZE)));
 
 void
@@ -10,30 +10,30 @@ init_pages(void)
 {
     unsigned long long addr = 0;
     uint32_t i, j;
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < PGS_NUM; i++)
     {
         if ((uint32_t)pgdir % PGSIZE)
             kprintf("pgdir isn't aligned\n");
         if ((uint32_t)&pgtbl[i][0] % PGSIZE)
             kprintf("pgtbl addr in entry #%d isn't aligned\n", i);
-        // kprintf("%x\n", &pgtbl);
+        
         pgdir[i] = ((uint32_t)&pgtbl[i] & ~(PGSIZE - 1));
-        // kprintf("pgdir[%d] = %x\n", i, pgdir[i]);
 
         pgdir[i] |= PAGE_W | PAGE_P;
         for (j = 0; j < PGS_NUM; j++)
         {
-            // if (addr == 0x405000)
-                // kprintf("addr %x mapped to %x\n", (i * PGS_NUM + j) * PGSIZE, addr);
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
             pgtbl[i][j] |= PAGE_W | PAGE_P;
         }
     }
 
-    kprintf("last_addr = %x\n", addr);
+    // kprintf("last_addr = %x\n", addr);
+    // kprintf("!!!%x, %d, %x\n", pgtbl, sizeof(pgtbl) / sizeof(**pgtbl), pgtbl+( sizeof(pgtbl) / sizeof(**pgtbl)));
 
-    kprintf("pgdir addr = %x\n", pgdir);
+    kprintf("pgdir: %x -- %x\n", pgdir, pgdir + sizeof(pgdir) / sizeof(*pgdir));
+    kprintf("pgtbl: %x -- %x\n", pgtbl, (uintptr_t)pgtbl + sizeof(pgtbl));
+
     kprintf("Pages inited\n");
 
     __asm__ __volatile__(

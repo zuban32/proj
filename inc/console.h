@@ -18,7 +18,7 @@ void kendline(void);
 void kclear_screen(void);
 void kbackspace(void);
 void kprints(char *);
-void kprintint(int , int);
+void kprintint(int, int, char);
 void kputc(char , char);
 void kprintf(const char *, ...);
 

@@ -48,13 +48,12 @@ kprints(char *str)
 }
 
 void
-kprintint(int c, int base)
+kprintint(int c, int base, char is_u)
 {
-    if (c < 0)
+    if (c < 0 && is_u)
         kputc('-', 1), c = -c;
-    char *mem = VGA_MEM + (cur_pos << 1);
-    int res = c;
-    int mult = 1, tmp = res;
+    // int res = c;
+    uint32_t res = c, tmp = res, mult = 1;
 
     do
         mult *= base;
@@ -89,16 +88,16 @@ kprintf(const char *fstr, ...)
             {
             case 'b':
                 x = va_arg(p, uint32_t);
-                kprintint(x, 2);
+                kprintint(x, 2, 1);
                 break;
             case 'd':
                 d = va_arg(p, int);
-                kprintint(d, 10);
+                kprintint(d, 10, 0);
                 break;
             case 'x':
                 x = va_arg(p, uint32_t);
                 kprintf("0x");
-                kprintint(x, 16);
+                kprintint(x, 16, 1);
                 break;
             case 's':
                 s = va_arg(p, char *);

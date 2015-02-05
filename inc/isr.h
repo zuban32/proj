@@ -22,6 +22,8 @@ void com_hndl(void);
 
 extern void pf_start(void);
 extern void gpf_start(void);
+extern void kbd_start(void);
+extern void com_start(void);
 
 static uintptr_t isr[MAX_ISR] = 
 {
@@ -29,7 +31,7 @@ static uintptr_t isr[MAX_ISR] =
 	(uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_start, (uintptr_t)&pf_start, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,															//0x10
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, (uintptr_t)&kbd_hndl, 0, 0, (uintptr_t)&com_hndl
+	0, (uintptr_t)&kbd_start, 0, 0, (uintptr_t)&com_start
 };
 
 #endif

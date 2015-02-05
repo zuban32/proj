@@ -18,6 +18,11 @@ const char scancodes[KEY_NUM] = {
 	NO, ' '
 };
 
+void init_kbd(void)
+{
+	kprintf("kbd_buf: %x -- %x\n", kbd_buf, kbd_buf + BUF_SIZE);		//just debug output
+	kprintf("scancodes: %x -- %x\n", scancodes, scancodes + KEY_NUM);
+}
 
 void 
 clear_buf(void)
