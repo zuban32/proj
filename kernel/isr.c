@@ -11,6 +11,36 @@ extern const char scancodes[];
 extern char input_on;
 
 void
+global_handler(uint32_t int_num)
+{
+    // kprintf("Got interrupt\n");
+    switch (int_num)
+    {
+    case ISR_DE:
+        divz_hndl();
+        break;
+    case ISR_PF:
+        pf_hndl();
+        break;
+    case ISR_KBD:
+        kbd_hndl();
+        break;
+    case ISR_DF:
+        df_hndl();
+        break;
+    case ISR_GP:
+        gpf_hndl();
+        break;
+    case ISR_COM1:
+        com_hndl();
+        break;
+    default:
+        kprintf("ISR for int num %d doesn't exist\n", int_num);
+        break;
+    }
+}
+
+void
 divz_hndl(void)
 {
     kprintf("Division by zero\n");
@@ -27,16 +57,16 @@ kbd_hndl(void)
         {
             if (sc != 0x1c)
             {
-                if (sc != 0xe)
-                    *cur_buf++ = scancodes[sc];
                 if (cur_buf - kbd_buf == BUF_SIZE)
                     cur_buf = kbd_buf;
+                if (sc != 0xe)
+                    *cur_buf++ = scancodes[sc];
             }
             else
             {
-                *cur_buf++ = 0;
                 if (cur_buf - kbd_buf == BUF_SIZE)
                     cur_buf = kbd_buf;
+                *cur_buf++ = 0;
                 input_on = 0;
             }
         }
@@ -108,33 +138,36 @@ com_hndl(void)
     char c = read_serial();
     if (input_on)
     {
-        if (c != '\n' && c != '\r')
+        switch (c)
         {
-            if (c != 0x7f)
-                *cur_buf++ = c;
-            if (cur_buf - kbd_buf == BUF_SIZE)
-                cur_buf = kbd_buf;
+            if (c != '\n' && c != '\r')
+            {
+                if (c != 0x7f)
+                    *cur_buf++ = c;
+                if (cur_buf - kbd_buf == BUF_SIZE)
+                    cur_buf = kbd_buf;
+            }
+            else
+            {
+                *cur_buf++ = 0;
+                input_on = 0;
+                if (cur_buf - kbd_buf == BUF_SIZE)
+                    cur_buf = kbd_buf;
+            }
         }
-        else
+        switch (c)
         {
-            *cur_buf++ = 0;
-            input_on = 0;
-            if (cur_buf - kbd_buf == BUF_SIZE)
-                cur_buf = kbd_buf;
-        }
-    }
-    switch (c)
-    {
-    case '\r':
-    case '\n':
-        kendline();
-        break;
-    case 0x7f:
-        kbackspace();
-        break;
-    default:
-        kputc(c, 0);
+        case '\r':
+        case '\n':
+            kendline();
+            break;
+        case 0x7f:
+            kbackspace();
+            break;
+        default:
+            kputc(c, 0);
 
+        }
+        pic_sendEOI(4);
     }
-    pic_sendEOI(4);
 }

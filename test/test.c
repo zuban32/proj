@@ -32,7 +32,7 @@ test(uint32_t type)
         // *((char *)CHECKADDR) = 1;
 
 #ifdef TEST
-        kprintf("OK\n");
+        kprintf("kprintf for testing\n");
 #endif
 
         // kprintf("");
@@ -45,7 +45,7 @@ test(uint32_t type)
                      ::"i"(CHECKADDR), "m"(res):"memory", "%eax"
                     );
 
-        kprintf("res = %d\n", res);
+        kprintf("res = %d\nshould be: 1\n", res);
         break;
     }
     default:
