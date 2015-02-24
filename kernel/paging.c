@@ -19,12 +19,12 @@ init_pages(void)
         
         pgdir[i] = ((uint32_t)&pgtbl[i] & ~(PGSIZE - 1));
 
-        pgdir[i] |= PAGE_W | PAGE_P;
+        pgdir[i] |= PAGE_W | PAGE_P | PAGE_U;
         for (j = 0; j < PGS_NUM; j++)
         {
             pgtbl[i][j] = (addr & ~(PGSIZE - 1));
             addr += PGSIZE;
-            pgtbl[i][j] |= PAGE_W | PAGE_P;
+            pgtbl[i][j] |= PAGE_W | PAGE_P | PAGE_U;
         }
     }
 

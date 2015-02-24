@@ -12,7 +12,7 @@ test(uint32_t type)
     switch (type)
     {
     case 0:
-        asm("int $14\n\t");
+        asm("int $14\n\t");     //fails because INT instruction doesn't push an error code
         break;
     case 1:
         pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_W | PAGE_U);
@@ -28,11 +28,10 @@ test(uint32_t type)
     {
         // kprintf("pdx = %x, ptx = %x\n", PDX(CHECKADDR), PTX(CHECKADDR));
         pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~PAGE_P;
-
-        // *((char *)CHECKADDR) = 1;
+        // char x = *((char *)CHECKADDR);
 
 #ifdef TEST
-        kprintf("kprintf for testing\n");
+        kprintf("kprintf for QEMU TB split\n");
 #endif
 
         // kprintf("");

@@ -11,16 +11,15 @@ extern const char scancodes[];
 extern char input_on;
 
 void
-global_handler(uint32_t int_num)
+global_handler(Intframe *tf)
 {
-    // kprintf("Got interrupt\n");
-    switch (int_num)
+    switch (tf->trapno)
     {
     case ISR_DE:
         divz_hndl();
         break;
     case ISR_PF:
-        pf_hndl();
+        pf_hndl(tf);
         break;
     case ISR_KBD:
         kbd_hndl();
@@ -35,7 +34,7 @@ global_handler(uint32_t int_num)
         com_hndl();
         break;
     default:
-        kprintf("ISR for int num %d doesn't exist\n", int_num);
+        kprintf("ISR for int num %d doesn't exist\n", tf->trapno);
         break;
     }
 }
@@ -95,26 +94,18 @@ df_hndl(void)
 
 extern uint32_t pgtbl[][PGS_NUM];
 
-static int gpf_count = 0;
-
 void
-pf_hndl(void)
+pf_hndl(Intframe *tf)
 {
     // asm volatile("pushal\n\t");
-    gpf_count = 0;
     kprintf("\nPage fault\n");
-    int err_code = 0, ret_eip = 0, err_addr = 0;
 
-    asm volatile("movl 80(%%esp), %%eax\n\t":"=a"(err_code));
-    asm volatile("movl 84(%%esp), %%eax\n\t":"=a"(ret_eip));
+    // kprintf("%x %x\n", tf->ret_eip, tf->err_code);
+    uint32_t err_addr = 0;
 
-    kprintf("error: ");
-
-    kprintf((!(err_code & PAGE_U)) ? "kernel "       : "user ");
-    kprintf((!(err_code & PAGE_W)) ? "read "         : "write ");
-    kprintf((!(err_code & PAGE_P)) ? "non-present "  : "present ");
-
-    kprintf("\n");
+    kprintf((!(tf->err_code & PAGE_U)) ? "kernel "       : "user ");
+    kprintf((!(tf->err_code & PAGE_W)) ? "read "         : "write ");
+    kprintf((!(tf->err_code & PAGE_P)) ? "non-present\n"  : "present\n");
 
     asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
     kprintf("fault addr = %x\n\n", err_addr);
@@ -128,7 +119,6 @@ pf_hndl(void)
 void
 gpf_hndl(void)
 {
-    gpf_count++;
     kprintf("GP fault\n");
 }
 

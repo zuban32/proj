@@ -3,9 +3,9 @@
 
 #include "common.h"
 
-#define MAX_ISR 0x40 
+#define MAX_ISR 0x40
 
-// exceptions 
+// exceptions
 #define ISR_DE      0x0
 #define ISR_DB      0x1
 #define ISR_NMI     0x2
@@ -32,28 +32,44 @@
 #define ISR_KBD     0x21
 #define ISR_COM1    0x24
 
-void global_handler(uint32_t);
+typedef struct
+{
+    uint32_t trapno;
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t orig_esp;
+    uint32_t ebx;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t eax;
+    uint32_t err_code;
+    uint32_t ret_eip;
+    uint32_t ret_cs;
+    uint32_t eflags;
+} Intframe;
+
+void global_handler(Intframe *);
 
 void divz_hndl(void);
 void kbd_hndl(void);
 void df_hndl(void);
 void gpf_hndl(void);
-void pf_hndl(void);
+void pf_hndl(Intframe *);
 void com_hndl(void);
-// extern  uintptr_t  
 
 // extern void pf_start(void);
 // extern void gpf_start(void);
 // extern void kbd_start(void);
 // extern void com_start(void);
 
-// static uintptr_t isr[MAX_ISR] = 
+// static uintptr_t isr[MAX_ISR] =
 // {
-// 	(uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0, 									//0x0
-// 	(uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_start, (uintptr_t)&pf_start, 0,
-// 	0, 0, 0, 0, 0, 0, 0, 0,															//0x10
-// 	0, 0, 0, 0, 0, 0, 0, 0,
-// 	0, (uintptr_t)&kbd_start, 0, 0, (uintptr_t)&com_start
+//  (uintptr_t)&divz_hndl, 0, 0, 0, 0, 0, 0, 0,                                     //0x0
+//  (uintptr_t)&df_hndl, 0, 0, 0, 0, (uintptr_t)&gpf_start, (uintptr_t)&pf_start, 0,
+//  0, 0, 0, 0, 0, 0, 0, 0,                                                         //0x10
+//  0, 0, 0, 0, 0, 0, 0, 0,
+//  0, (uintptr_t)&kbd_start, 0, 0, (uintptr_t)&com_start
 // };
 
 #endif

@@ -4,24 +4,17 @@
 global isr%1_start
 isr%1_start:
 	pushad
-	; extern %1_hndl
-	; call %1_hndl
 	push %1
+	push esp
 	extern global_handler
 	call global_handler
-	add esp, 4
+	add esp, 8
 	popad
 	%if %2 = 1
 	add esp, 4
 	%endif
 	iret
 %endmacro
-
-; isr_entry pf, 1
-; isr_entry gpf, 0
-; isr_entry kbd, 0
-; isr_entry com, 0
-
 
 ; exceptions
 isr_entry 0, 0
@@ -67,6 +60,7 @@ isr_entry 34, 0
 isr_entry 35, 0
 
 section .data
+
 global isr_handlers
 isr_handlers:
 dd isr0_start
