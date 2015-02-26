@@ -34,7 +34,7 @@
 
 typedef struct
 {
-    uint32_t trapno;
+    uint32_t intno;
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -48,6 +48,8 @@ typedef struct
     uint32_t ret_cs;
     uint32_t eflags;
 } Intframe;
+
+void printf_intframe(Intframe *);
 
 void global_handler(Intframe *);
 

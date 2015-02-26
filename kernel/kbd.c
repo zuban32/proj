@@ -7,7 +7,7 @@ char *cur_buf = kbd_buf;
 
 #define NO 0
 
-const char scancodes[KEY_NUM] = { 
+const char scancodes[] = { 
 	NO,   0x1B, '1',  '2',  '3',  '4',  '5',  '6',	// 0x00
 	'7',  '8',  '9',  '0',  '-',  '=',  '\b', '\t',
 	'q',  'w',  'e',  'r',  't',  'y',  'u',  'i',	// 0x10

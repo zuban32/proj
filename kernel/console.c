@@ -48,17 +48,26 @@ kprints(char *str)
 }
 
 void
-kprintint(int c, int base, char is_u)
+kprintint(int c, int base, char is_u, int lz)
 {
     if (c < 0 && is_u)
         kputc('-', 1), c = -c;
     // int res = c;
-    uint32_t res = c, tmp = res, mult = 1;
+    uint32_t res = c, tmp = res, mult = 1, deg = 0;
 
     do
+    {
         mult *= base;
+        deg++;
+    }
     while (tmp /= base);
     mult /= base;
+
+    if (lz)
+    {
+        for (int i = 0; i < lz - deg; i++)
+            kputc('0', 1);
+    }
 
     do
     {
@@ -80,24 +89,29 @@ kprintf(const char *fstr, ...)
     uint32_t x;
     char *s, c;
 
+    char lead_zeroes_num = 0;
+
     for (char *str = fstr; *str; str++)
     {
         if (*str == '%')
         {
+            if (*(str + 1) == '0')
+                lead_zeroes_num = (*(str += 2) != '0') ? *str - '0' : 32;     //add check for digit
+
             switch (*++str)
             {
             case 'b':
                 x = va_arg(p, uint32_t);
-                kprintint(x, 2, 1);
+                kprintint(x, 2, 1, lead_zeroes_num);
                 break;
             case 'd':
                 d = va_arg(p, int);
-                kprintint(d, 10, 0);
+                kprintint(d, 10, 0, lead_zeroes_num);
                 break;
             case 'x':
                 x = va_arg(p, uint32_t);
                 kprintf("0x");
-                kprintint(x, 16, 1);
+                kprintint(x, 16, 1, lead_zeroes_num);
                 break;
             case 's':
                 s = va_arg(p, char *);

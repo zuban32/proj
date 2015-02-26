@@ -10,16 +10,65 @@ extern char kbd_buf[];
 extern const char scancodes[];
 extern char input_on;
 
-void
-global_handler(Intframe *tf)
+const char *exception_names[] =
 {
-    switch (tf->trapno)
+    "Divide error",
+    "Debug Exception",
+    "NMI Interrupt",
+    "Breakpoint",
+    "Overflow",
+    "BOUND Range Exceeded",
+    "Invalide Opcode",
+    "Coprocessor Not Available",
+    "Double Fault",
+    "Coprocessor segment overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+    "General Protection",
+    "Page Fault",
+    "x87 FPU Floating-Point Error",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point Exception",
+    "Virtualization Exception"
+};
+
+void
+print_intframe(Intframe *iframe)
+{
+    if (iframe->intno == ISR_KBD || iframe->intno == ISR_COM1)
+        return;
+    kprintf("\nIntframe:\n%d - ", iframe->intno);
+    if (iframe->intno >= 0 && iframe->intno < 21 && iframe->intno != 9 && iframe->intno != 15)
+        kprintf("%s\n", exception_names[iframe->intno]);
+    else
+        kprintf("User-Defined Interrupt\n");
+    kprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\nerr_code = %03b  ", iframe->ret_eip,
+            iframe->ret_cs,
+            iframe->eflags,
+            iframe->err_code & 0x7);
+    if (iframe->intno == ISR_PF)
+    {
+        kprintf((!(iframe->err_code & PAGE_U)) ? "kernel "       : "user ");
+        kprintf((!(iframe->err_code & PAGE_W)) ? "read "         : "write ");
+        kprintf((!(iframe->err_code & PAGE_P)) ? "non-present\n"  : "present\n");
+    }
+
+}
+
+void
+global_handler(Intframe *iframe)
+{
+    print_intframe(iframe);
+
+    switch (iframe->intno)
     {
     case ISR_DE:
         divz_hndl();
         break;
     case ISR_PF:
-        pf_hndl(tf);
+        pf_hndl(iframe);
         break;
     case ISR_KBD:
         kbd_hndl();
@@ -34,7 +83,7 @@ global_handler(Intframe *tf)
         com_hndl();
         break;
     default:
-        kprintf("ISR for int num %d doesn't exist\n", tf->trapno);
+        kprintf("ISR for int num %d doesn't exist\n", iframe->intno);
         break;
     }
 }
@@ -95,25 +144,13 @@ df_hndl(void)
 extern uint32_t pgtbl[][PGS_NUM];
 
 void
-pf_hndl(Intframe *tf)
+pf_hndl(Intframe *iframe)
 {
-    // asm volatile("pushal\n\t");
-    kprintf("\nPage fault\n");
-
-    // kprintf("%x %x\n", tf->ret_eip, tf->err_code);
     uint32_t err_addr = 0;
-
-    kprintf((!(tf->err_code & PAGE_U)) ? "kernel "       : "user ");
-    kprintf((!(tf->err_code & PAGE_W)) ? "read "         : "write ");
-    kprintf((!(tf->err_code & PAGE_P)) ? "non-present\n"  : "present\n");
-
     asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
     kprintf("fault addr = %x\n\n", err_addr);
 
     pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
-    // asm volatile("add $4, %esp\n\t"
-    //     "popal\n\t"
-    //     "iret\n\t");
 }
 
 void
