@@ -13,6 +13,8 @@ typedef long long int64_t;
 
 typedef unsigned uintptr_t;
 
+#define NULL 0
+
 static inline uint8_t
 inb(int port)
 {

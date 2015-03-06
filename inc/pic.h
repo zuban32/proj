@@ -15,5 +15,6 @@
 
 void pic_sendEOI(uint8_t);
 void pic_init(uint8_t, uint8_t);
+void pic_set_mask(uint8_t, uint8_t);
 
 #endif

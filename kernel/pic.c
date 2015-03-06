@@ -48,7 +48,7 @@ pic_init(uint8_t off1, uint8_t off2)
 	MASK(1, 0);
 	UNMASK(1, 4);
 
-	kprintf("Masks: %b %b\n", m1, m2);
+	kprintf("Masks: %08b %08b\n", m1, m2);
 
 	pic_set_mask(m1, m2);
 

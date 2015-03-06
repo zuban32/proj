@@ -38,6 +38,7 @@ cmd_test(void)
 {
 	// void test();
 	// asm volatile("jmp %0\n"::"r"(&test));
+	extern void test(uint32_t);
 	test(params[0]);
 }
 

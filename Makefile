@@ -1,7 +1,8 @@
 CC = gcc
 LD = @ld
 AS = nasm
-CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc -fno-builtin -DTEST
+CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc -fno-builtin -DTEST\
+-pedantic -Wall -Werror -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wno-unused-but-set-variable
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin
@@ -27,11 +28,10 @@ gdb: boot.bin kernel.bin
 
 boot.bin: $(BOOT_SRCS)
 	@echo "Compiling bootloader"
-	$(AS) $(ASBOOTFLAGS) $< -o $@
+	@$(AS) $(ASBOOTFLAGS) $< -o $@
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@mkdir -p $(OBJDIR) 2>/dev/null
-	@echo $(KERNEL_OBJ1)
 	@$(foreach var, $(KERNEL_ASM), $(AS) $(ASKERNFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.asm=.o));)
 	@echo 'Compiling kernel'
 	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o));)
@@ -55,4 +55,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@qemu-system-i386 -fda os.disk -serial stdio
+	@qemu-system-i386 -drive file=os.disk,format=raw,if=floppy -serial stdio

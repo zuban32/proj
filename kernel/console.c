@@ -71,7 +71,7 @@ kprintint(int c, int base, char is_u, int lz)
 
     do
     {
-        int tmp = res / mult + '0';
+        tmp = res / mult + '0';
         kputc(res / mult + ((tmp > '9') ? 'a' - 0xa : '0'), 1);
         res %= mult;
     }
@@ -91,14 +91,14 @@ kprintf(const char *fstr, ...)
 
     char lead_zeroes_num = 0;
 
-    for (char *str = fstr; *str; str++)
+    for (;*fstr; fstr++)
     {
-        if (*str == '%')
+        if (*fstr == '%')
         {
-            if (*(str + 1) == '0')
-                lead_zeroes_num = (*(str += 2) != '0') ? *str - '0' : 32;     //add check for digit
+            if (*(fstr + 1) == '0')
+                lead_zeroes_num = (*(fstr += 2) != '0') ? *fstr - '0' : 32;     //add check for digit
 
-            switch (*++str)
+            switch (*++fstr)
             {
             case 'b':
                 x = va_arg(p, uint32_t);
@@ -125,10 +125,10 @@ kprintf(const char *fstr, ...)
                 break;
             }
         }
-        else if (*str == '\n')
+        else if (*fstr == '\n')
             kendline();
         else
-            kputc(*str, 1);
+            kputc(*fstr, 1);
     }
     va_end(p);
 }

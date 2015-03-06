@@ -19,8 +19,7 @@ addISR(uint8_t ind, uint16_t selector, uint8_t type)
         return;
     }
 
-    // if(ind == ISR_KBD)
-    //     kprintf("knd_addr = %x\n", isr_handlers[ind]);
+    // kprintf("knd_addr = %x\n", isr_handlers[ind]);
 
     idt_tbl[ind].offset1 = addr & 0xffff;
     idt_tbl[ind].selector = selector;

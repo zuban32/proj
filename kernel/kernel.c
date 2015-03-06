@@ -4,11 +4,12 @@
 #include <inc/cmd.h>
 #include <inc/serial.h>
 #include <inc/paging.h>
+#include <inc/kbd.h>
 
 int
 kernel_main(void)
 {
-	kprintf("%x\n", 0x0);
+	// kprintf("%x\n", 0x0);
     kclear_screen();
 
     init_kbd();
@@ -16,7 +17,7 @@ kernel_main(void)
     load_idt();
     init_serial();
     init_pages();
-    kprintf("All inited\n");
+    kprintf("Init finished\n");
 
     while (1)
         cmd();

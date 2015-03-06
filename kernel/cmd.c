@@ -72,7 +72,7 @@ void
 parse_cmd(void)
 {
 	// kprintf(1, "Parsing command\n");
-	uint32_t num = 0;
+	// uint32_t num = 0;
 	char *s = kbd_buf;
 	char *nm = cmd_name;
 	while(k_isspace(*s) && *s) s++;

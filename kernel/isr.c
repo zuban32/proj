@@ -34,27 +34,56 @@ const char *exception_names[] =
     "Virtualization Exception"
 };
 
+const char *eflags_flagnames[] =
+{
+    "CF",   NULL,   "PF",       NULL,       "AF",
+    NULL,   "ZF",   "SF",       "TF",       "IF",
+    "DF",   "OF",   "IOPL1",    "IOPL2",    "NT",
+    NULL,   "RF",   "VM",       "AC",       "VIF",
+    "VIP",  "ID"
+};
+
 void
 print_intframe(Intframe *iframe)
 {
     if (iframe->intno == ISR_KBD || iframe->intno == ISR_COM1)
         return;
-    kprintf("\nIntframe:\n%d - ", iframe->intno);
+    kprintf("\n-------------------------\n");
+    kprintf("INTFRAME\n%d - ", iframe->intno);
     if (iframe->intno >= 0 && iframe->intno < 21 && iframe->intno != 9 && iframe->intno != 15)
         kprintf("%s\n", exception_names[iframe->intno]);
     else
         kprintf("User-Defined Interrupt\n");
-    kprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\nerr_code = %03b  ", iframe->ret_eip,
+    kprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\n", iframe->ret_eip,
             iframe->ret_cs,
-            iframe->eflags,
-            iframe->err_code & 0x7);
+            iframe->eflags);
+
+    kprintf("[ ");   //just like gdb shows enable flags
+    for (int i = 0; i < 22; i++)
+    {
+        if (i == 12)
+        {
+            kprintf("IOPL=%d ", 2 * (iframe->eflags & (1 << 13)) +
+                    (iframe->eflags & (1 << 12)) );
+            i++;
+        }
+        if (eflags_flagnames[i] && (iframe->eflags & (1 << i)))
+            kprintf("%s ", eflags_flagnames[i]);
+    }
+    kprintf("]\n");
+
+    kprintf("err_code = %03b  ", iframe->err_code & 0x7);
     if (iframe->intno == ISR_PF)
     {
         kprintf((!(iframe->err_code & PAGE_U)) ? "kernel "       : "user ");
         kprintf((!(iframe->err_code & PAGE_W)) ? "read "         : "write ");
         kprintf((!(iframe->err_code & PAGE_P)) ? "non-present\n"  : "present\n");
-    }
 
+        uint32_t err_addr = 0;
+        asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
+        kprintf("fault addr = %x", err_addr);
+    }
+    kprintf("\n-------------------------\n\n");
 }
 
 void
@@ -146,17 +175,14 @@ extern uint32_t pgtbl[][PGS_NUM];
 void
 pf_hndl(Intframe *iframe)
 {
-    uint32_t err_addr = 0;
-    asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
-    kprintf("fault addr = %x\n\n", err_addr);
-
     pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
 }
 
 void
 gpf_hndl(void)
 {
-    kprintf("GP fault\n");
+    // kprintf("GP fault\n");
+    // while(1);
 }
 
 void

@@ -2,13 +2,13 @@
 #include <inc/console.h>
 #include <inc/common.h>
 
-int k_isspace(char c)
+int k_isspace(const char c)
 {
 	return (c == ' ' || c == '\n');
 }
 
 int
-kstrcmp(char *s1, char *s2)
+kstrcmp(const char *s1, const char *s2)
 {
 	while(*s1 == *s2 && *s1 && *s2 && !k_isspace(*s1) && !k_isspace(*s2))
 		s1++, s2++;
@@ -28,7 +28,7 @@ uint32_t
 kstoi(const char *s)
 {
 	// kprintf(1, "kstoi started: %s\n", s);
-	char *str = s;
+	const char *str = s;
 	while(*str++);
 	str -= 2;
 	uint32_t res = 0;
