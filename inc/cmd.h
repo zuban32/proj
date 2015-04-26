@@ -14,3 +14,4 @@ void cmd_test(void);
 void cmd_clear(void);
 void cmd_help(void);
 #endif
+

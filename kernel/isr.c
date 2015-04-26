@@ -80,7 +80,7 @@ print_intframe(Intframe *iframe)
         kprintf((!(iframe->err_code & PAGE_P)) ? "non-present\n"  : "present\n");
 
         uint32_t err_addr = 0;
-        asm volatile("movl %%cr2, %%eax\n\t":"=a"(err_addr));
+        __asm__ __volatile__("movl %%cr2, %%eax\n\t":"=a"(err_addr));
         kprintf("fault addr = %x", err_addr);
     }
     kprintf("\n-------------------------\n\n");
@@ -224,3 +224,4 @@ com_hndl(void)
         pic_sendEOI(4);
     }
 }
+

@@ -2,8 +2,8 @@
 #include <inc/common.h>
 #include <inc/serial.h>
 
-static unsigned cur_pos = 0;
-static unsigned cur_bound = 0;
+static int cur_pos = 0;
+static int cur_bound = 0;
 
 extern char kbd_buf[];
 extern char *cur_buf;
@@ -147,3 +147,4 @@ kputc(char c, char move_bound)
     }
     write_serial(c);
 }
+

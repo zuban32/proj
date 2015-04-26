@@ -34,7 +34,7 @@
 
 typedef struct
 {
-    uint32_t intno;
+    int32_t intno;
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -75,3 +75,4 @@ void com_hndl(void);
 // };
 
 #endif
+

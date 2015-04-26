@@ -32,3 +32,4 @@ clear_buf(void)
 	cur_buf = kbd_buf;
 	// printf("Buffer cleared\n");
 }
+

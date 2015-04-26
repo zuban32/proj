@@ -44,3 +44,4 @@ init_pages(void)
         "mov %%eax, %%cr0\t\n"
         ::"g"(pgdir): "eax");
 }
+

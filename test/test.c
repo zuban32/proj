@@ -12,7 +12,7 @@ test(uint32_t type)
     switch (type)
     {
     case 0:
-        asm("int $14\n\t");     //fails because INT instruction doesn't push an error code
+        __asm__("int $14\n\t");     //fails because INT instruction doesn't push an error code
         break;
     case 1:
         pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_W | PAGE_U);
@@ -36,7 +36,7 @@ test(uint32_t type)
 
         // kprintf("");
 
-        asm volatile("addl $1, %1\n\t"
+        __asm__ __volatile__("addl $1, %1\n\t"
                      "mov %0, %%edi\n\t"
                      "maskmovq %%mm2, %%mm1\n\t"
                      "maskmovdqu %%xmm2, %%xmm1\n\t"

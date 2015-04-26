@@ -41,9 +41,10 @@ load_idt(void)
 
     uint32_t p = (uint32_t)&idtr;
     // __asm__ __volatile__("lidt (%0)"::"p"(p) );
-    asm volatile("lidt (%%eax)\n\t"::"a"(p));
+    __asm__ __volatile__("lidt (%%eax)\n\t"::"a"(p));
 
     kprintf("idt: %x -- %x\n", ((struct idt_descr *)p)->start, ((struct idt_descr *)p)->start + ((struct idt_descr *)p)->size);
 
     // kprintf("isrKBD_start: %x\n", idt_tbl[ISR_KBD].offset1 | (idt_tbl[ISR_KBD].offset2 << 16));
 }
+

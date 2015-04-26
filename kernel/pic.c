@@ -55,3 +55,4 @@ pic_init(uint8_t off1, uint8_t off2)
 	kprintf("PIC inited\n");
 	// __asm__("sti");
 }
+

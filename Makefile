@@ -1,8 +1,9 @@
-CC = gcc
+CC = clang
 LD = @ld
 AS = nasm
+QEMU = qemu-system-i386
 CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc -fno-builtin -DTEST\
--pedantic -Wall -Werror -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wno-unused-but-set-variable
+-pedantic -Wall -Werror -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin
@@ -24,7 +25,7 @@ all: boot.bin kernel.bin
 
 gdb: boot.bin kernel.bin
 	@cat $^ > os.disk
-	@qemu-system-i386 -fda os.disk -S -gdb tcp::1234 -serial stdio
+	@$(QEMU) -fda os.disk -S -gdb tcp::1234 -serial stdio
 
 boot.bin: $(BOOT_SRCS)
 	@echo "Compiling bootloader"
