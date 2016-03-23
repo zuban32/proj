@@ -1,6 +1,8 @@
 #ifndef CONSOLE_H_INCLUDED
 #define CONSOLE_H_INCLUDED
 
+#include <stdint.h>
+
 typedef __builtin_va_list va_list;
 
 #define va_start(ap, last) __builtin_va_start(ap, last)
@@ -9,19 +11,11 @@ typedef __builtin_va_list va_list;
 
 #define va_end(ap) __builtin_va_end(ap)
 
-#define VGA_MEM (char *)0xb8000
-#define VGA_MODE 0x7
-#define DISPLAY_WIDTH 80
-#define DISPLAY_HEIGHT 25
-
 void kendline(void);
 void kclear_screen(void);
 void kbackspace(void);
-void kprints(char *);
-void kprintint(int, int, char, int);
-void kputc(char , char);
-void kprintf(const char *, ...);
-
+void kputc(char c, char move_bound);
+void kprintf(const char *fstr, ...);
 
 #endif
 

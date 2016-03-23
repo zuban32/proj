@@ -5,23 +5,23 @@
 #include <inc/serial.h>
 #include <inc/paging.h>
 #include <inc/kbd.h>
+#include <inc/graphics.h>
 
-int
-kernel_main(void)
+int kernel_main(void)
 {
-	// kprintf("%x\n", 0x0);
-    kclear_screen();
+	init_vesa();
+	kclear_screen();
 
-    init_kbd();
-    pic_init(0x20, 0x28);
-    load_idt();
-    init_serial();
-    init_pages();
-    kprintf("Init finished\n");
+	init_kbd();
+	pic_init(0x20, 0x28);
+	load_idt();
+	init_serial();
+	init_pages();
+	kprintf("Init finished\n");
 
-    while (1)
-        cmd();
+	while (1)
+		cmd();
 
-    return 0;
+	return 0;
 }
 

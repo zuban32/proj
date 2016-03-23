@@ -1,12 +1,16 @@
 [org 0x7c00]
-
 KERN_OFF equ 0x1000
 
     mov [boot_drive], dl
 
     mov bp, 0x9000
     mov sp, bp
-    
+
+    ;enable VESA 1024*768*24 mode
+    mov ax, 0x4f02
+    mov bx, 0x118
+    int 0x10
+
     call load_ker    
     
     call switch_pm

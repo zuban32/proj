@@ -1,12 +1,14 @@
 #ifndef STRING_H_INCLUDED
 #define STRING_H_INCLUDED
 
-#include "common.h"
+#include <inc/common.h>
 
-int kstrcmp(const char *, const char *);
-void kmemset(void *, int, uint32_t);
-uint32_t kstoi(const char *);
-int k_isspace(const char);
+int kstrcmp(const char *s1, const char *s2);
+void kmemset(void *s0, int val, uint32_t size);
+uint32_t kstoi(const char *s);
+int kisspace(const char c);
+int kisdigit(const char c);
+int kisletter(const char c);
 
 #endif
 

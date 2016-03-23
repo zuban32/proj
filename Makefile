@@ -1,9 +1,9 @@
 CC = clang
 LD = @ld
 AS = nasm
-QEMU = qemu-system-i386
-CFLAGS = -m32 -c -I../proj -std=gnu99 -nostdinc -fno-builtin -DTEST\
--pedantic -Wall -Werror -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes
+QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
+CFLAGS = -m32 -c -I../proj -std=c11 -fno-builtin -DTEST\
+-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin
@@ -12,7 +12,7 @@ OBJDIR = obj/
 TESTDIR = test/
 BOOT_SRCS = $(wildcard boot/*)
 KERNEL_ASM = $(wildcard kernel/*.asm)
-KERNEL_C = $(wildcard kernel/*.c)
+KERNEL_C = $(wildcard kernel/*.c kernel/hw/*.c)
 TEST_C = $(TESTDIR)test.c
 KERNEL_OBJ1 = $(addprefix $(OBJDIR), $(notdir $(KERNEL_ASM:.asm=.o)))
 KERNEL_OBJ2 = $(addprefix $(OBJDIR), $(notdir $(KERNEL_C:.c=.o)))
@@ -56,4 +56,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@qemu-system-i386 -drive file=os.disk,format=raw,if=floppy -serial stdio
+	@${QEMU} -drive file=os.disk,format=raw,if=floppy -serial stdio -vga std
