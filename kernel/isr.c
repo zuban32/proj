@@ -5,6 +5,7 @@
 #include <inc/paging.h>
 #include <inc/kbd.h>
 #include <inc/string.h>
+#include <inc/ata.h>
 
 extern char *cur_buf;
 extern char kbd_buf[];
@@ -25,7 +26,7 @@ NULL, "RF", "VM", "AC", "VIF", "VIP", "ID" };
 
 void print_intframe(Intframe *iframe)
 {
-	if (iframe->intno == ISR_KBD || iframe->intno == ISR_COM1)
+	if (iframe->intno >= 0x20) // print only exceptions
 		return;
 	kprintf("\n-------------------------\n");
 	kprintf("INTFRAME\n%d - ", iframe->intno);
@@ -63,9 +64,15 @@ void print_intframe(Intframe *iframe)
 	kprintf("\n-------------------------\n\n");
 }
 
+static void timer_hndl(void)
+{
+	pic_sendEOI(0);
+}
+
 void global_handler(Intframe *iframe)
 {
-	print_intframe(iframe);
+	if(iframe->intno != 0x20)
+		print_intframe(iframe);
 
 	switch (iframe->intno) {
 	case ISR_DE:
@@ -82,6 +89,12 @@ void global_handler(Intframe *iframe)
 		break;
 	case ISR_GP:
 		gpf_hndl();
+		break;
+	case 0x20:
+		timer_hndl();
+		break;
+	case 46:
+		ata_complete_readsector();
 		break;
 	case ISR_COM1:
 		com_hndl();

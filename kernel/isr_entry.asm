@@ -48,16 +48,25 @@ isr_entry 27, 0
 isr_entry 28, 0
 isr_entry 29, 0
 isr_entry 30, 1
-
+isr_entry 31, 0
 ; IRQs
 isr_entry 32, 0
 isr_entry 33, 0
-isr_entry 36, 0
-
-; empty yet
-isr_entry 31, 0
 isr_entry 34, 0
 isr_entry 35, 0
+isr_entry 36, 0
+isr_entry 37, 0
+isr_entry 38, 0
+isr_entry 39, 0
+isr_entry 40, 0
+isr_entry 41, 0
+isr_entry 42, 0
+isr_entry 43, 0
+isr_entry 44, 0
+isr_entry 45, 0
+isr_entry 46, 0
+isr_entry 47, 0
+isr_entry 48, 0
 
 section .data
 
@@ -100,3 +109,15 @@ dd isr33_start
 dd isr34_start
 dd isr35_start
 dd isr36_start
+dd isr37_start
+dd isr38_start
+dd isr39_start
+dd isr40_start
+dd isr41_start
+dd isr42_start
+dd isr43_start
+dd isr44_start
+dd isr45_start
+dd isr46_start
+dd isr47_start
+dd isr48_start

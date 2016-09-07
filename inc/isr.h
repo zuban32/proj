@@ -35,8 +35,6 @@ enum
 	ISR_COM1 = 0x24
 };
 
-#define ISR_COM1    0x24
-
 typedef struct
 {
 	int32_t intno;

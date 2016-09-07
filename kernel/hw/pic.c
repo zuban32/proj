@@ -20,15 +20,15 @@ void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
 void pic_init(uint8_t off1, uint8_t off2)
 {
 	__asm__("cli");
-	uint8_t m1, m2;
+	uint8_t m1 = 0, m2 = 0;
 	m1 = inb(PIC_M_DATA);
 	m2 = inb(PIC_S_DATA);
 
 	outb(PIC_M_CMD, PIC_INIT);
 	outb(PIC_S_CMD, PIC_INIT);
 
-	outb(PIC_M_DATA, 0x20);	//ICW2
-	outb(PIC_S_DATA, 0x28);
+	outb(PIC_M_DATA, off1);	//ICW2
+	outb(PIC_S_DATA, off2);
 
 	outb(PIC_M_DATA, 0x4);	//ICW3
 	outb(PIC_S_DATA, 0x2);
@@ -42,8 +42,8 @@ void pic_init(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6b);
 	outb(PIC_S_CMD, 0x6b);
 
-	MASK(1, 0);
-	UNMASK(1, 4);
+//	MASK(1, 0);
+//	UNMASK(1,
 
 //	kprintf("Masks: %08b %08b\n", m1, m2);
 

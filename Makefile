@@ -56,4 +56,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@${QEMU} -drive file=os.disk,format=raw,if=floppy -serial stdio -vga std
+	@${QEMU} -fda os.disk -hda td.img -serial stdio -vga std
