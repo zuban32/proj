@@ -3,7 +3,6 @@
 #include <inc/isr.h>
 #include <inc/console.h>
 #include <inc/paging.h>
-#include <inc/graphics.h>
 
 extern uintptr_t isr_handlers[];
 

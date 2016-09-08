@@ -1,8 +1,8 @@
 #include <inc/pic.h>
 #include <inc/console.h>
 
-#define MASK(i, n) m##i |= 1 << n
-#define UNMASK(i, n) m##i &= ~(1 << n)
+#define MASK(i, n) (m##i |= 1 << n)
+#define UNMASK(i, n) (m##i &= ~(1 << n))
 
 void pic_sendEOI(uint8_t irq)
 {
@@ -20,7 +20,7 @@ void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
 void pic_init(uint8_t off1, uint8_t off2)
 {
 	__asm__("cli");
-	uint8_t m1 = 0, m2 = 0;
+	uint8_t m1, m2;
 	m1 = inb(PIC_M_DATA);
 	m2 = inb(PIC_S_DATA);
 
@@ -42,8 +42,8 @@ void pic_init(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6b);
 	outb(PIC_S_CMD, 0x6b);
 
-//	MASK(1, 0);
-//	UNMASK(1,
+	MASK(1, 0);
+	UNMASK(1, 4);
 
 //	kprintf("Masks: %08b %08b\n", m1, m2);
 

@@ -1,9 +1,10 @@
-CC = clang
+CC = gcc
 LD = @ld
 AS = nasm
 QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
 CFLAGS = -m32 -c -I../proj -std=c11 -fno-builtin -DTEST\
--pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
+-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror\
+-fdelete-null-pointer-checks -s -Os
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
 ASBOOTFLAGS = -fbin

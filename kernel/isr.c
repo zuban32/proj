@@ -7,11 +7,6 @@
 #include <inc/string.h>
 #include <inc/ata.h>
 
-extern char *cur_buf;
-extern char kbd_buf[];
-extern const char scancodes[];
-extern char input_on;
-
 const char *exception_names[] = { "Divide error", "Debug Exception",
 		"NMI Interrupt", "Breakpoint", "Overflow", "BOUND Range Exceeded",
 		"Invalide Opcode", "Coprocessor Not Available", "Double Fault",
@@ -113,17 +108,24 @@ void divz_hndl(void)
 void kbd_hndl(void)
 {
 	uint8_t sc = inb(0x60);
+	char *cur_buf = kbd_get_cur_buf();
+	char *kbd_buf = kbd_get_buf();
 
 	if (sc > 0 && sc < 0x40) {
-		if (input_on) {
-			if (cur_buf - kbd_buf == BUF_SIZE)
-				cur_buf = kbd_buf;
+		char letter = get_scancode(sc);
+		if (input_is_on()) {
+			if (cur_buf - kbd_buf == BUF_SIZE) {
+				set_cur_buf(kbd_buf);
+			}
 			if (sc != 0x1c) {
-				if (sc != 0xe)
-					*cur_buf++ = scancodes[sc];
+				if (sc != 0xe) {
+					*cur_buf = letter;
+					set_cur_buf(++cur_buf);
+				}
 			} else {
-				*cur_buf++ = 0;
-				input_on = 0;
+				*cur_buf = 0;
+				set_cur_buf(++cur_buf);
+				set_input_status(0);
 			}
 		}
 
@@ -135,7 +137,7 @@ void kbd_hndl(void)
 			kbackspace();
 			break;
 		default:
-			kputc(scancodes[sc], 0);
+			kputc(letter, 0);
 		}
 	}
 	pic_sendEOI(1);
@@ -144,8 +146,7 @@ void kbd_hndl(void)
 void df_hndl(void)
 {
 	kprintf("Double fault\n");
-	while (1)
-		;
+	while(1);
 }
 
 extern uint32_t pgtbl[][PGS_NUM];
@@ -164,15 +165,20 @@ void gpf_hndl(void)
 void com_hndl(void)
 {
 	uint8_t c = read_serial();
-	if (input_on) {
+	char *cur_buf = kbd_get_cur_buf();
+	char *kbd_buf = kbd_get_buf();
+	if (input_is_on()) {
 		if (cur_buf - kbd_buf == BUF_SIZE)
-			cur_buf = kbd_buf;
+			set_cur_buf(kbd_buf);
 		if (c != '\n' && c != '\r') {
-			if (c != 0x7f && (kisdigit(c) || kisletter(c) || kisspace(c)))
-				*cur_buf++ = c;
+			if (c != 0x7f && (kisdigit(c) || kisletter(c) || kisspace(c))) {
+				*cur_buf = c;
+				set_cur_buf(++cur_buf);
+			}
 		} else {
-			*cur_buf++ = 0;
-			input_on = 0;
+			*cur_buf = 0;
+			set_cur_buf(++cur_buf);
+			set_input_status(0);
 		}
 		switch (c) {
 		case '\r':

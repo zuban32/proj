@@ -5,9 +5,6 @@
 #include <inc/idt.h>
 #include <inc/isr.h>
 
-extern char input_on;
-extern char kbd_buf[];
-
 char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];
 
@@ -19,8 +16,8 @@ void cmd(void)
 {
 	kprintf("K> ");
 	clear_buf();
-	input_on = 1;
-	while (input_on);
+	set_input_status(1);
+	while (input_is_on());
 
 	parse_cmd();
 
@@ -37,7 +34,7 @@ void cmd(void)
 
 void parse_cmd(void)
 {
-	char *s = kbd_buf;
+	char *s = kbd_get_buf();
 	char *nm = cmd_name;
 	while (kisspace(*s) && *s)
 		s++;

@@ -2,13 +2,35 @@
 #include <inc/common.h>
 #include <inc/serial.h>
 #include <inc/graphics.h>
+#include <inc/font.h>
+#include <inc/kbd.h>
 
-int cur_x = 0;
-int cur_y = 0;
+static int cur_x = 0;
+static int cur_y = 0;
 static int cur_bound = 0;
 
-extern char kbd_buf[];
-extern char *cur_buf;
+#define DISPLAY_STRING_LEN (DISPLAY_PIXEL_WIDTH / FONT_WIDTH)
+#define DISPLAY_COLUMN_LEN (DISPLAY_PIXEL_HEIGHT / FONT_HEIGHT)
+
+int get_curx(void)
+{
+	return cur_x;
+}
+
+int get_cury(void)
+{
+	return cur_y;
+}
+
+void set_curx(int val)
+{
+	cur_x = val;
+}
+
+void set_cury(int val)
+{
+	cur_y = val;
+}
 
 void kendline(void)
 {
@@ -35,7 +57,10 @@ void kbackspace(void)
 		draw_letter(--cur_x, cur_y, NULL);
 	}
 	write_serial('\b');
-	*(cur_buf -= (cur_buf > kbd_buf) ? 1 : 0) = 0;
+	char *cur_buf = kbd_get_cur_buf(), *kbd_buf = kbd_get_buf();
+	int off = (cur_buf > kbd_buf) ? 1 : 0;
+	*(cur_buf -= off) = 0;
+	set_cur_buf(cur_buf);
 }
 
 static void kprints(char *str)
@@ -140,7 +165,7 @@ void kputc(char c, char move_bound)
 {
 	if (cur_x < DISPLAY_COLUMN_LEN && cur_y < DISPLAY_STRING_LEN && cur_x >= 0
 			&& cur_y >= 0) {
-		draw_letter(cur_x, cur_y, (uint8_t *) letters[c - 32]);
+		draw_letter(cur_x, cur_y, get_letter_font(c - 32));
 		cur_x++;
 		if (move_bound)
 			cur_bound = cur_x;

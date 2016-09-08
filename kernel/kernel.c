@@ -22,10 +22,10 @@ int kernel_main(void)
 
 	// test ATA read
 	ata_request_readsector(1, 1);
-	while(is_bsy || cur_buf_ind == 0);
+	while(is_bsy() || get_cur_ind() == 0);
 
-	if(ata_read_buffer[0] != 0x11)
-		kprintf("%d\n", ata_read_buffer[0]);
+	if(get_ata_buffer()[0] != 0x11)
+		kprintf("%d\n", get_ata_buffer()[0]);
 	else
 		kprintf("Correct value read from HDD\n");
 

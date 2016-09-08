@@ -1,8 +1,7 @@
 #include <inc/idt.h>
 #include <inc/console.h>
 #include <inc/graphics.h>
-
-extern int cur_x, cur_y;
+#include <inc/font.h>
 
 #if 0
 static uint16_t detect_bios_area_hardware(void)
@@ -20,8 +19,8 @@ void draw_letter(int16_t pos_x, int16_t pos_y, uint8_t *letter)
 {
 	for (int i = 0; i < FONT_HEIGHT; i++) {
 		for (int j = 0; j < FONT_WIDTH; j++) {
-			int16_t x = cur_x * FONT_HEIGHT + (FONT_HEIGHT - i - 1);
-			int16_t y = cur_y * FONT_WIDTH + (FONT_WIDTH - j - 1);
+			int16_t x = get_curx() * FONT_HEIGHT + (FONT_HEIGHT - i - 1);
+			int16_t y = get_cury() * FONT_WIDTH + (FONT_WIDTH - j - 1);
 			if (!letter) {
 				put_pixel(x, y, 0, 0, 0);
 			} else if (letter[j] & (1 << i)) {

@@ -2,11 +2,11 @@
 #include <inc/console.h>
 #include <inc/kbd.h>
 
-char input_on = 0;
-char kbd_buf[BUF_SIZE];
-char *cur_buf = kbd_buf;
+static uint8_t input_on = 0;
+static char kbd_buf[BUF_SIZE];
+static char *cur_buf = kbd_buf;
 
-const char scancodes[] = {
+static const char scancodes[] = {
 NULL, 0x1B, '1', '2', '3', '4', '5',
 		'6',	// 0x00
 		'7', '8', '9', '0', '-', '=', '\b', '\t', 'q', 'w', 'e', 'r', 't', 'y',
@@ -25,6 +25,11 @@ void init_kbd(void)
 //	kprintf("scancodes: %x -- %x\n", scancodes, scancodes + KEY_NUM);
 }
 
+char get_scancode(uint8_t sc)
+{
+	return scancodes[sc];
+}
+
 void clear_buf(void)
 {
 	char *p = kbd_buf;
@@ -34,3 +39,27 @@ void clear_buf(void)
 	// printf("Buffer cleared\n");
 }
 
+uint8_t input_is_on(void)
+{
+	return input_on;
+}
+
+void set_input_status(uint8_t input)
+{
+	input_on = input;
+}
+
+char *kbd_get_cur_buf(void)
+{
+	return cur_buf;
+}
+
+char *kbd_get_buf(void)
+{
+	return kbd_buf;
+}
+
+void set_cur_buf(char *buf)
+{
+	cur_buf = buf;
+}

@@ -16,7 +16,7 @@ void test(uint32_t type)
 		pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] &= ~(PAGE_P | PAGE_W | PAGE_U);
 		kprintf("Checking pagefault\n");
 		char *x = (char *) CHECKADDR;
-		char p = *x;
+		__attribute((unused)) char p = *x;
 		kprintf("Check again\n");
 		p = *x;
 		kprintf("End\n");

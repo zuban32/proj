@@ -21,8 +21,8 @@ enum {
 void ata_request_readsector(int lba, int count);
 void ata_complete_readsector(void);
 
-uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-uint8_t cur_buf_ind;
-uint8_t is_bsy;
+uint8_t is_bsy(void);
+uint8_t get_cur_ind(void);
+uint16_t *get_ata_buffer(void);
 
 #endif

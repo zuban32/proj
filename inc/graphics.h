@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include <inc/font.h>
-
 // defines for text mode 80x25
 #define DISPLAY_TEXT_WIDTH 		80
 #define DISPLAY_TEXT_HEIGHT 	25
@@ -18,9 +16,6 @@
 #define DISPLAY_PIXEL_HEIGHT 	768
 #define COLOR_DEPTH 			3
 
-#define DISPLAY_STRING_LEN (DISPLAY_PIXEL_WIDTH / FONT_WIDTH)
-#define DISPLAY_COLUMN_LEN (DISPLAY_PIXEL_HEIGHT / FONT_HEIGHT)
-
 enum
 {
 	BIOS_VESA_GET_CONTROLLER_MODE = 0x4F00,
@@ -28,7 +23,7 @@ enum
 	BIOS_VESA_SET_MODE = 0x4F02
 };
 
-enum video_type
+enum
 {
 	VIDEO_TYPE_NONE = 0x00,
 	VIDEO_TYPE_COLOUR = 0x20,
