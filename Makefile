@@ -1,13 +1,12 @@
-CC = gcc
-LD = @ld
+CC = clang
+LD = ld
 AS = nasm
 QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
 CFLAGS = -m32 -c -I../proj -std=c11 -fno-builtin -DTEST\
--pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror\
--fdelete-null-pointer-checks -s -Os
+-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
 LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
-ASBOOTFLAGS = -fbin
+ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
 TESTDIR = test/
@@ -21,12 +20,12 @@ TEST_OBJ = $(TESTDIR)test.o
 KERNEL_DUMP = kernel.elf
 
 
-all: boot.bin kernel.bin
-	@cat $^ > os.disk
+all: kernel.bin boot.bin
+	@cat boot.bin kernel.bin > os.disk
 
 gdb: boot.bin kernel.bin
 	@cat $^ > os.disk
-	@$(QEMU) -fda os.disk -S -gdb tcp::1234 -serial stdio
+	@$(QEMU) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
 
 boot.bin: $(BOOT_SRCS)
 	@echo "Compiling bootloader"
@@ -41,14 +40,14 @@ kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@$(CC) $(CFLAGS) $(TEST_C) -o $(TEST_OBJ)
 
 kernel.asm: kernel.obj
-	$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $(OBJDIR)$<
+	@$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $(OBJDIR)$<
 	@echo "Dumping kernel"
 	@objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
 
 kernel.bin: kernel.obj kernel.asm
 	@echo "Linking kernel"
-	$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $@ 2>/dev/null
+	@$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $@ 2>/dev/null
 
 clean:
 	@rm -r -f $(OBJDIR)
@@ -57,4 +56,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@${QEMU} -fda os.disk -hda td.img -serial stdio -vga std
+	@${QEMU} -hda os.disk -serial stdio -vga std

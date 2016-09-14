@@ -21,7 +21,7 @@ int kernel_main(void)
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(1, 1);
+	ata_request_readsector(0, 1);
 	while(is_bsy() || get_cur_ind() == 0);
 
 	if(get_ata_buffer()[0] != 0x11)
