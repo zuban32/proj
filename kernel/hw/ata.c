@@ -53,9 +53,9 @@ uint16_t *get_ata_buffer(void)
 	return ata_read_buffer;
 }
 
-void ata_request_readsector(int lba, int count)
+void ata_request_readsector(int lba, uint8_t count)
 {
-	outb(PRIMARY_BASE_START + 6, 0xA0 | ((lba >> 24) & 0x0F));	// choose master
+	outb(PRIMARY_BASE_START + 6, 0xE0 | ((lba >> 24) & 0x0F));	// choose master
 	outb(PRIMARY_BASE_START + 2, count);
 	outb(PRIMARY_BASE_START + 3, lba & 0xFF);
 	outb(PRIMARY_BASE_START + 4, (lba >> 8) & 0xFF);
@@ -65,12 +65,13 @@ void ata_request_readsector(int lba, int count)
 
 void ata_complete_readsector(void)
 {
+	inb(PRIMARY_BASE_START + 7);
 	bsy = 1;
 	uint16_t *out = ata_read_buffer + cur_buf_ind * SECTOR_SIZE;
 	for(int i = 0; i < SECTOR_SIZE; i++) {
 		*(out + i) = inw(PRIMARY_BASE_START);
 	}
 	cur_buf_ind++;
-	pic_sendEOI(14);
 	bsy = 0;
+	pic_sendEOI(14);
 }

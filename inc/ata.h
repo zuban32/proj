@@ -18,7 +18,7 @@ enum {
 	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
 };
 
-void ata_request_readsector(int lba, int count);
+void ata_request_readsector(int lba, uint8_t count);
 void ata_complete_readsector(void);
 
 uint8_t is_bsy(void);

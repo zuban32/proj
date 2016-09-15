@@ -9,6 +9,8 @@ static int cur_x = 0;
 static int cur_y = 0;
 static int cur_bound = 0;
 
+#define abs(x) ((x) > 0? x : -x)
+
 #define DISPLAY_STRING_LEN (DISPLAY_PIXEL_WIDTH / FONT_WIDTH)
 #define DISPLAY_COLUMN_LEN (DISPLAY_PIXEL_HEIGHT / FONT_HEIGHT)
 
@@ -69,14 +71,14 @@ static void kprints(char *str)
 		kputc(*str++, 1);
 }
 
-static void kprintint(int c, uint32_t base, char is_u, int lz)
+static void kprintint(int64_t c, uint32_t base, char is_u, int lz)
 {
 	if (!is_u && c < 0) {
 		kputc('-', 1);
 	}
 
-	uint32_t res = (uint32_t) c;
-	uint32_t tmp = res, mult = 1, deg = 0;
+	uint64_t res = abs(c);
+	uint64_t tmp = res, mult = 1, deg = 0;
 
 	do {
 		mult *= base;
@@ -103,7 +105,7 @@ void kprintf(const char *fstr, ...)
 	va_list p;
 	va_start(p, fstr);
 	int d;
-	uint32_t x;
+	uint64_t x;
 	char *s, c;
 
 	char lead_zeroes_num = 0;
@@ -118,12 +120,21 @@ void kprintf(const char *fstr, ...)
 				x = va_arg(p, uint32_t);
 				kprintint(x, 2, 1, lead_zeroes_num);
 				break;
+			case 'u':
+				d = va_arg(p, uint64_t);
+				kprintint(d, 10, 1, lead_zeroes_num);
+				break;
 			case 'd':
-				d = va_arg(p, int);
+				d = va_arg(p, int32_t);
 				kprintint(d, 10, 0, lead_zeroes_num);
 				break;
 			case 'x':
 				x = va_arg(p, uint32_t);
+				kprintf("0x");
+				kprintint(x, 16, 1, lead_zeroes_num);
+				break;
+			case 'p':
+				x = va_arg(p, uint64_t);
 				kprintf("0x");
 				kprintint(x, 16, 1, lead_zeroes_num);
 				break;

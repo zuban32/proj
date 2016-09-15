@@ -14,8 +14,44 @@ KERN_SECTS equ (KERNEL_SIZE/512 + 1)
 
     call load_ker
     
+    xor ebx, ebx
+    xor bp, bp
+ 	mov edi, 0x500
+ 	mov dword[edi], 0x508
+ 	mov dword[edi + 4], ebx
+ 	add edi, 8
+    mov edx, 0x534D4150
+    mov eax, 0xE820
+    mov ecx, 20
+    int 0x15
+    jc error
+    mov edx, 0x534D4150
+    cmp eax, edx
+    jnz error
+    test ebx, ebx
+    jz error
+    jmp jmp_tail
+
+map_entry_read:
+    mov eax, 0xE820
+    mov ecx, 20
+    int 0x15
+    jc map_entry_end
+    mov edx, 0x534D4150
+jmp_tail:
+    jecxz empty_entry
+    mov ecx, dword[edi + 8]
+    or ecx, dword[edi + 12]
+    jz empty_entry
+    add edi, 20
+    add dword[0x504], 1
+empty_entry:
+	test ebx, ebx
+	jne map_entry_read
+map_entry_end:
     call switch_pm
     
+error:
     jmp $
     
     %include "boot/gdt.asm"

@@ -19,6 +19,13 @@ static inline uint16_t inw(int port)
 	return data;
 }
 
+static inline uint16_t insw(int port)
+{
+	uint16_t data;
+	__asm __volatile("inw %w1,%0" : "=a" (data) : "d" (port));
+	return data;
+}
+
 static inline void outb(int port, uint8_t data)
 {
 	__asm __volatile("outb %0,%w1" : : "a" (data), "d" (port));

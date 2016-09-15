@@ -1,11 +1,13 @@
-CC = clang
+CC = gcc
 LD = ld
 AS = nasm
-QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
-CFLAGS = -m32 -c -I../proj -std=c11 -fno-builtin -DTEST\
+QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386 -m 256M
+QEMU_FLAGS = -m 256M
+CFLAGS = -m32 -c -I../proj -std=c11 -DTEST -fno-builtin -ffreestanding\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
-LDFLAGS = -melf_i386 -Ttext 0x1000 --oformat binary -e kern_start
-DLDFLAGS = -melf_i386 -Ttext 0x1000 -e kern_start
+LDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 --oformat binary -e kern_start
+DLDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 -e kern_start
+GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
 ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
@@ -18,10 +20,14 @@ KERNEL_OBJ1 = $(addprefix $(OBJDIR), $(notdir $(KERNEL_ASM:.asm=.o)))
 KERNEL_OBJ2 = $(addprefix $(OBJDIR), $(notdir $(KERNEL_C:.c=.o)))
 TEST_OBJ = $(TESTDIR)test.o
 KERNEL_DUMP = kernel.elf
-
+TEST_ELF = /home/zuban32/a.out
+TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
 all: kernel.bin boot.bin
 	@cat boot.bin kernel.bin > os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x5000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	@cat /home/zuban32/a.out >> os.disk
+	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk
 
 gdb: boot.bin kernel.bin
 	@cat $^ > os.disk
@@ -45,9 +51,9 @@ kernel.asm: kernel.obj
 	@objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
 
-kernel.bin: kernel.obj kernel.asm
+kernel.bin: kernel.obj
 	@echo "Linking kernel"
-	@$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $@ 2>/dev/null
+	@$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) $(GCC_LIB) -o $@
 
 clean:
 	@rm -r -f $(OBJDIR)

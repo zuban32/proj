@@ -14,7 +14,7 @@
 #define ICW4_80386 0x1
 
 void pic_sendEOI(uint8_t irq);
-void pic_init(uint8_t off1, uint8_t off2);
+void init_pic(uint8_t off1, uint8_t off2);
 void pic_set_mask(uint8_t mask_m, uint8_t mask_s);
 
 #endif
