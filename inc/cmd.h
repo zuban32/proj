@@ -10,7 +10,6 @@ void parse_cmd(void);
 
 void cmd_isr(void);
 void cmd_listisr(void);
-void cmd_test(void);
 void cmd_clear(void);
 void cmd_help(void);
 #endif

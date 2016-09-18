@@ -1,6 +1,8 @@
 #ifndef PAGING_H_INCLUDED
 #define PAGING_H_INCLUDED
 
+#include <inc/isr.h>
+
 #define PGS_NUM 1024
 #define PGSIZE 4096
 
@@ -15,6 +17,7 @@
 #define POFF(addr) ((addr) & ~(PGSIZE - 1))
 
 void init_pages(void);
+void handle_pagefault(Intframe *iframe);
 
 #endif
 

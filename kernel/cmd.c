@@ -8,9 +8,9 @@
 char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];
 
-const char *cmd_names[CMD_NUM] = { "isr", "listisr", "test", "clear", "help" };
+const char *cmd_names[CMD_NUM] = { "isr", "listisr", "clear", "help" };
 void (*cmds[CMD_NUM])(
-		void) = {&cmd_isr, &cmd_listisr, &cmd_test, &cmd_clear, &cmd_help };
+		void) = {&cmd_isr, &cmd_listisr, &cmd_clear, &cmd_help };
 
 void cmd(void)
 {

@@ -6,6 +6,7 @@
 #include <inc/kbd.h>
 #include <inc/string.h>
 #include <inc/ata.h>
+#include <inc/process.h>
 
 const char *exception_names[] = { "Divide error", "Debug Exception",
 		"NMI Interrupt", "Breakpoint", "Overflow", "BOUND Range Exceeded",
@@ -66,6 +67,13 @@ static void timer_hndl(void)
 
 void global_handler(Intframe *iframe)
 {
+	Process *cur_proc = get_cur_process();
+	// if switch from userspace
+	if((iframe->ret_cs & 3) == 3) {
+		cur_proc->iframe = *iframe;
+		iframe = &cur_proc->iframe;
+	}
+
 	if(iframe->intno != 0x20)
 		print_intframe(iframe);
 
@@ -74,7 +82,7 @@ void global_handler(Intframe *iframe)
 		divz_hndl();
 		break;
 	case ISR_PF:
-		pf_hndl(iframe);
+		handle_pagefault(iframe);
 		break;
 	case ISR_KBD:
 		kbd_hndl();
@@ -147,13 +155,6 @@ void df_hndl(void)
 {
 	kprintf("Double fault\n");
 	while(1);
-}
-
-extern uint32_t pgtbl[][PGS_NUM];
-
-void pf_hndl(Intframe *iframe)
-{
-	pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
 }
 
 void gpf_hndl(void)

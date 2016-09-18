@@ -10,7 +10,7 @@ extern struct idt_entry idt_tbl[];
 extern uint32_t params[];
 
 const char *cmd_helps[CMD_NUM] = { "create ISR #param0",
-		"list all existing ISRs", "run test with #param0", "clear screen",
+		"list all existing ISRs", "clear screen",
 		"show this help" };
 
 void cmd_isr(void)
@@ -25,14 +25,6 @@ void cmd_listisr(void)
 		if (idt_tbl[i].offset1 || idt_tbl[i].offset2)
 			kprintf("%d ", i);
 	kendline();
-}
-
-void cmd_test(void)
-{
-	// void test();
-	// asm volatile("jmp %0\n"::"r"(&test));
-	extern void test(uint32_t);
-	test(params[0]);
 }
 
 void cmd_clear(void)

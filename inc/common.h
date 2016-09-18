@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define NULL 0
+#define NULL (0)
 
 static inline uint8_t inb(int port)
 {

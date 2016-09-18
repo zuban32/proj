@@ -32,6 +32,14 @@ void kmemset(void *s0, int val, uint32_t size)
 		*s1++ = val;
 }
 
+void kmemcpy(char *dest, char *src, int size)
+{
+	char *end = src + size;
+	while(src < end) {
+		*dest++ = *src++;
+	}
+}
+
 uint32_t kstoi(const char *s)
 {
 	// kprintf(1, "kstoi started: %s\n", s);
