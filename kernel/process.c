@@ -60,6 +60,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	proc->code_start = (void *)file->e_entry;
 	proc->status = PROC_READY;
 	proc->iframe.ret_eip = file->e_entry;
+	kprintf("ELF start = %x\n", proc->iframe.ret_eip);
 
 	proc->iframe.ds = GD_UD | 3;
 	proc->iframe.es = GD_UD | 3;
@@ -73,28 +74,16 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	return 0;
 }
 
+
 void process_ret(Process *proc)
 {
-	__asm __volatile("movl %0,%%esp\n"
-			"\tpopal\n"
-			"\tpopl %%es\n"
-			"\tpopl %%ds\n"
-			"\taddl $0x8,%%esp\n" /* skip tf_trapno and tf_errcode */
-			"\tiret"
-			: : "g" (&(proc->iframe)) : "memory");
-//	__asm __volatile(
-//			"movw $0x23, %%ax\n\t"
-//			"movw %%ax, %%ds\n\t"
-//			"movw %%ax, %%es\n\t"
-//			"movw %%ax, %%fs\n\t"
-//			"movw %%ax, %%gs\n\t"
-//
-//			"movl %%esp, %%eax\n\t"
-//			"pushl $0x23\n\t"
-//			"pushl %%eax\n\t"
-//			"pushf\n\t"
-//			"pushl $0x1B\n\t"
-//			"pushl %0\n\t"
-//			"iret\n\t"::"r"(0x1000));
-
+	__asm __volatile(".intel_syntax noprefix\n\t"
+			"mov esp, %0\n\t"
+			"popad\n\t"
+			"pop es\n\t"
+			"pop ds\n\t"
+			"add esp, 8\n\t"
+			"iret\n\t"
+			".att_syntax\n\t"
+			: : "g" (&proc->iframe));
 }

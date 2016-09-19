@@ -26,10 +26,10 @@ int kernel_main(uintptr_t gdt_start)
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(40, 2);
-	while(is_bsy() || get_cur_ind() < 2);
+	ata_request_readsector(48, 3);
+	while(is_bsy() || get_cur_ind() < 3);
 
-	if(((uint8_t *)get_ata_buffer())[0x350] != 0x6D)
+	if(((uint8_t *)get_ata_buffer())[0x350] != 0x8B)
 		kprintf("%x\n", ((uint8_t *)get_ata_buffer())[0x350]);
 	else
 		kprintf("Correct value read from HDD\n");

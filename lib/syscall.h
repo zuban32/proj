@@ -2,19 +2,12 @@
 #define LIB_SYSCALL_H_
 
 enum {
-	SYS_PUTS,
+	SYS_PUTC = 1,
 };
 
+#include <stdint.h>
+
 // maybe should add par6(ebp) to be Linux compatible
-inline int syscall(int num, int par1, int par2, int par3, int par4, int par5)
-{
-	int res;
-	__asm __volatile(
-			"int $0x80\n\t"
-			:"=a"(res):"a"(num), "b"(par1), "c"(par2),"d"(par3),"S"(par4),"D"(par5)
-			:"memory"
-			);
-	return res;
-}
+uint32_t syscall(uint32_t num, uint32_t par1, uint32_t par2, uint32_t par3, uint32_t par4, uint32_t par5);
 
 #endif /* LIB_SYSCALL_H_ */

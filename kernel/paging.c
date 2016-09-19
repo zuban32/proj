@@ -47,5 +47,5 @@ void handle_pagefault(Intframe *iframe)
 void page_alloc(uint32_t vaddr)
 {
 	kprintf("Allocating page for addr %x\n", vaddr);
-	pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_P;
+	pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_P | PAGE_U;
 }

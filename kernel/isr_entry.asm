@@ -1,5 +1,3 @@
-[bits 32]
-
 %macro isr_entry 2
 global isr%1_start
 isr%1_start:
@@ -7,15 +5,17 @@ isr%1_start:
 	push eax
 	%endif
 	push %1
-	push eax
-	push eax
+	push ds
+	push es
 	pushad
 	push esp
 	extern global_handler
 	call global_handler
 	add esp, 4
 	popad
-	add esp, 16
+	pop es
+	pop ds
+	add esp, 8
 	iret
 %endmacro
 
@@ -70,6 +70,86 @@ isr_entry 45, 0
 isr_entry 46, 0
 isr_entry 47, 0
 isr_entry 48, 0
+isr_entry 49, 0
+isr_entry 50, 0
+isr_entry 51, 0
+isr_entry 52, 0
+isr_entry 53, 0
+isr_entry 54, 0
+isr_entry 55, 0
+isr_entry 56, 0
+isr_entry 57, 0
+isr_entry 58, 0
+isr_entry 59, 0
+isr_entry 60, 0
+isr_entry 61, 0
+isr_entry 62, 0
+isr_entry 63, 0
+isr_entry 64, 0
+isr_entry 65, 0
+isr_entry 66, 0
+isr_entry 67, 0
+isr_entry 68, 0
+isr_entry 69, 0
+isr_entry 70, 0
+isr_entry 71, 0
+isr_entry 72, 0
+isr_entry 73, 0
+isr_entry 74, 0
+isr_entry 75, 0
+isr_entry 76, 0
+isr_entry 77, 0
+isr_entry 78, 0
+isr_entry 79, 0
+isr_entry 80, 0
+isr_entry 81, 0
+isr_entry 82, 0
+isr_entry 83, 0
+isr_entry 84, 0
+isr_entry 85, 0
+isr_entry 86, 0
+isr_entry 87, 0
+isr_entry 88, 0
+isr_entry 89, 0
+isr_entry 90, 0
+isr_entry 91, 0
+isr_entry 92, 0
+isr_entry 93, 0
+isr_entry 94, 0
+isr_entry 95, 0
+isr_entry 96, 0
+isr_entry 97, 0
+isr_entry 98, 0
+isr_entry 99, 0
+isr_entry 100, 0
+isr_entry 101, 0
+isr_entry 102, 0
+isr_entry 103, 0
+isr_entry 104, 0
+isr_entry 105, 0
+isr_entry 106, 0
+isr_entry 107, 0
+isr_entry 108, 0
+isr_entry 109, 0
+isr_entry 110, 0
+isr_entry 111, 0
+isr_entry 112, 0
+isr_entry 113, 0
+isr_entry 114, 0
+isr_entry 115, 0
+isr_entry 116, 0
+isr_entry 117, 0
+isr_entry 118, 0
+isr_entry 119, 0
+isr_entry 120, 0
+isr_entry 121, 0
+isr_entry 122, 0
+isr_entry 123, 0
+isr_entry 124, 0
+isr_entry 125, 0
+isr_entry 126, 0
+isr_entry 127, 0
+isr_entry 128, 0
 
 section .data
 
@@ -124,3 +204,83 @@ dd isr45_start
 dd isr46_start
 dd isr47_start
 dd isr48_start
+dd isr49_start
+dd isr50_start
+dd isr51_start
+dd isr52_start
+dd isr53_start
+dd isr54_start
+dd isr55_start
+dd isr56_start
+dd isr57_start
+dd isr58_start
+dd isr59_start
+dd isr60_start
+dd isr61_start
+dd isr62_start
+dd isr63_start
+dd isr64_start
+dd isr65_start
+dd isr66_start
+dd isr67_start
+dd isr68_start
+dd isr69_start
+dd isr70_start
+dd isr71_start
+dd isr72_start
+dd isr73_start
+dd isr74_start
+dd isr75_start
+dd isr76_start
+dd isr77_start
+dd isr78_start
+dd isr79_start
+dd isr80_start
+dd isr81_start
+dd isr82_start
+dd isr83_start
+dd isr84_start
+dd isr85_start
+dd isr86_start
+dd isr87_start
+dd isr88_start
+dd isr89_start
+dd isr90_start
+dd isr91_start
+dd isr92_start
+dd isr93_start
+dd isr94_start
+dd isr95_start
+dd isr96_start
+dd isr97_start
+dd isr98_start
+dd isr99_start
+dd isr100_start
+dd isr101_start
+dd isr102_start
+dd isr103_start
+dd isr104_start
+dd isr105_start
+dd isr106_start
+dd isr107_start
+dd isr108_start
+dd isr109_start
+dd isr110_start
+dd isr111_start
+dd isr112_start
+dd isr113_start
+dd isr114_start
+dd isr115_start
+dd isr116_start
+dd isr117_start
+dd isr118_start
+dd isr119_start
+dd isr120_start
+dd isr121_start
+dd isr122_start
+dd isr123_start
+dd isr124_start
+dd isr125_start
+dd isr126_start
+dd isr127_start
+dd isr128_start

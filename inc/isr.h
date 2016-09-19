@@ -45,8 +45,10 @@ typedef struct
 	uint32_t edx;
 	uint32_t ecx;
 	uint32_t eax;
-	uint32_t es;
-	uint32_t ds;
+	uint16_t es;
+	uint16_t padd1;
+	uint16_t ds;
+	uint16_t padd2;
 	uint32_t intno;
 	uint32_t err_code;
 //	below provided by x86

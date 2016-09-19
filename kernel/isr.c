@@ -34,6 +34,12 @@ void print_intframe(Intframe *iframe)
 	kprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\n", iframe->ret_eip,
 			iframe->ret_cs, iframe->eflags);
 
+	if(iframe->intno == ISR_GP) {
+		kprintf("ds = %x\n", iframe->ds);
+		kprintf("es = %x\n", iframe->es);
+		kprintf("ss = %x\n", iframe->ss);
+	}
+
 	kprintf("[ ");   //just like gdb shows enable flags
 	for (int i = 0; i < 22; i++) {
 		if (i == 12) {
@@ -103,7 +109,10 @@ void global_handler(Intframe *iframe)
 		com_hndl();
 		break;
 	case 0x80:
-		kprintf("Syscall\n");
+		kprintf("Syscall #%d\n", iframe->eax);
+		if(iframe->eax == 0) {
+			kprintf("%d\n", (char)iframe->ebx);
+		}
 		break;
 	default:
 		kprintf("ISR for int num %d doesn't exist\n", iframe->intno);

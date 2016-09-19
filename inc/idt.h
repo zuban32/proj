@@ -3,7 +3,7 @@
 
 #include <inc/common.h>
 
-#define IDTSIZE 0x40
+#define IDTSIZE 0x81
 
 #define i386_INT 	0x8E
 #define i386_TRAP 	0x8F
