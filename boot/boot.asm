@@ -81,6 +81,7 @@ begin_PM:
     mov ebx, pm_str
     call print_string_pm
 
+	push gdt_start
     call KERN_OFF
     
     jmp $

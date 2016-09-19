@@ -35,6 +35,7 @@ void load_idt(void)
 	addISR(ISR_GP, 0x8, i386_INT);
 	addISR(32, 0x8, i386_TRAP);
 	addISR(32 + 14, 0x8, i386_TRAP);
+//	addISR(0x80, 0x8, i386_TRAP);
 //	int i = 0;
 //	for(i = 32; i < 32 + 16; i++)
 //		addISR(i, 0x8, i386_TRAP);

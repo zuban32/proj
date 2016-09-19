@@ -18,6 +18,7 @@
 
 void init_pages(void);
 void handle_pagefault(Intframe *iframe);
+void page_alloc(uint32_t vaddr);
 
 #endif
 

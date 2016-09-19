@@ -26,7 +26,7 @@ void print_intframe(Intframe *iframe)
 		return;
 	kprintf("\n-------------------------\n");
 	kprintf("INTFRAME\n%d - ", iframe->intno);
-	if (iframe->intno >= 0 && iframe->intno < 21 && iframe->intno != 9
+	if (iframe->intno < 21 && iframe->intno != 9
 			&& iframe->intno != 15)
 		kprintf("%s\n", exception_names[iframe->intno]);
 	else
@@ -101,6 +101,9 @@ void global_handler(Intframe *iframe)
 		break;
 	case ISR_COM1:
 		com_hndl();
+		break;
+	case 0x80:
+		kprintf("Syscall\n");
 		break;
 	default:
 		kprintf("ISR for int num %d doesn't exist\n", iframe->intno);

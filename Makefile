@@ -30,8 +30,11 @@ all: kernel.bin boot.bin user
 	@cat /home/zuban32/a.out >> os.disk
 	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 
-gdb: boot.bin kernel.bin
-	@cat $^ > os.disk
+gdb: kernel.bin boot.bin user kernel.asm
+	@cat boot.bin kernel.bin > os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x5000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	@cat /home/zuban32/a.out >> os.disk
+	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 	@$(QEMU) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
 
 boot.bin: $(BOOT_SRCS)
@@ -45,7 +48,7 @@ kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(KERNEL_CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.c=.o));)
 
 kernel.asm: kernel.obj
-	@$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(TEST_OBJ) -o $(OBJDIR)$<
+	@$(LD) $(DLDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(GCC_LIB) -o $(OBJDIR)$<
 	@echo "Dumping kernel"
 	@objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit

@@ -9,8 +9,9 @@
 #include <inc/ata.h>
 #include <inc/process.h>
 #include <inc/x86_mem.h>
+#include <inc/gdt.h>
 
-int kernel_main(void)
+int kernel_main(uintptr_t gdt_start)
 {
 	init_vesa();
 	kclear_screen();
@@ -20,6 +21,8 @@ int kernel_main(void)
 	load_idt();
 	init_serial();
 	init_pages();
+	kprintf("GDT start: %x\n", gdt_start);
+	init_user_gdt((gdt_entry *)gdt_start);
 	kprintf("Init finished\n");
 
 	// test ATA read
@@ -37,6 +40,9 @@ int kernel_main(void)
 	} else {
 		load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr);
 	}
+
+	kprintf("Process loaded and created successfully\n");
+	process_ret(pr);
 
 	RAMMap *map = (RAMMap *)0x500;
 	kprintf("RAM size: %d\n", get_memory_size(map));

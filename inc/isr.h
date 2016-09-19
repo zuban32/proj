@@ -37,7 +37,6 @@ enum
 
 typedef struct
 {
-	int32_t intno;
 	uint32_t edi;
 	uint32_t esi;
 	uint32_t ebp;
@@ -46,10 +45,16 @@ typedef struct
 	uint32_t edx;
 	uint32_t ecx;
 	uint32_t eax;
+	uint32_t es;
+	uint32_t ds;
+	uint32_t intno;
 	uint32_t err_code;
-	uint32_t ret_eip;
+//	below provided by x86
+	uintptr_t ret_eip;
 	uint32_t ret_cs;
 	uint32_t eflags;
+	uintptr_t esp;
+	uint32_t ss;
 } Intframe;
 
 void printf_intframe(Intframe *iframe);

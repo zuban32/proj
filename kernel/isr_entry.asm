@@ -3,16 +3,19 @@
 %macro isr_entry 2
 global isr%1_start
 isr%1_start:
-	pushad
+	%if %2 == 0
+	push eax
+	%endif
 	push %1
+	push eax
+	push eax
+	pushad
 	push esp
 	extern global_handler
 	call global_handler
-	add esp, 8
-	popad
-	%if %2 = 1
 	add esp, 4
-	%endif
+	popad
+	add esp, 16
 	iret
 %endmacro
 
