@@ -2,7 +2,7 @@
 #define LIB_SYSCALL_H_
 
 enum {
-	SYS_PUTC = 1,
+	SYS_PUTS,
 };
 
 #include <stdint.h>

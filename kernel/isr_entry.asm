@@ -2,12 +2,15 @@
 global isr%1_start
 isr%1_start:
 	%if %2 == 0
-	push eax
+	push 0
 	%endif
 	push %1
 	push ds
 	push es
 	pushad
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
 	push esp
 	extern global_handler
 	call global_handler

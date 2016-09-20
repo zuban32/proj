@@ -29,23 +29,17 @@ int kernel_main(uintptr_t gdt_start)
 	ata_request_readsector(48, 3);
 	while(is_bsy() || get_cur_ind() < 3);
 
-	if(((uint8_t *)get_ata_buffer())[0x350] != 0x8B)
-		kprintf("%x\n", ((uint8_t *)get_ata_buffer())[0x350]);
-	else
-		kprintf("Correct value read from HDD\n");
+	RAMMap *map = (RAMMap *)0x500;
+	dump_map(map);
+	kprintf("RAM size: %d\n", get_memory_size(map));
 
 	Process *pr = create_process();
-	if(pr == NULL) {
-		kprintf("Error creating process\n");
+	if(load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr)) {
+		kprintf("Error loading process\n");
 	} else {
-		load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr);
+		kprintf("Process loaded and created successfully\n");
+		process_ret(pr);
 	}
-
-	kprintf("Process loaded and created successfully\n");
-	process_ret(pr);
-
-	RAMMap *map = (RAMMap *)0x500;
-	kprintf("RAM size: %d\n", get_memory_size(map));
 
 	while (1)
 		cmd();

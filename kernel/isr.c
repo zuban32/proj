@@ -53,7 +53,7 @@ void print_intframe(Intframe *iframe)
 	}
 	kprintf("]\n");
 
-	kprintf("err_code = %03b  ", iframe->err_code & 0x7);
+	kprintf("err_code = %03b\n", iframe->err_code & 0x7);
 	if (iframe->intno == ISR_PF) {
 		kprintf((!(iframe->err_code & PAGE_U)) ? "kernel " : "user ");
 		kprintf((!(iframe->err_code & PAGE_W)) ? "read " : "write ");
@@ -61,8 +61,9 @@ void print_intframe(Intframe *iframe)
 
 		uint32_t err_addr = 0;
 		__asm__ __volatile__("movl %%cr2, %%eax\n\t":"=a"(err_addr));
-		kprintf("fault addr = %x", err_addr);
+		kprintf("fault addr = %x\n", err_addr);
 	}
+
 	kprintf("\n-------------------------\n\n");
 }
 
@@ -111,7 +112,8 @@ void global_handler(Intframe *iframe)
 	case 0x80:
 		kprintf("Syscall #%d\n", iframe->eax);
 		if(iframe->eax == 0) {
-			kprintf("%d\n", (char)iframe->ebx);
+			for(int i = 0; i < iframe->ecx; i++)
+				kprintf("%c", ((char *)iframe->ebx)[i]);
 		}
 		break;
 	default:

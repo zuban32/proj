@@ -176,8 +176,16 @@ void kputc(char c, char move_bound)
 {
 	if (cur_x < DISPLAY_COLUMN_LEN && cur_y < DISPLAY_STRING_LEN && cur_x >= 0
 			&& cur_y >= 0) {
-		draw_letter(cur_x, cur_y, get_letter_font(c - 32));
-		cur_x++;
+		if(c == '\n') {
+			kendline();
+		} else if(c == '\b') {
+			kbackspace();
+		} else if(c == ' ') {
+			cur_x++;
+		} else {
+			draw_letter(cur_x, cur_y, get_letter_font(c - 32));
+			cur_x++;
+		}
 		if (move_bound)
 			cur_bound = cur_x;
 	}

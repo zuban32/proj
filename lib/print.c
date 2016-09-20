@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <syscall.h>
 
-int puts(const char *str)
+int puts(const char *str, int len)
 {
-	while(*str) {
-		syscall(1, (uint32_t)*str, 0, 0, 0, 0);
-		str++;
-	}
+	syscall(SYS_PUTS, (uint32_t)str, len, 0, 0, 0);
 	return 0;
 }

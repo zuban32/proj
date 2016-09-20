@@ -44,6 +44,10 @@ Process *get_cur_process(void)
 
 int load_process_code(Elf32_Ehdr *file, Process *proc)
 {
+	if(!proc) {
+		kprintf("Process for loading us NULL\n");
+		return 1;
+	}
 	if(!is_elf(file)) {
 		kprintf("Error loading ELF: it's not ELF\n");
 		return 1;
@@ -65,8 +69,8 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	proc->iframe.ds = GD_UD | 3;
 	proc->iframe.es = GD_UD | 3;
 	proc->iframe.ss = GD_UD | 3;
-	page_alloc(0xF0000000 - 4096 * 2);
-	proc->iframe.esp = 0xF0000000 - (4096 * 2);
+	page_alloc(0xF000000 - 4096 * 2);
+	proc->iframe.esp = 0xF000000 - (4096 * 2);
 	proc->iframe.ret_cs = GD_UT | 3;
 	// Enable interrupts while in user mode.
 	proc->iframe.eflags |= 0x200;
