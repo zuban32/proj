@@ -55,7 +55,6 @@ error:
     jmp $
     
     %include "boot/gdt.asm"
-    %include "boot/video.asm"
     %include "boot/switch_pm.asm"
 
 [bits 16]
@@ -77,9 +76,6 @@ error:
 [bits 32]
 begin_PM:
     sti
-    
-    mov ebx, pm_str
-    call print_string_pm
 
 	push gdt_start
     call KERN_OFF
@@ -87,6 +83,5 @@ begin_PM:
     jmp $
     
     boot_drive db 0
-    pm_str db "Loading kernel", 0
     times 510 - ($ - $$) db 0
     dw 0xaa55
