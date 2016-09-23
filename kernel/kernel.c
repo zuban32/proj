@@ -33,10 +33,11 @@ int kernel_main(uintptr_t gdt_start)
 //	dump_map(map);
 	kprintf("RAM size: %d\n", get_memory_size(map));
 
-	Process *pr1 = create_process(), *pr2 = create_process();
-	int ret1 = load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr1);
-	int ret2 = load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr2);
-	if(ret1 || ret2) {
+	Process *pr1 = create_process(), *pr2 = create_process(), *pr3 = create_process();
+	int ret = load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr1);
+	ret |= load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr2);
+	ret |= load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr3);
+	if(ret) {
 		kprintf("Error loading process\n");
 	} else {
 		kprintf("Processes loaded and created successfully\n");

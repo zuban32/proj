@@ -13,9 +13,9 @@ void sched_yield(void)
 
 				cur = proc_table;
 			}
-			kprintf("Sched: looking at proc %d\n", cur->id);
+//			kprintf("Sched: looking at proc %d\n", cur->id);
 			if(cur->status == PROC_READY) {
-				kprintf("Running this process\n");
+//				kprintf("Running this process\n");
 				process_ret(cur);
 			}
 			cur++;

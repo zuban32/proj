@@ -105,7 +105,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 
 void process_ret(Process *proc)
 {
-	kprintf("Ret from proc %d\n", proc->id);
+//	kprintf("Ret from proc %d\n", proc->id);
 	proc->status = PROC_RUNNING;
 	set_cur_process(proc);
 	__asm __volatile(".intel_syntax noprefix\n\t"
