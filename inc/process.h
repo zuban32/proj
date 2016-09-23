@@ -16,7 +16,7 @@ enum {
 };
 
 typedef struct {
-	int pid;
+	int id;
 	int status;
 	void *code_start;
 	Intframe iframe;
@@ -24,8 +24,17 @@ typedef struct {
 
 Process *create_process(void);
 Process *get_process_table(void);
+
+void set_cur_process(Process *proc);
 Process *get_cur_process(void);
+
+int get_max_pid(void);
 int load_process_code(Elf32_Ehdr *file, Process *proc);
 void process_ret(Process *proc);
+
+int sched_enabled(void);
+void enable_sched(void);
+
+void sched_yield(void);
 
 #endif /* INC_PROCESS_H_ */

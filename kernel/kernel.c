@@ -30,19 +30,23 @@ int kernel_main(uintptr_t gdt_start)
 	while(is_bsy() || get_cur_ind() < 3);
 
 	RAMMap *map = (RAMMap *)0x500;
-	dump_map(map);
+//	dump_map(map);
 	kprintf("RAM size: %d\n", get_memory_size(map));
 
-	Process *pr = create_process();
-	if(load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr)) {
+	Process *pr1 = create_process(), *pr2 = create_process();
+	int ret1 = load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr1);
+	int ret2 = load_process_code((Elf32_Ehdr *)get_ata_buffer(), pr2);
+	if(ret1 || ret2) {
 		kprintf("Error loading process\n");
 	} else {
-		kprintf("Process loaded and created successfully\n");
-		process_ret(pr);
+		kprintf("Processes loaded and created successfully\n");
+//		process_ret(pr);
 	}
 
-	while (1)
-		cmd();
+	enable_sched();
+
+	while (1);
+//		cmd();
 
 	return 0;
 }

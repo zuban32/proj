@@ -42,7 +42,7 @@ void init_pic(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6B);
 	outb(PIC_S_CMD, 0x6B);
 
-	MASK(1, 0);
+	UNMASK(1, 0);
 	UNMASK(1, 4);
 	UNMASK(1, 14);
 

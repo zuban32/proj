@@ -16,6 +16,9 @@
 #define PTX(addr) ((addr)>>12 & ((PGSIZE >> 2) - 1))
 #define POFF(addr) ((addr) & ~(PGSIZE - 1))
 
+#define USTACKTOP 0xF000000
+#define PROCSTACKTOP(proc) (USTACKTOP - (proc->id * PGSIZE))
+
 void init_pages(void);
 void handle_pagefault(Intframe *iframe);
 void page_alloc(uint32_t vaddr);

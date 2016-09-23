@@ -70,6 +70,7 @@ void print_intframe(Intframe *iframe)
 static void timer_hndl(void)
 {
 	pic_sendEOI(0);
+	sched_yield();
 }
 
 void global_handler(Intframe *iframe)
@@ -78,7 +79,8 @@ void global_handler(Intframe *iframe)
 	// if switch from userspace
 	if((iframe->ret_cs & 3) == 3) {
 		cur_proc->iframe = *iframe;
-		iframe = &cur_proc->iframe;
+		cur_proc->status = PROC_READY;
+//		iframe = &cur_proc->iframe;
 	}
 
 	if(iframe->intno != 0x20)
@@ -110,10 +112,12 @@ void global_handler(Intframe *iframe)
 		com_hndl();
 		break;
 	case 0x80:
-		kprintf("Syscall #%d\n", iframe->eax);
+//		kprintf("Syscall #%d\n", iframe->eax);
 		if(iframe->eax == 0) {
 			for(int i = 0; i < iframe->ecx; i++)
 				kprintf("%c", ((char *)iframe->ebx)[i]);
+		} else if(iframe->eax == 1) {
+			iframe->eax = cur_proc->id;
 		}
 		break;
 	default:

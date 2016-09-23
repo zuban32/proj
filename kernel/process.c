@@ -8,7 +8,19 @@
 #define GD_UD 0x20
 
 static int cur_max_pid = 0;
+static int sched_status = 0;
+static Process *cur_proc = NULL;
 static Process process_table[MAX_PROCESS_NUM];
+
+int sched_enabled(void)
+{
+	return sched_status == 1;
+}
+
+void enable_sched(void)
+{
+	sched_status = 1;
+}
 
 Process *create_process(void)
 {
@@ -18,7 +30,8 @@ Process *create_process(void)
 	Process *res = &process_table[cur_max_pid++];
 	kmemset(res, 0, sizeof(*res));
 	res->status = PROC_EMPTY;
-	res->pid = cur_max_pid - 1;
+	res->id = cur_max_pid - 1;
+	kprintf("Creating proc: %d\n", res->id);
 	res->code_start = NULL;
 
 	return res;
@@ -29,17 +42,27 @@ Process *get_process_table(void)
 	return process_table;
 }
 
-static Process *get_process(int pid)
+//static Process *get_process(int pid)
+//{
+//	if(pid < 0 || pid > MAX_PROCESS_NUM) {
+//		return NULL;
+//	}
+//	return &process_table[pid];
+//}
+
+void set_cur_process(Process *proc)
 {
-	if(pid < 0 || pid > MAX_PROCESS_NUM) {
-		return NULL;
-	}
-	return &process_table[pid];
+	cur_proc = proc;
 }
 
 Process *get_cur_process(void)
 {
-	return get_process(cur_max_pid - 1);
+	return cur_proc;
+}
+
+int get_max_pid(void)
+{
+	return cur_max_pid;
 }
 
 int load_process_code(Elf32_Ehdr *file, Process *proc)
@@ -62,18 +85,19 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 		}
 	}
 	proc->code_start = (void *)file->e_entry;
-	proc->status = PROC_READY;
 	proc->iframe.ret_eip = file->e_entry;
 	kprintf("ELF start = %x\n", proc->iframe.ret_eip);
 
 	proc->iframe.ds = GD_UD | 3;
 	proc->iframe.es = GD_UD | 3;
 	proc->iframe.ss = GD_UD | 3;
-	page_alloc(0xF000000 - 4096 * 2);
-	proc->iframe.esp = 0xF000000 - (4096 * 2);
+	uint32_t stack_top = PROCSTACKTOP(proc);
+	page_alloc(stack_top);
+	proc->iframe.esp = stack_top;
 	proc->iframe.ret_cs = GD_UT | 3;
 	// Enable interrupts while in user mode.
 	proc->iframe.eflags |= 0x200;
+	proc->status = PROC_READY;
 
 	return 0;
 }
@@ -81,12 +105,16 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 
 void process_ret(Process *proc)
 {
+	kprintf("Ret from proc %d\n", proc->id);
+	proc->status = PROC_RUNNING;
+	set_cur_process(proc);
 	__asm __volatile(".intel_syntax noprefix\n\t"
 			"mov esp, %0\n\t"
 			"popad\n\t"
 			"pop es\n\t"
 			"pop ds\n\t"
 			"add esp, 8\n\t"
+//			"sti\n\t"
 			"iret\n\t"
 			".att_syntax\n\t"
 			: : "g" (&proc->iframe));
