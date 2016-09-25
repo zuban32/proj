@@ -7,6 +7,7 @@
 #include <inc/string.h>
 #include <inc/ata.h>
 #include <inc/process.h>
+#include <inc/syscall.h>
 
 const char *exception_names[] = { "Divide error", "Debug Exception",
 		"NMI Interrupt", "Breakpoint", "Overflow", "BOUND Range Exceeded",
@@ -75,8 +76,8 @@ static void timer_hndl(void)
 
 void global_handler(Intframe *iframe)
 {
-	Process *cur_proc = get_cur_process();
 	// if switch from userspace
+	Process *cur_proc = get_cur_process();
 	if((iframe->ret_cs & 3) == 3) {
 		cur_proc->iframe = *iframe;
 		cur_proc->status = PROC_READY;
@@ -113,12 +114,7 @@ void global_handler(Intframe *iframe)
 		break;
 	case 0x80:
 //		kprintf("Syscall #%d\n", iframe->eax);
-		if(iframe->eax == 0) {
-			for(int i = 0; i < iframe->ecx; i++)
-				kprintf("%c", ((char *)iframe->ebx)[i]);
-		} else if(iframe->eax == 1) {
-			iframe->eax = cur_proc->id;
-		}
+		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
 		break;
 	default:
 		kprintf("ISR for int num %d doesn't exist\n", iframe->intno);
