@@ -9,20 +9,25 @@ enum {
 };
 
 enum {
-	PROC_DEAD,
 	PROC_EMPTY,
+	PROC_TAKEN,
+	PROC_READY,
 	PROC_RUNNING,
-	PROC_READY
+	PROC_DEAD
 };
 
-typedef struct {
+typedef struct Process Process;
+
+typedef struct Process {
 	int id;
 	int status;
 	void *code_start;
 	Intframe iframe;
+	Process *next;
+	Process *prev;
 } Process;
 
-Process *create_process(void);
+Process *create_process(Elf32_Ehdr *file);
 Process *get_process_table(void);
 
 void set_cur_process(Process *proc);

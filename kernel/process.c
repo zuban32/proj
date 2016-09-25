@@ -22,20 +22,50 @@ void enable_sched(void)
 	sched_status = 1;
 }
 
-Process *create_process(void)
+static Process *init_process(void)
 {
-	if(cur_max_pid + 1 == MAX_PROCESS_NUM) {
+	Process *cur = process_table, *end = cur + MAX_PROCESS_NUM;
+	Process *prev = NULL;
+	while(cur < end) {
+		if(cur->status == PROC_EMPTY) {
+			// found right place
+			kmemset(cur, 0, sizeof(*cur));
+			if(prev) {
+				if(prev->next) {
+					prev->next->prev = cur;
+				}
+				prev->next = cur;
+				cur->next = prev->next;
+			}
+			cur->prev = prev;
+			cur->status = PROC_TAKEN;
+			break;
+		} else {
+			prev = cur;
+		}
+		cur++;
+	}
+	if(cur == end) {
+		kprintf("Panic: can't create new process - not enought space\n");
 		return NULL;
 	}
-	Process *res = &process_table[cur_max_pid++];
-	kmemset(res, 0, sizeof(*res));
+
+	Process *res = cur;
 	res->status = PROC_EMPTY;
-	res->id = cur_max_pid - 1;
+	res->id = cur_max_pid++;
 	kprintf("Creating proc: %d\n", res->id);
 	res->code_start = NULL;
 
 	return res;
 }
+
+Process *create_process(Elf32_Ehdr *file)
+{
+	Process *proc = init_process();
+	load_process_code(file, proc);
+	return proc;
+}
+
 
 Process *get_process_table(void)
 {
