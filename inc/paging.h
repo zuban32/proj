@@ -10,8 +10,6 @@
 #define PAGE_W 1 << 1
 #define PAGE_U 1 << 2
 
-#define CHECKADDR 0x1346789
-
 #define PDX(addr) ((addr)>>22)
 #define PTX(addr) ((addr)>>12 & ((PGSIZE >> 2) - 1))
 #define POFF(addr) ((addr) & ~(PGSIZE - 1))
@@ -21,7 +19,7 @@
 
 void init_pages(void);
 void handle_pagefault(Intframe *iframe);
-void page_alloc(uint32_t vaddr);
+void page_alloc(uint32_t vaddr, int user);
 
 #endif
 

@@ -10,6 +10,7 @@
 
 void addISR(uint8_t ind, uint16_t selector, uint8_t type);
 void load_idt(void);
+int isr_exists(int num);
 
 struct idt_entry
 {

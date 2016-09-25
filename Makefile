@@ -6,7 +6,7 @@ QEMU_FLAGS = -m 4G
 CFLAGS = -m32 -std=c11 -fno-builtin -ffreestanding\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
 KERNEL_CFLAGS = -c -I../proj
-USER_CFLAGS =  -nostdlib -I../proj/lib
+USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
 LDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 --oformat binary -e kern_start
 DLDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 -e kern_start
 GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
@@ -61,7 +61,6 @@ kernel.bin: kernel.obj
 	@$(LD) $(LDFLAGS) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(GCC_LIB) -o $@
 	
 usrlib:
-#	$(CC) -c $(CFLAGS) $(USER_CFLAGS) $(LIB_C) -o $(LIB_OUT).o
 	@$(foreach var, $(LIB_C), $(CC) -c $(CFLAGS) $(USER_CFLAGS) $(var) -o $(notdir $(var:.c=.o));)
 	ar r $(LIB_OUT).a $(LIB_OBJ)
 

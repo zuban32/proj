@@ -103,16 +103,16 @@ void global_handler(Intframe *iframe)
 	case ISR_GP:
 		gpf_hndl();
 		break;
-	case 0x20:
+	case ISR_PIT:
 		timer_hndl();
 		break;
-	case 46:
+	case ISR_ATA:
 		ata_complete_readsector();
 		break;
 	case ISR_COM1:
 		com_hndl();
 		break;
-	case 0x80:
+	case ISR_SYSCALL:
 //		kprintf("Syscall #%d\n", iframe->eax);
 		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
 		break;

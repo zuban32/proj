@@ -35,6 +35,7 @@ void put_pixel(int x, int y, int r, int g, int b)
 	uintptr_t place = (x + y * DISPLAY_PIXEL_WIDTH) * COLOR_DEPTH;
 
 	uint8_t *mem = (uint8_t *) VIDEO_MEM + place;
+
 	mem[0] = r;
 	mem[1] = g;
 	mem[2] = b;

@@ -22,12 +22,17 @@ void enable_sched(void)
 	sched_status = 1;
 }
 
+void disable_sched(void)
+{
+	sched_status = 0;
+}
+
 static Process *init_process(void)
 {
 	Process *cur = process_table, *end = cur + MAX_PROCESS_NUM;
 	Process *prev = NULL;
 	while(cur < end) {
-		if(cur->status == PROC_EMPTY) {
+		if(cur->status == PROC_FREE) {
 			// found right place
 			kmemset(cur, 0, sizeof(*cur));
 			if(prev) {
@@ -51,7 +56,7 @@ static Process *init_process(void)
 	}
 
 	Process *res = cur;
-	res->status = PROC_EMPTY;
+	res->status = PROC_FREE;
 	res->id = cur_max_pid++;
 	kprintf("Creating proc: %d\n", res->id);
 	res->code_start = NULL;
@@ -66,6 +71,33 @@ Process *create_process(Elf32_Ehdr *file)
 	return proc;
 }
 
+Process *create_kernel_process(void (*code)(void))
+{
+	Process *proc = init_process();
+	proc->status = PROC_TAKEN;
+	proc->iframe.ret_eip = (uint32_t)code;
+	page_alloc(proc->iframe.ret_eip, 0);
+	proc->iframe.ret_cs = 0x8;
+	proc->iframe.ds = 0x10;
+	proc->iframe.es = 0x10;
+	proc->iframe.ss = 0x10;
+	proc->iframe.esp = 0x900000;
+	proc->status = PROC_READY;
+	proc->iframe.eflags |= 0x200;
+	return proc;
+}
+
+void free_process(Process *proc)
+{
+	proc->status = PROC_DEAD;
+	if(proc->prev) {
+		proc->prev->next = proc->next;
+	}
+	if(proc->next) {
+		proc->next->prev = proc->prev;
+	}
+	proc->status = PROC_FREE;
+}
 
 Process *get_process_table(void)
 {
@@ -109,7 +141,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	for(int i = 0; i < file->e_phnum; i++) {
 		Elf32_Phdr *cur_ph = ph + i;
 		if(cur_ph->p_type == 1) {
-			page_alloc(cur_ph->p_vaddr);
+			page_alloc(cur_ph->p_vaddr, 1);
 			kmemset((void *)cur_ph->p_vaddr, 0, cur_ph->p_memsz);
 			kmemcpy((void *)cur_ph->p_vaddr, (char *)file + cur_ph->p_offset, cur_ph->p_filesz);
 		}
@@ -122,7 +154,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	proc->iframe.es = GD_UD | 3;
 	proc->iframe.ss = GD_UD | 3;
 	uint32_t stack_top = PROCSTACKTOP(proc);
-	page_alloc(stack_top);
+	page_alloc(stack_top, 1);
 	proc->iframe.esp = stack_top;
 	proc->iframe.ret_cs = GD_UT | 3;
 	// Enable interrupts while in user mode.

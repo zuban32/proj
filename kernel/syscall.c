@@ -13,6 +13,10 @@ uint32_t syscall(Process *cur_proc, uint32_t num, uint32_t par1, uint32_t par2, 
 	case SYS_GETPID:
 		res = cur_proc->id;
 		break;
+	case SYS_EXIT:
+		free_process(cur_proc);
+		sched_yield();
+		break;
 	default:
 		kprintf("Syscall with num [%d] doesn't exist\n", num);
 		break;

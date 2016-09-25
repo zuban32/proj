@@ -22,8 +22,8 @@ void cmd_isr(void)
 void cmd_listisr(void)
 {
 	for (int i = 0; i < IDTSIZE; i++)
-		if (idt_tbl[i].offset1 || idt_tbl[i].offset2)
-			kprintf("%d ", i);
+		if (isr_exists(i))
+			kprintf("%x ", i);
 	kendline();
 }
 

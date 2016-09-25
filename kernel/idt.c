@@ -6,9 +6,14 @@
 
 extern uintptr_t isr_handlers[];
 
-struct idt_entry idt_tbl[IDTSIZE] __attribute__ ((aligned (16 * PGSIZE)));
-struct idt_descr idtr =
+static struct idt_entry idt_tbl[IDTSIZE] __attribute__ ((aligned (16 * PGSIZE)));
+static struct idt_descr idtr =
 		{ IDTSIZE * sizeof(struct idt_entry), (uint32_t) idt_tbl };
+
+int isr_exists(int num)
+{
+	return idt_tbl[num].offset1 || idt_tbl[num].offset2;
+}
 
 void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 {

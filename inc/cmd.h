@@ -1,7 +1,7 @@
 #ifndef CMD_H_INCLUDED
 #define CMD_H_INCLUDED
 
-#define CMD_NUM 5
+#define CMD_NUM 4
 #define CMD_NAME_LEN 80
 #define MAX_PARAMS 2
 

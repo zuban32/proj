@@ -3,7 +3,8 @@
 
 enum {
 	SYS_PUTS,
-	SYS_GETPID
+	SYS_GETPID,
+	SYS_EXIT
 };
 
 #include <stdint.h>

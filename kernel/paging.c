@@ -41,11 +41,13 @@ void init_pages(void)
 
 void handle_pagefault(Intframe *iframe)
 {
-	pgtbl[PDX(CHECKADDR)][PTX(CHECKADDR)] |= PAGE_U | PAGE_W | PAGE_P;
+	uint32_t err_addr = 0;
+	__asm__ __volatile__("movl %%cr2, %%eax\n\t":"=a"(err_addr));
+	page_alloc(err_addr, 0);
 }
 
-void page_alloc(uint32_t vaddr)
+void page_alloc(uint32_t vaddr, int user)
 {
 	kprintf("Allocating page for addr %x\n", vaddr);
-	pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_P | PAGE_U | PAGE_W;
+	pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_P | (user ? PAGE_U : 0) | PAGE_W;
 }

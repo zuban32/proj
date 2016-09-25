@@ -27,12 +27,14 @@ enum
 	ISR_MC = 0x12,
 	ISR_XM = 0x13,
 	ISR_VE = 0x14,
-	ISR_SX = 0x30,
+//	ISR_SX = 0x30,
 
 	// already mapped
 	ISR_PIT = 0x20,
 	ISR_KBD = 0x21,
-	ISR_COM1 = 0x24
+	ISR_COM1 = 0x24,
+	ISR_ATA = 0x2E,
+	ISR_SYSCALL = 0x80
 };
 
 typedef struct

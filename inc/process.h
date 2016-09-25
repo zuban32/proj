@@ -9,7 +9,7 @@ enum {
 };
 
 enum {
-	PROC_EMPTY,
+	PROC_FREE,
 	PROC_TAKEN,
 	PROC_READY,
 	PROC_RUNNING,
@@ -28,7 +28,9 @@ typedef struct Process {
 } Process;
 
 Process *create_process(Elf32_Ehdr *file);
+Process *create_kernel_process(void (*code)(void));
 Process *get_process_table(void);
+void free_process(Process *proc);
 
 void set_cur_process(Process *proc);
 Process *get_cur_process(void);
@@ -39,6 +41,7 @@ void process_ret(Process *proc);
 
 int sched_enabled(void);
 void enable_sched(void);
+void disable_sched(void);
 
 void sched_yield(void);
 

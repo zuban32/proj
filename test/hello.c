@@ -9,6 +9,6 @@ int main(void)
 	puts("Process #", 9);
 	puts(&num, 1);
 	puts("\n", 1);
-	while(1);	// just to make sched work forever
+//	while(1);	// just to make sched work forever
 	return 0;
 }

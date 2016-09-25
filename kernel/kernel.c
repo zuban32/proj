@@ -11,6 +11,13 @@
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
 
+void idle(void)
+{
+	disable_sched();
+	while (1)
+		cmd();
+}
+
 int kernel_main(uintptr_t gdt_start)
 {
 	init_vesa();
@@ -36,18 +43,16 @@ int kernel_main(uintptr_t gdt_start)
 	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
 			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
 			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
-	int ret = (pr1 == NULL) | (pr2 == NULL) | (pr3 == NULL);
+	Process *shell = create_kernel_process(idle);
+	int ret = (pr1 == NULL) || (pr2 == NULL) || (pr3 == NULL) || (shell == NULL);
 	if(ret) {
 		kprintf("Error loading process\n");
 	} else {
 		kprintf("Processes loaded and created successfully\n");
-//		process_ret(pr);
 	}
 
 	enable_sched();
-
-	while (1);
-//		cmd();
+	sched_yield();
 
 	return 0;
 }
