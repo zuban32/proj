@@ -44,7 +44,7 @@ int kernel_main(uintptr_t gdt_start)
 			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
 			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
 	Process *shell = create_kernel_process(idle);
-	int ret = (pr1 == NULL) || (pr2 == NULL) || (pr3 == NULL) || (shell == NULL);
+	int ret = (shell == NULL) || (pr1 == NULL) || (pr2 == NULL) || (pr3 == NULL);
 	if(ret) {
 		kprintf("Error loading process\n");
 	} else {
