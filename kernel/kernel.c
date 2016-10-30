@@ -20,7 +20,9 @@ void idle(void)
 
 int kernel_main(uintptr_t gdt_start)
 {
+
 	init_vesa();
+	init_ata();
 	kclear_screen();
 
 	init_kbd();

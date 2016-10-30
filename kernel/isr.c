@@ -74,8 +74,14 @@ static void timer_hndl(void)
 	sched_yield();
 }
 
+extern void global_dispatch(Intframe *iframe);
+
 void global_handler(Intframe *iframe)
 {
+	if(iframe->intno == ISR_ATA) {
+		global_dispatch(iframe);
+		return;
+	}
 	// if switch from userspace
 	Process *cur_proc = get_cur_process();
 	if((iframe->ret_cs & 3) == 3) {
@@ -156,6 +162,7 @@ void kbd_hndl(void)
 			kendline();
 			break;
 		case 0xe:
+			kprintf("Backspace\n");
 			kbackspace();
 			break;
 		default:

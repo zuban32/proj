@@ -1,6 +1,7 @@
 #include <inc/ata.h>
 #include <inc/console.h>
 #include <inc/pic.h>
+#include <inc/controller.h>
 
 //static int ata_identify(int base)
 //{
@@ -33,10 +34,25 @@
 //	return 0;
 //}
 
-
 static uint16_t ata_read_buffer[READ_BUFFER_SIZE];
 static uint8_t cur_buf_ind;
 static uint8_t bsy;
+
+int ata_condition(int num)
+{
+	return num == ISR_ATA;
+}
+
+int ata_disp_func(Intframe *iframe)
+{
+	ata_complete_readsector();
+	return 0;
+}
+
+void init_ata(void)
+{
+	add_local_dispatcher(ata_disp_func, ata_condition);
+}
 
 uint8_t is_bsy(void)
 {

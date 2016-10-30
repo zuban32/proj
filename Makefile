@@ -75,4 +75,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@${QEMU} $(QEMU_FLAGS) -hda os.disk -nographic
+	@${QEMU} $(QEMU_FLAGS) -hda os.disk -serial stdio
