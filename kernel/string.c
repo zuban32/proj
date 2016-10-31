@@ -27,7 +27,7 @@ int kstrcmp(const char *s1, const char *s2)
 void kmemset(void *s0, int val, uint32_t size)
 {
 	const char *s = (char *) s0 + size;
-	char *s1 = s0;
+	char *s1 = (char *)s0;
 	while (s1 < s)
 		*s1++ = val;
 }

@@ -6,7 +6,7 @@ uint32_t syscall(Process *cur_proc, uint32_t num, uint32_t par1, uint32_t par2, 
 	uint32_t res = 0;
 	switch(num) {
 	case SYS_PUTS:
-		for(int i = 0; i < par2; i++) {
+		for(unsigned i = 0; i < par2; i++) {
 			kprintf("%c", ((char *)par1)[i]);
 		}
 		break;

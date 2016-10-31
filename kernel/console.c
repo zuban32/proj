@@ -87,7 +87,7 @@ static void kprintint(int64_t c, uint32_t base, char is_u, int lz)
 	mult /= base;
 
 	if (lz) {
-		for (int i = 0; i < lz - deg; i++)
+		for (unsigned i = 0; i < lz - deg; i++)
 			kputc('0', 1);
 	}
 

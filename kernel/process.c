@@ -143,7 +143,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 		if(cur_ph->p_type == 1) {
 			page_alloc(cur_ph->p_vaddr, 1);
 			kmemset((void *)cur_ph->p_vaddr, 0, cur_ph->p_memsz);
-			kmemcpy((void *)cur_ph->p_vaddr, (char *)file + cur_ph->p_offset, cur_ph->p_filesz);
+			kmemcpy((char *)cur_ph->p_vaddr, (char *)file + cur_ph->p_offset, cur_ph->p_filesz);
 		}
 	}
 	proc->code_start = (void *)file->e_entry;
