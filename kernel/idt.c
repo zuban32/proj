@@ -32,6 +32,7 @@ void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 
 void load_idt(void)
 {
+	addISR(ISR_BP, 0x8, i386_TRAP | 0x60);
 	addISR(ISR_DE, 0x8, i386_INT);
 	addISR(ISR_DF, 0x8, i386_INT);
 	addISR(ISR_KBD, 0x8, i386_TRAP);

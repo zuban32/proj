@@ -28,12 +28,14 @@ void kmemset(void *s0, int val, uint32_t size)
 {
 	const char *s = (char *) s0 + size;
 	char *s1 = (char *)s0;
-	while (s1 < s)
+	while (s1 < s) {
 		*s1++ = val;
+	}
 }
 
 void kmemcpy(char *dest, char *src, int size)
 {
+	kprintf("kmemcpy: %x %x %d\n", dest, src, size);
 	char *end = src + size;
 	while(src < end) {
 		*dest++ = *src++;

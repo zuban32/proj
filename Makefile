@@ -27,13 +27,13 @@ TEST_SRC = test/hello.c
 TEST_ELF = test/hello
 TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
-all: kernel.bin boot.bin user
+all: kernel.bin boot.bin
 	@cat boot.bin kernel.bin > os.disk
 	@dd if=/dev/zero bs=1 count=$$((0x6000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	@cat $(TEST_ELF) >> os.disk
 	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 
-gdb: kernel.bin boot.bin user kernel.asm
+gdb: kernel.bin boot.bin kernel.asm
 	@cat boot.bin kernel.bin > os.disk
 	@dd if=/dev/zero bs=1 count=$$((0x6000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	@cat $(TEST_ELF) >> os.disk
@@ -70,7 +70,7 @@ user: usrlib
 
 clean:
 	@rm -r -f $(OBJDIR)
-	@cd test && find . ! -name '*.c' -type f -exec rm -f {} +
+#	@cd test && find . ! -name '*.c' -type f -exec rm -f {} +
 	@rm -f *.o *.a *~ *.disk *.bin *.elf .gdbinit
 
 run: all

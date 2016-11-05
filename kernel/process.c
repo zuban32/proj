@@ -156,7 +156,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	uint32_t stack_top = PROCSTACKTOP(proc);
 	page_alloc(stack_top - 4096 * 2, 1);
 	page_alloc(stack_top - 4096, 1);
-	proc->iframe.esp = stack_top;
+	proc->iframe.esp = stack_top - 4;
 	proc->iframe.ret_cs = GD_UT | 3;
 	// Enable interrupts while in user mode.
 	proc->iframe.eflags |= 0x200;

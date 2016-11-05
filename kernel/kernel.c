@@ -10,6 +10,7 @@
 #include <inc/process.h>
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
+#include <inc/string.h>
 
 void idle(void)
 {
@@ -42,16 +43,23 @@ int kernel_main(uintptr_t gdt_start)
 //	dump_map(map);
 	kprintf("RAM size: %d\n", get_memory_size(map));
 
-	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
-			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
-			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
+	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer());//,
+//			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
+//			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
 	Process *shell = create_kernel_process(idle);
-	int ret = (shell == NULL) || (pr1 == NULL) || (pr2 == NULL) || (pr3 == NULL);
+	int ret = (shell == NULL) || (pr1 == NULL);// || (pr2 == NULL) || (pr3 == NULL);
 	if(ret) {
 		kprintf("Error loading process\n");
 	} else {
 		kprintf("Processes loaded and created successfully\n");
 	}
+
+	// only for experimental GOT simulation
+	page_alloc(0x804a000, 1);
+	int a = 0x804b000;
+	kmemcpy((char *)0x804a014, (char *)&a, 4);
+	page_alloc(0x804b000, 1);
+	*((unsigned char *)0x804b000) = 0xCC;
 
 	enable_sched();
 	sched_yield();
