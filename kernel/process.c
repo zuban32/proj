@@ -171,14 +171,13 @@ void process_ret(Process *proc)
 //	kprintf("Ret from proc %d\n", proc->id);
 	proc->status = PROC_RUNNING;
 	set_cur_process(proc);
-	__asm __volatile(".intel_syntax noprefix\n\t"
-			"mov esp, %0\n\t"
-			"popad\n\t"
-			"pop es\n\t"
-			"pop ds\n\t"
-			"add esp, 8\n\t"
+	__asm __volatile(
+			"mov %0, %%esp\n\t"
+			"popal\n\t"
+			"pop %%es\n\t"
+			"pop %%ds\n\t"
+			"add $8, %%esp\n\t"
 //			"sti\n\t"
 			"iret\n\t"
-			".att_syntax\n\t"
 			: : "g" (&proc->iframe));
 }
