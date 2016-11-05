@@ -7,6 +7,7 @@
 #include <inc/string.h>
 #include <inc/ata.h>
 #include <inc/process.h>
+#include <inc/string.h>
 #include <inc/syscall.h>
 
 const char *exception_names[] = { "Divide error", "Debug Exception",
@@ -85,7 +86,7 @@ void global_handler(Intframe *iframe)
 	// if switch from userspace
 	Process *cur_proc = get_cur_process();
 	if((iframe->ret_cs & 3) == 3) {
-		cur_proc->iframe = *iframe;
+		kmemcpy((char *)&cur_proc->iframe, (char *)iframe, sizeof(*iframe));
 		cur_proc->status = PROC_READY;
 //		iframe = &cur_proc->iframe;
 	}
