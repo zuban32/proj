@@ -18,7 +18,7 @@ void idle(void)
 		cmd();
 }
 
-int kernel_main(uintptr_t gdt_start)
+extern "C" int kernel_main(uintptr_t gdt_start)
 {
 
 	init_vesa();

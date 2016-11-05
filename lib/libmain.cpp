@@ -2,7 +2,7 @@
 
 extern void main(void);
 
-void usermain(void)
+extern "C" void usermain(void)
 {
 	main();
 	process_exit();

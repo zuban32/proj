@@ -77,7 +77,7 @@ static void timer_hndl(void)
 
 extern void global_dispatch(Intframe *iframe);
 
-void global_handler(Intframe *iframe)
+extern "C" void global_handler(Intframe *iframe)
 {
 	if(iframe->intno == ISR_ATA) {
 		global_dispatch(iframe);

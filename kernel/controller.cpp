@@ -1,7 +1,7 @@
 #include <inc/controller.h>
 #include <inc/console.h>
 
-extern GlobalController global_controller;
+GlobalController global_controller;
 
 void global_dispatch(Intframe *iframe)
 {

@@ -27,7 +27,7 @@ typedef struct
 	int dispatchers_num;
 } GlobalController;
 
-GlobalController global_controller;
+extern "C" GlobalController global_controller;
 
 void add_local_dispatcher(dispatcher_func_t func, disp_condition cond);
 void global_dispatch(Intframe *iframe);

@@ -63,7 +63,7 @@ typedef struct
 
 void printf_intframe(Intframe *iframe);
 
-void global_handler(Intframe *iframe);
+extern "C" void global_handler(Intframe *iframe);
 
 void divz_hndl(void);
 void kbd_hndl(void);
