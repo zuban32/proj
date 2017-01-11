@@ -42,7 +42,7 @@ void print_intframe(Intframe *iframe)
 		kprintf("ss = %x\n", iframe->ss);
 	}
 
-	kprintf("[ ");   //just like gdb shows enable flags
+	kprintf("[ ");   //just like gdb shows enabled flags
 	for (int i = 0; i < 22; i++) {
 		if (i == 12) {
 			kprintf("IOPL=%d ",
@@ -75,16 +75,10 @@ static void timer_hndl(void)
 	sched_yield();
 }
 
-extern void global_dispatch(Intframe *iframe);
-
 void global_handler(Intframe *iframe)
 {
-	if(iframe->intno == ISR_ATA) {
-		global_dispatch(iframe);
-		return;
-	}
-	// if switch from userspace
 	Process *cur_proc = get_cur_process();
+	// if switch from userspace
 	if((iframe->ret_cs & 3) == 3) {
 		kmemcpy((char *)&cur_proc->iframe, (char *)iframe, sizeof(*iframe));
 		cur_proc->status = PROC_READY;
@@ -163,7 +157,6 @@ void kbd_hndl(void)
 			kendline();
 			break;
 		case 0xe:
-			kprintf("Backspace\n");
 			kbackspace();
 			break;
 		default:

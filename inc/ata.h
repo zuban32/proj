@@ -1,6 +1,7 @@
 #ifndef INC_ATA_H_
 #define INC_ATA_H_
 
+#include <inc/abstract.h>
 #include <inc/common.h>
 
 enum {
@@ -18,7 +19,16 @@ enum {
 	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
 };
 
-void init_ata(void);
+typedef struct
+{
+	Driver *base;
+	uint8_t bsy;
+	uint8_t cur_buf_ind;
+
+	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
+} ATA_State;
+
+int ata_init(void);
 
 void ata_request_readsector(int lba, uint8_t count);
 void ata_complete_readsector(void);

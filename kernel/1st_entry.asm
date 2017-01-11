@@ -11,10 +11,6 @@ mov eax, cr4
 or eax, 3 << 9
 mov cr4, eax
 
-mov eax, 0xffffffff
-movd mm2, eax
-movd xmm2, eax
-
 pop eax
 extern kernel_main
 call kernel_main

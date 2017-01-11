@@ -10,7 +10,7 @@ static void write_tss(void)
 	tss->esp0 = 0x900000;
 }
 
-void init_user_gdt(gdt_entry *gdt)
+void init_user_gdt(void)
 {
 	write_tss();
 	tss_entry *tss = (tss_entry *)0x7E00;

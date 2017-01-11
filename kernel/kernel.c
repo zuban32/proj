@@ -10,6 +10,7 @@
 #include <inc/process.h>
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
+#include <inc/system.h>
 
 void idle(void)
 {
@@ -18,24 +19,25 @@ void idle(void)
 		cmd();
 }
 
-int kernel_main(uintptr_t gdt_start)
+int kernel_main(void)
 {
+//	init_vesa();
+//	ata_init();
+//	kclear_screen();
 
-	init_vesa();
-	init_ata();
-	kclear_screen();
+	drivers_init();
 
 	init_kbd();
 	init_pic(0x20, 0x28);
 	load_idt();
 	init_serial();
 	init_pages();
-	kprintf("GDT start: %x\n", gdt_start);
-	init_user_gdt((gdt_entry *)gdt_start);
+//	kprintf("GDT start: %x\n", gdt_start);
+	init_user_gdt();
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(48, 3);
+	ata_request_readsector(0x20000/512, 3);
 	while(is_bsy() || get_cur_ind() < 3);
 
 	RAMMap *map = (RAMMap *)0x500;

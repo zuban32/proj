@@ -22,7 +22,7 @@ prot_mode:
     mov ss, ax
     
     
-    mov ebp, 0x900000       ;kernel stack top
+    mov ebp, 0x9000000       ;kernel stack top
     mov esp, ebp
      
     call begin_PM

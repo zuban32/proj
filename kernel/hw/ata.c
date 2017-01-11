@@ -1,7 +1,6 @@
 #include <inc/ata.h>
 #include <inc/console.h>
 #include <inc/pic.h>
-#include <inc/controller.h>
 
 //static int ata_identify(int base)
 //{
@@ -34,39 +33,54 @@
 //	return 0;
 //}
 
-static uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-static uint8_t cur_buf_ind;
-static uint8_t bsy;
+//static int ata_init(void);
+static int ata_irq_condition(Intframe *iframe);
+static int ata_irq_handler(Intframe *iframe);
 
-int ata_condition(int num)
+Driver ata_driver = {
+		ata_init,
+		ata_irq_condition,
+		ata_irq_handler,
+		"ATA core driver"
+};
+
+static ATA_State state = {
+		.base = &ata_driver
+};
+
+static int ata_irq_condition(Intframe *iframe)
 {
-	return num == ISR_ATA;
+	return iframe->intno == ISR_ATA;
 }
 
-int ata_disp_func(Intframe *iframe)
+static int ata_irq_handler(Intframe *iframe)
 {
 	ata_complete_readsector();
 	return 0;
 }
 
-void init_ata(void)
+int ata_init(void)
 {
-	add_local_dispatcher(ata_disp_func, ata_condition);
+	state.bsy = 0;
+	state.cur_buf_ind = 0;
+
+	return 0;
 }
+
 
 uint8_t is_bsy(void)
 {
-	return bsy;
+	return state.bsy;
 }
 
 uint8_t get_cur_ind(void)
 {
-	return cur_buf_ind;
+	return state.cur_buf_ind;
 }
 
 uint16_t *get_ata_buffer(void)
 {
-	return ata_read_buffer;
+	return state.ata_read_buffer;
 }
 
 void ata_request_readsector(int lba, uint8_t count)
@@ -82,12 +96,12 @@ void ata_request_readsector(int lba, uint8_t count)
 void ata_complete_readsector(void)
 {
 	inb(PRIMARY_BASE_START + 7);
-	bsy = 1;
-	uint16_t *out = ata_read_buffer + cur_buf_ind * SECTOR_SIZE;
+	state.bsy = 1;
+	uint16_t *out = state.ata_read_buffer + state.cur_buf_ind * SECTOR_SIZE;
 	for(int i = 0; i < SECTOR_SIZE; i++) {
 		*(out + i) = inw(PRIMARY_BASE_START);
 	}
-	cur_buf_ind++;
-	bsy = 0;
+	state.cur_buf_ind++;
+	state.bsy = 0;
 	pic_sendEOI(14);
 }

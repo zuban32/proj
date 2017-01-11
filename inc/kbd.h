@@ -6,7 +6,16 @@
 #define KEY_NUM 0x60
 #define KEY_LEN 0x4
 
-void init_kbd(void);
+#include <inc/abstract.h>
+
+typedef struct {
+	Driver base;
+	uint8_t input_on;
+	char kbd_buf[BUF_SIZE];
+	char *cur_buf;
+} KBD_State;
+
+int init_kbd(void);
 void clear_buf(void);
 
 char get_scancode(uint8_t sc);

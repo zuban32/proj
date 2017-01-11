@@ -55,6 +55,6 @@ typedef struct
    uint16_t iomap_base;
 } __attribute__((packed)) tss_entry;
 
-void init_user_gdt(gdt_entry *gdt);
+void init_user_gdt(void);
 
 #endif /* INC_GDT_H_ */
