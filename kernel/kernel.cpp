@@ -11,6 +11,7 @@
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
 
+
 void idle(void)
 {
 	disable_sched();
@@ -20,10 +21,11 @@ void idle(void)
 
 extern "C" int kernel_main(uintptr_t gdt_start)
 {
-
-	init_vesa();
+//	while(1);
+//	init_vesa();
 	init_ata();
-	kclear_screen();
+//	kclear_screen();
+//	while(1);
 
 	init_kbd();
 	init_pic(0x20, 0x28);
@@ -35,8 +37,9 @@ extern "C" int kernel_main(uintptr_t gdt_start)
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(48, 3);
+	ata_request_readsector(0x7000/512, 3);
 	while(is_bsy() || get_cur_ind() < 3);
+	kprintf("ATA finished\n");
 
 	RAMMap *map = (RAMMap *)0x500;
 //	dump_map(map);

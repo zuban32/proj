@@ -2,7 +2,6 @@
 #define COMMON_H_INCLUDED
 
 #include <stdint.h>
-
 #define NULL (0)
 
 static inline uint8_t inb(int port)
