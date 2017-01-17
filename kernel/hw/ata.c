@@ -51,22 +51,40 @@ int ata_disp_func(Intframe *iframe)
 
 void init_ata(void)
 {
+<<<<<<< HEAD:kernel/hw/ata.c
 	add_local_dispatcher(ata_disp_func, ata_condition);
+=======
+	add_local_dispatcher(&ata_driver);
+	kprintf("ATA dbg = %x\n", ATADriver::dbg);
+//	add_local_dispatcher(ata_disp_func, ata_condition);
+>>>>>>> 7d191ed... Secondary bootloader works, but C++ virtual functions works only with static classes fields:kernel/hw/ata.cpp
 }
 
 uint8_t is_bsy(void)
 {
+<<<<<<< HEAD:kernel/hw/ata.c
 	return bsy;
+=======
+	return ATADriver::bsy;
+>>>>>>> 7d191ed... Secondary bootloader works, but C++ virtual functions works only with static classes fields:kernel/hw/ata.cpp
 }
 
 uint8_t get_cur_ind(void)
 {
+<<<<<<< HEAD:kernel/hw/ata.c
 	return cur_buf_ind;
+=======
+	return ATADriver::cur_buf_ind;
+>>>>>>> 7d191ed... Secondary bootloader works, but C++ virtual functions works only with static classes fields:kernel/hw/ata.cpp
 }
 
 uint16_t *get_ata_buffer(void)
 {
+<<<<<<< HEAD:kernel/hw/ata.c
 	return ata_read_buffer;
+=======
+	return ATADriver::ata_read_buffer;
+>>>>>>> 7d191ed... Secondary bootloader works, but C++ virtual functions works only with static classes fields:kernel/hw/ata.cpp
 }
 
 void ata_request_readsector(int lba, uint8_t count)
@@ -82,6 +100,7 @@ void ata_request_readsector(int lba, uint8_t count)
 void ata_complete_readsector(void)
 {
 	inb(PRIMARY_BASE_START + 7);
+<<<<<<< HEAD:kernel/hw/ata.c
 	bsy = 1;
 	uint16_t *out = ata_read_buffer + cur_buf_ind * SECTOR_SIZE;
 	for(int i = 0; i < SECTOR_SIZE; i++) {
@@ -89,5 +108,14 @@ void ata_complete_readsector(void)
 	}
 	cur_buf_ind++;
 	bsy = 0;
+=======
+	ATADriver::bsy = 1;
+	uint16_t *out = ATADriver::ata_read_buffer + ATADriver::cur_buf_ind * SECTOR_SIZE;
+	for(int i = 0; i < SECTOR_SIZE; i++) {
+		*(out + i) = inw(PRIMARY_BASE_START);
+	}
+	ATADriver::cur_buf_ind++;
+	ATADriver::bsy = 0;
+>>>>>>> 7d191ed... Secondary bootloader works, but C++ virtual functions works only with static classes fields:kernel/hw/ata.cpp
 	pic_sendEOI(14);
 }

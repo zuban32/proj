@@ -77,7 +77,7 @@ begin_PM:
 	push gdt_start
 	push KERN_OFF
 	;0x7d0d
-    call BOOT2_OFF+0xA6
+    call BOOT2_OFF+0xA9
     
     jmp $
 dap:
