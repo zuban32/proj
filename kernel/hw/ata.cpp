@@ -37,10 +37,12 @@
 
 struct ATADriver: LocalController
 {
-	static uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-	static uint8_t cur_buf_ind;
-	static uint8_t bsy;
-	static int dbg;
+	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
+	uint8_t cur_buf_ind;
+	uint8_t bsy;
+	int dbg;
+
+	ATADriver(): cur_buf_ind(0), bsy(0), dbg(0x32) {}
 
 	bool cond(int num);
 	int func(Intframe *iframe);
@@ -48,13 +50,7 @@ struct ATADriver: LocalController
 	~ATADriver();
 };
 
-uint16_t ATADriver::ata_read_buffer[READ_BUFFER_SIZE];
-uint8_t ATADriver::bsy = 0;
-uint8_t ATADriver::cur_buf_ind = 0;
-int ATADriver::dbg = 0x32;
-
-static ATADriver ata_driver;
-
+ATADriver ata_driver;
 
 bool ATADriver::cond(int num)
 {
@@ -86,23 +82,23 @@ int ata_disp_func(Intframe *iframe)
 void init_ata(void)
 {
 	add_local_dispatcher(&ata_driver);
-	kprintf("ATA dbg = %x\n", ATADriver::dbg);
+	kprintf("ATA dbg = %x\n", ata_driver.dbg);
 //	add_local_dispatcher(ata_disp_func, ata_condition);
 }
 
 uint8_t is_bsy(void)
 {
-	return ATADriver::bsy;
+	return ata_driver.bsy;
 }
 
 uint8_t get_cur_ind(void)
 {
-	return ATADriver::cur_buf_ind;
+	return ata_driver.cur_buf_ind;
 }
 
 uint16_t *get_ata_buffer(void)
 {
-	return ATADriver::ata_read_buffer;
+	return ata_driver.ata_read_buffer;
 }
 
 void ata_request_readsector(int lba, uint8_t count)
@@ -118,12 +114,12 @@ void ata_request_readsector(int lba, uint8_t count)
 void ata_complete_readsector(void)
 {
 	inb(PRIMARY_BASE_START + 7);
-	ATADriver::bsy = 1;
-	uint16_t *out = ATADriver::ata_read_buffer + ATADriver::cur_buf_ind * SECTOR_SIZE;
+	ata_driver.bsy = 1;
+	uint16_t *out = ata_driver.ata_read_buffer + ata_driver.cur_buf_ind * SECTOR_SIZE;
 	for(int i = 0; i < SECTOR_SIZE; i++) {
 		*(out + i) = inw(PRIMARY_BASE_START);
 	}
-	ATADriver::cur_buf_ind++;
-	ATADriver::bsy = 0;
+	ata_driver.cur_buf_ind++;
+	ata_driver.bsy = 0;
 	pic_sendEOI(14);
 }

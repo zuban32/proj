@@ -4,9 +4,10 @@ AS = nasm
 
 QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
 QEMU_FLAGS = -m 4G -d guest_errors
-CFLAGS = -m32 -Os -std=c++0x -fno-builtin -ffreestanding\
--pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -fno-exceptions -fno-rtti
-CBOOT_FLAGS = -m32 -std=c99 -c -fno-builtin -ffreestanding -I../proj\
+CFLAGS = -m32 -std=c++0x -Os -ffreestanding -fno-stack-protector\
+-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -fno-exceptions\
+ -fno-rtti
+CBOOT_FLAGS = -m32 -std=c99 -c -Os -fno-builtin -ffreestanding -I../proj\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -nostdlib
 
 CRTI_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crti.o)
@@ -16,8 +17,8 @@ CRTN_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crtn.o)
 
 KERNEL_CFLAGS = -c -I../proj
 USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
-LDFLAGS = -melf_i386 -nostdlib  -e kern_start
-DLDFLAGS = -melf_i386 -nostdlib -e kern_start
+LDFLAGS = -melf_i386 -e kern_start -Ttext=0x10000 -nostdlib
+DLDFLAGS = -melf_i386 -e kern_start -Ttext=0x10000 -nostdlib
 GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
 ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
@@ -71,14 +72,15 @@ kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@$(foreach var, $(KERNEL_C), $(CC) $(CFLAGS) $(KERNEL_CFLAGS) $(var) -o $(OBJDIR)$(notdir $(var:.cpp=.o));)
 
 kernel.asm: kernel.obj
-	@$(LD) $(DLDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(GCC_LIB) $(CRTEND_OBJ) $(CRTN_OBJ)  -o $(OBJDIR)$<
+	@$(LD) $(DLDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(CRTEND_OBJ) $(CRTN_OBJ) $(GCC_LIB)  -o $(OBJDIR)$<
 	@echo "Dumping kernel"
 	@objdump -D -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
 
 kernel.bin: kernel.obj
 	@echo "Linking kernel"
-	@$(LD) $(LDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(GCC_LIB) $(CRTEND_OBJ) $(CRTN_OBJ) -o $@
+	@echo $(CRTI_OBJ)
+	@$(LD) $(LDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(CRTEND_OBJ) $(CRTN_OBJ) $(GCC_LIB)  -o $@
 	
 kernel.bin1:
 	@echo "Compiling & linking kernel"

@@ -32,15 +32,15 @@ void add_local_dispatcher(LocalController *c)
 {
 	global_controller.dispatchers[global_controller.dispatchers_num++] = c;
 }
-
-bool LocalController::cond(int num)
-{
-	kprintf("PANIC: dummy cond function called!\n");
-	return true;
-}
-
-int LocalController::func(Intframe *iframe)
-{
-	kprintf("PANIC: dummy func function called!\n");
-	return -1;
-}
+//
+//bool LocalController::cond(int num)
+//{
+//	kprintf("PANIC: dummy cond function called!\n");
+//	return true;
+//}
+//
+//int LocalController::func(Intframe *iframe)
+//{
+//	kprintf("PANIC: dummy func function called!\n");
+//	return -1;
+//}

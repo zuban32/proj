@@ -23,9 +23,21 @@ extern "C" int kernel_main(uint32_t gdt_start)
 {
 //	while(1);
 //	init_vesa();
-	init_ata();
 //	kclear_screen();
 //	while(1);
+
+//	Call global constructors
+	extern char *__init_array_start;
+	extern char *__init_array_end;
+//	kprintf("Init array: start = %x, end = %x\n",
+//			&__init_array_start, &__init_array_end);
+
+	for(char **p = &__init_array_start; p < &__init_array_end; p++) {
+		uint32_t a = (uint32_t)p;
+		(*(void (**)(void))a)();
+	}
+
+	init_ata();
 
 	init_kbd();
 	init_pic(0x20, 0x28);
