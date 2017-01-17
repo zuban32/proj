@@ -24,10 +24,10 @@ typedef int (*dispatcher_func_t)(Intframe *iframe);
 
 struct LocalController
 {
-	 virtual bool cond(int num) = 0;
-	 virtual int func(Intframe *iframe) = 0;
+	 bool cond(int num);// = 0;
+	 int func(Intframe *iframe);// = 0;
 
-	virtual ~LocalController() {}
+//	virtual ~LocalController() {}
 };
 
 typedef struct GlobalController

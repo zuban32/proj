@@ -61,7 +61,7 @@ ATADriver ata_driver;
 
 ATADriver::~ATADriver()
 {
-	kprintf("Ata destructore\n");
+	kprintf("Ata destructor\n");
 }
 
 int ATADriver::func(Intframe *iframe)

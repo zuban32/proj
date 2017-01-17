@@ -1,16 +1,19 @@
-[org 0x7c00]
-KERN_OFF equ 0x1000
+KERN_OFF equ 0x8300
 KERN_SECTS equ (KERNEL_SIZE/512 + 1)
+BOOT2_OFF equ 0x8100
+BOOT2_SECTS equ 1
+TOTAL_SECTS equ (BOOT2_SECTS + KERN_SECTS)
+BOOT_DRIVE equ 0x80
 
-    mov [boot_drive], dl
+[org 0x7c00]
 
-    mov bp, 0x9000
+    mov bp, 0x8000
     mov sp, bp
 
     ;enable VESA 1024*768*24 mode
-    mov ax, 0x4f02
-    mov bx, 0x118
-    int 0x10
+    ;mov ax, 0x4f02
+    ;mov bx, 0x118
+    ;int 0x10
 
     call load_ker
     
@@ -27,9 +30,9 @@ KERN_SECTS equ (KERNEL_SIZE/512 + 1)
     jc error
     mov edx, 0x534D4150
     cmp eax, edx
-    jnz error
+    ;jnz error
     test ebx, ebx
-    jz error
+    ;jz error
     jmp jmp_tail
 
 map_entry_read:
@@ -59,29 +62,32 @@ error:
 
 [bits 16]
     load_ker:
-    mov ah, 2
-    mov al, KERN_SECTS
-    xor ch, ch
-    mov cl, 2
-    xor dh, dh
-    mov bx, KERN_OFF
-    mov dl, [boot_drive]
+    mov si, dap
+    mov ah, 0x42
+    mov dl, BOOT_DRIVE
     int 0x13
-    jc .error
+    ;jc error
     ret
-.error:
-	jmp $
-	ret
     
 [bits 32]
+;0x7d07
 begin_PM:
-    sti
+    ;sti
 
 	push gdt_start
-    call KERN_OFF
+	push KERN_OFF
+	;0x7d0d
+    call BOOT2_OFF+0xA6
     
     jmp $
-    
-    boot_drive db 0
+dap:
+	db 0x10
+	db 0
+	dw TOTAL_SECTS
+	dw BOOT2_OFF
+	dw 0
+	dd 1
+	dd 0
+
     times 510 - ($ - $$) db 0
     dw 0xaa55
