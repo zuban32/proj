@@ -37,7 +37,7 @@ extern "C" int kernel_main(uint32_t gdt_start)
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(0x7000/512, 3);
+	ata_request_readsector(0x9000/512, 3);
 	while(is_bsy() || get_cur_ind() < 3);
 	kprintf("ATA finished\n");
 

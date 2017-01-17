@@ -16,8 +16,8 @@ CRTN_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crtn.o)
 
 KERNEL_CFLAGS = -c -I../proj
 USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
-LDFLAGS = -melf_i386 -nostdlib -Ttext 0x8300 -e kern_start
-DLDFLAGS = -melf_i386 -nostdlib -Ttext 0x8300 -e kern_start
+LDFLAGS = -melf_i386 -nostdlib  -e kern_start
+DLDFLAGS = -melf_i386 -nostdlib -e kern_start
 GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
 ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
@@ -73,7 +73,7 @@ kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 kernel.asm: kernel.obj
 	@$(LD) $(DLDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(GCC_LIB) $(CRTEND_OBJ) $(CRTN_OBJ)  -o $(OBJDIR)$<
 	@echo "Dumping kernel"
-	@objdump -d -M intel $(OBJDIR)$< >$(OBJDIR)$@
+	@objdump -D -M intel $(OBJDIR)$< >$(OBJDIR)$@
 	@echo "target remote :1234\nsymbol-file $(OBJDIR)$^" > .gdbinit
 
 kernel.bin: kernel.obj

@@ -16,6 +16,8 @@ movd mm2, eax
 movd xmm2, eax
 
 pop eax
+extern _init
+call _init
 extern kernel_main
 call kernel_main
 ret
