@@ -2,19 +2,24 @@ CC = gcc
 LD = ld
 AS = nasm
 QEMU = /home/zuban32/qemu-install/bin/qemu-system-i386
+<<<<<<< HEAD
 QEMU_FLAGS = -m 4G
 CFLAGS = -m32 -std=c11 -fno-builtin -ffreestanding\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Werror
+CBOOT_FLAGS = -m32 -std=c99 -c -fno-builtin -ffreestanding -I../proj\
+-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -nostdlib
 KERNEL_CFLAGS = -c -I../proj
 USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
-LDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 --oformat binary -e kern_start
-DLDFLAGS = -melf_i386 -nostdlib -Ttext 0x1000 -e kern_start
+LDFLAGS = -melf_i386 -nostdlib -Ttext 0x8300 -e kern_start
+DLDFLAGS = -melf_i386 -nostdlib -Ttext 0x8300 -e kern_start
 GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
 ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
 TESTDIR = test/
-BOOT_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm#$(wildcard boot/*)
+BOOT1_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm
+BOOT2_SRCS = boot/boot2.c
+>>>>>>> 112755f... Half-way on a secondary bootloader implementation
 KERNEL_ASM = kernel/1st_entry.asm kernel/isr_entry.asm#$(wildcard kernel/*.asm)
 KERNEL_C = $(wildcard kernel/*.c kernel/hw/*.c)
 LIB_C = $(wildcard lib/*.c)
@@ -27,6 +32,7 @@ TEST_SRC = test/hello.c
 TEST_ELF = test/hello
 TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
+<<<<<<< HEAD
 all: kernel.bin boot.bin user
 	@cat boot.bin kernel.bin > os.disk
 	@dd if=/dev/zero bs=1 count=$$((0x6000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
@@ -38,11 +44,34 @@ gdb: kernel.bin boot.bin user kernel.asm
 	@dd if=/dev/zero bs=1 count=$$((0x6000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	@cat $(TEST_ELF) >> os.disk
 	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+=======
+all: kernel.bin boot1.bin boot2.bin user
+	cat boot1.bin boot2.bin > os.disk
+	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
+	cat kernel.bin >> os.disk
+	dd if=/dev/zero bs=1 count=$$((0x9000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	cat $(TEST_ELF) >> os.disk
+	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+
+gdb: kernel.bin boot1.bin boot2.bin user kernel.asm
+	cat boot1.bin boot2.bin > os.disk
+	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
+	cat kernel.bin >> os.disk
+	dd if=/dev/zero bs=1 count=$$((0x9000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	cat $(TEST_ELF) >> os.disk
+	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+>>>>>>> 112755f... Half-way on a secondary bootloader implementation
 	@$(QEMU) $(QEMU_FLAGS) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
 
-boot.bin: $(BOOT_SRCS)
-	@echo "Compiling bootloader"
+boot1.bin: $(BOOT1_SRCS)
+	@echo "Compiling bootloader1"
 	@$(AS) $(ASBOOTFLAGS) $< -o $@
+	
+boot2.bin:
+	@echo "Compiling bootloader2"
+	gcc $(CBOOT_FLAGS) $(BOOT2_SRCS)
+	$(LD) -nostdlib -melf_i386 -e boot2_main --oformat binary boot2.o -o $@
+#	@objcopy -O binary boot2.out $@
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
 	@mkdir -p $(OBJDIR) 2>/dev/null
