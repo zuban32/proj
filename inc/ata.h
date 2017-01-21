@@ -1,6 +1,7 @@
 #ifndef INC_ATA_H_
 #define INC_ATA_H_
 
+#include <inc/abstract.h>
 #include <inc/common.h>
 
 enum {
@@ -16,6 +17,29 @@ enum {
 	SECTOR_SIZE = 256,	// 256 word-size values
 	READ_BUFFER_SEC_NUM = 16,
 	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
+};
+
+class ATASocket: public Socket
+{
+public:
+	ATASocket(Unit *_u): Socket(_u) {}
+	int send();
+	int recv();
+};
+
+struct ATADriver: Unit
+{
+	ATASocket sock;
+	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
+	uint8_t cur_buf_ind;
+	uint8_t bsy;
+	int dbg;
+
+	ATADriver(): sock(this), cur_buf_ind(0), bsy(0), dbg(0x32) {}
+
+	int handle(Socket *s);
+
+	~ATADriver();
 };
 
 void init_ata(void);

@@ -1,7 +1,6 @@
 #include <inc/ata.h>
 #include <inc/console.h>
 #include <inc/pic.h>
-#include <inc/controller.h>
 
 //static int ata_identify(int base)
 //{
@@ -34,27 +33,29 @@
 //	return 0;
 //}
 
-
-struct ATADriver: LocalController
-{
-	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-	uint8_t cur_buf_ind;
-	uint8_t bsy;
-	int dbg;
-
-	ATADriver(): cur_buf_ind(0), bsy(0), dbg(0x32) {}
-
-	bool cond(int num);
-	int func(Intframe *iframe);
-
-	~ATADriver();
-};
-
 ATADriver ata_driver;
 
-bool ATADriver::cond(int num)
+
+int ATASocket::send()
 {
-	return num == ISR_ATA;
+	return 0;
+}
+
+int ATASocket::recv()
+{
+	return this->u->handle(this);
+}
+
+
+//bool ATADriver::cond(int num)
+//{
+//	return num == ISR_ATA;
+//}
+
+int ATADriver::handle(Socket *s)
+{
+	ata_complete_readsector();
+	return 0;
 }
 
 ATADriver::~ATADriver()
@@ -62,27 +63,28 @@ ATADriver::~ATADriver()
 	kprintf("Ata destructor\n");
 }
 
-int ATADriver::func(Intframe *iframe)
-{
-	ata_complete_readsector();
-	return 0;
-}
+//int ATADriver::func(Intframe *iframe)
+//{
+//	ata_complete_readsector();
+//	return 0;
+//}
 
-int ata_condition(int num)
-{
-	return num == ISR_ATA;
-}
-
-int ata_disp_func(Intframe *iframe)
-{
-	ata_complete_readsector();
-	return 0;
-}
+//int ata_condition(int num)
+//{
+//	return num == ISR_ATA;
+//}
+//
+//int ata_disp_func(Intframe *iframe)
+//{
+//	ata_complete_readsector();
+//	return 0;
+//}
 
 void init_ata(void)
 {
-	add_local_dispatcher(&ata_driver);
+//	add_local_dispatcher(&ata_driver);
 	kprintf("ATA dbg = %x\n", ata_driver.dbg);
+	kprintf("ATA inited\n");
 //	add_local_dispatcher(ata_disp_func, ata_condition);
 }
 
@@ -109,6 +111,7 @@ void ata_request_readsector(int lba, uint8_t count)
 	outb(PRIMARY_BASE_START + 4, (lba >> 8) & 0xFF);
 	outb(PRIMARY_BASE_START + 5, (lba >> 16) & 0xFF);
 	outb(PRIMARY_BASE_START + 7, 0x20);
+	kprintf("READ SECTOR request\n");
 }
 
 void ata_complete_readsector(void)

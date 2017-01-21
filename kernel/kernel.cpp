@@ -21,10 +21,8 @@ void idle(void)
 
 extern "C" int kernel_main(uint32_t gdt_start)
 {
-//	while(1);
 //	init_vesa();
 //	kclear_screen();
-//	while(1);
 
 //	Call global constructors
 	extern char *__init_array_start;
@@ -37,25 +35,24 @@ extern "C" int kernel_main(uint32_t gdt_start)
 		(*(void (**)(void))a)();
 	}
 
+	load_idt();
 	init_ata();
 
 	init_kbd();
 	init_pic(0x20, 0x28);
-	load_idt();
 	init_serial();
 	init_pages();
 	kprintf("GDT start: %x\n", gdt_start);
 	init_user_gdt((gdt_entry *)gdt_start);
-	kprintf("Init finished\n");
-
-	// test ATA read
-	ata_request_readsector(0x9000/512, 3);
-	while(is_bsy() || get_cur_ind() < 3);
-	kprintf("ATA finished\n");
-
 	RAMMap *map = (RAMMap *)0x500;
 //	dump_map(map);
 	kprintf("RAM size: %d\n", get_memory_size(map));
+	kprintf("Init finished\n");
+
+	// test ATA read
+	ata_request_readsector(0x10000/512, 3);
+	while(is_bsy() || get_cur_ind() < 3);
+
 
 	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
 			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),

@@ -10,6 +10,8 @@
 #include <inc/string.h>
 #include <inc/syscall.h>
 
+#include <inc/idt.h>
+
 const char *exception_names[] = { "Divide error", "Debug Exception",
 		"NMI Interrupt", "Breakpoint", "Overflow", "BOUND Range Exceeded",
 		"Invalide Opcode", "Coprocessor Not Available", "Double Fault",
@@ -75,12 +77,14 @@ static void timer_hndl(void)
 	sched_yield();
 }
 
-extern void global_dispatch(Intframe *iframe);
+extern IDT_Unit u_idt;
 
 extern "C" void global_handler(Intframe *iframe)
 {
+//	IDT_Unit *u_idt = get_idt_unit();
 	if(iframe->intno == ISR_ATA) {
-		global_dispatch(iframe);
+		kprintf("Handling ATA irq\n");
+		u_idt.handle(u_idt.socks + iframe->intno);
 		return;
 	}
 	// if switch from userspace

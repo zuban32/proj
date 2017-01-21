@@ -17,8 +17,8 @@ CRTN_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crtn.o)
 
 KERNEL_CFLAGS = -c -I../proj
 USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
-LDFLAGS = -melf_i386 -e kern_start -Ttext=0x10000 -nostdlib
-DLDFLAGS = -melf_i386 -e kern_start -Ttext=0x10000 -nostdlib
+LDFLAGS = -melf_i386 -e kern_start -Ttext=0x100000 -nostdlib
+DLDFLAGS = -melf_i386 -e kern_start -Ttext=0x100000 -nostdlib
 GCC_LIB = $(shell $(CC) $(CFLAGS) --print-libgcc-file-name)
 ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
@@ -42,7 +42,7 @@ all: kernel.bin boot1.bin boot2.bin user
 	cat boot1.bin boot2.bin > os.disk
 	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
 	cat kernel.bin >> os.disk
-	dd if=/dev/zero bs=1 count=$$((0x9000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	cat $(TEST_ELF) >> os.disk
 	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 
@@ -50,7 +50,7 @@ gdb: kernel.bin boot1.bin boot2.bin user kernel.asm
 	cat boot1.bin boot2.bin > os.disk
 	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
 	cat kernel.bin >> os.disk
-	dd if=/dev/zero bs=1 count=$$((0x9000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	cat $(TEST_ELF) >> os.disk
 	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 	@$(QEMU) $(QEMU_FLAGS) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
