@@ -46,12 +46,6 @@ int ATASocket::recv()
 	return this->u->handle(this);
 }
 
-
-//bool ATADriver::cond(int num)
-//{
-//	return num == ISR_ATA;
-//}
-
 int ATADriver::handle(Socket *s)
 {
 	kprintf("ATA handle\n");
@@ -63,23 +57,6 @@ ATADriver::~ATADriver()
 {
 	kprintf("Ata destructor\n");
 }
-
-//int ATADriver::func(Intframe *iframe)
-//{
-//	ata_complete_readsector();
-//	return 0;
-//}
-
-//int ata_condition(int num)
-//{
-//	return num == ISR_ATA;
-//}
-//
-//int ata_disp_func(Intframe *iframe)
-//{
-//	ata_complete_readsector();
-//	return 0;
-//}
 
 void init_ata(void)
 {

@@ -11,7 +11,7 @@ void pic_sendEOI(uint8_t irq)
 	outb(PIC_M_CMD, PIC_EOI);
 }
 
-void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
+static void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
 {
 	outb(PIC_M_DATA, mask_m);
 	outb(PIC_S_DATA, mask_s);

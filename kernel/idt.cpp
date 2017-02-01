@@ -76,7 +76,6 @@ int IDT_Unit::handle(Socket *s)
 	return res;
 }
 
-// Enabling this causes weird memory bug that sets all ISRs addrs to -1
 IDT_Unit u_idt;
 
 //IDT_Unit *get_idt_unit()
