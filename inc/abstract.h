@@ -3,6 +3,10 @@
 
 #include <inc/common.h>
 
+enum {
+	MAX_TUNNELS_NUM = 128
+};
+
 class Unit;
 
 
@@ -22,7 +26,9 @@ public:
 	virtual int send() = 0;
 	virtual int recv() = 0;
 
-	char *get_data(void);
+	char *get_data(void) {
+		return (char *)this->buf;
+	}
 
 	virtual ~Socket() {}
 };
@@ -45,7 +51,7 @@ public:
 	Tunnel(): in(nullptr), out(nullptr), bytes_num(0) {}
 	Tunnel(int _bytes_num): in(nullptr), out(nullptr), bytes_num(_bytes_num) {}
 
-	int init(Socket *_in, Socket *_out, int bytes_num);
+	int init(Socket *_in, Socket *_out, int _bytes_num);
 
 	virtual int transfer();
 

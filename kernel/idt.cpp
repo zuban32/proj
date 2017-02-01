@@ -44,7 +44,7 @@ int ISR_Socket::init(Unit *_u, int _num)
 
 int ISR_Socket::send()
 {
-//	*((int *)buf) = num;
+	*((int *)buf) = num;
 	return 0;
 }
 
@@ -64,6 +64,7 @@ int IDT_Unit::handle(Socket *s)
 	case ISR_ATA:
 		t = create_tunnel(s, &ata_driver.sock, sizeof(is->get_num()));
 		if(t == nullptr) {
+			kprintf("Error creating tunnel at ISR #%d\n", is->get_num());
 			res = -1;
 		} else {
 			res = t->transfer();

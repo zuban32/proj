@@ -54,6 +54,7 @@ int ATASocket::recv()
 
 int ATADriver::handle(Socket *s)
 {
+	kprintf("ATA handle\n");
 	ata_complete_readsector();
 	return 0;
 }
