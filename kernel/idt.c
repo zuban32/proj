@@ -6,7 +6,7 @@
 
 extern uintptr_t isr_handlers[];
 
-static struct idt_entry idt_tbl[IDTSIZE] __attribute__ ((aligned (16 * PGSIZE)));
+static struct idt_entry idt_tbl[IDTSIZE] __attribute__ ((aligned (PGSIZE)));
 static struct idt_descr idtr =
 		{ IDTSIZE * sizeof(struct idt_entry), (uint32_t) idt_tbl };
 

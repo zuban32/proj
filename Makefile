@@ -14,8 +14,8 @@ ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
 TESTDIR = test/
-BOOT_SRCS = $(wildcard boot/*)
-KERNEL_ASM = $(wildcard kernel/*.asm)
+BOOT_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm
+KERNEL_ASM = kernel/1st_entry.asm kernel/isr_entry.asm#$(wildcard kernel/*.asm)
 KERNEL_C = $(wildcard kernel/*.c kernel/hw/*.c)
 LIB_C = $(wildcard lib/*.c)
 LIB_OBJ = $(notdir $(LIB_C:.c=.o))
@@ -29,7 +29,7 @@ TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
 all: kernel.bin boot.bin user
 	@cat boot.bin kernel.bin > os.disk
-	@dd if=/dev/zero bs=1 count=$$((0x6000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	@dd if=/dev/zero bs=1 count=$$((0x7000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk
 	@cat $(TEST_ELF) >> os.disk
 	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 
@@ -75,4 +75,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@${QEMU} $(QEMU_FLAGS) -hda os.disk -serial stdio
+	@${QEMU} $(QEMU_FLAGS) -hda os.disk -hdb fat32.img -serial stdio

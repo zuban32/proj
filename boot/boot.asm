@@ -8,9 +8,9 @@ KERN_SECTS equ (KERNEL_SIZE/512 + 1)
     mov sp, bp
 
     ;enable VESA 1024*768*24 mode
-    mov ax, 0x4f02
-    mov bx, 0x118
-    int 0x10
+    ;mov ax, 0x4f02
+    ;mov bx, 0x118
+    ;int 0x10
 
     call load_ker
     
@@ -82,6 +82,6 @@ begin_PM:
     
     jmp $
     
-    boot_drive db 0
+    boot_drive db 0x80
     times 510 - ($ - $$) db 0
     dw 0xaa55

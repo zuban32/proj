@@ -2,7 +2,7 @@
 #include <inc/console.h>
 #include <inc/common.h>
 
-static uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE << 7)));
+static uint32_t pgtbl[PGS_NUM][PGS_NUM] __attribute__ ((aligned (PGSIZE)));
 static uint32_t pgdir[PGS_NUM] __attribute__ ((aligned (PGSIZE)));
 
 void init_pages(void)

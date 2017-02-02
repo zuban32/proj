@@ -20,11 +20,12 @@ enum {
 
 void init_ata(void);
 
-void ata_request_readsector(int lba, uint8_t count);
+void ata_request_readsector(int lba, uint8_t count, char slave);
 void ata_complete_readsector(void);
 
 uint8_t is_bsy(void);
-uint8_t get_cur_ind(void);
+uint32_t get_cur_ind(void);
+void set_cur_ind(uint32_t ind);
 uint16_t *get_ata_buffer(void);
 
 #endif

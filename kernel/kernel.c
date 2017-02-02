@@ -10,6 +10,7 @@
 #include <inc/process.h>
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
+#include <inc/fat32.h>
 
 void idle(void)
 {
@@ -35,7 +36,7 @@ int kernel_main(uintptr_t gdt_start)
 	kprintf("Init finished\n");
 
 	// test ATA read
-	ata_request_readsector(48, 3);
+	ata_request_readsector(0x7000/512, 3, 0);
 	while(is_bsy() || get_cur_ind() < 3);
 
 	RAMMap *map = (RAMMap *)0x500;
@@ -52,6 +53,8 @@ int kernel_main(uintptr_t gdt_start)
 	} else {
 		kprintf("Processes loaded and created successfully\n");
 	}
+
+	init_fat32();
 
 	enable_sched();
 	sched_yield();

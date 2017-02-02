@@ -35,7 +35,7 @@
 //}
 
 static uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-static uint8_t cur_buf_ind;
+static uint32_t cur_buf_ind;
 static uint8_t bsy;
 
 int ata_condition(int num)
@@ -59,9 +59,14 @@ uint8_t is_bsy(void)
 	return bsy;
 }
 
-uint8_t get_cur_ind(void)
+uint32_t get_cur_ind(void)
 {
 	return cur_buf_ind;
+}
+
+void set_cur_ind(uint32_t ind)
+{
+	cur_buf_ind = ind;
 }
 
 uint16_t *get_ata_buffer(void)
@@ -69,9 +74,9 @@ uint16_t *get_ata_buffer(void)
 	return ata_read_buffer;
 }
 
-void ata_request_readsector(int lba, uint8_t count)
+void ata_request_readsector(int lba, uint8_t count, char slave)
 {
-	outb(PRIMARY_BASE_START + 6, 0xE0 | ((lba >> 24) & 0x0F));	// choose master
+	outb(PRIMARY_BASE_START + 6, 0xE0 | ((slave & 1) << 4) | ((lba >> 24) & 0x0F));
 	outb(PRIMARY_BASE_START + 2, count);
 	outb(PRIMARY_BASE_START + 3, lba & 0xFF);
 	outb(PRIMARY_BASE_START + 4, (lba >> 8) & 0xFF);
