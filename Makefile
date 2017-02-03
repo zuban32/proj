@@ -14,8 +14,8 @@ ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) -fbin
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
 TESTDIR = test/
-BOOT_SRCS = $(wildcard boot/*)
-KERNEL_ASM = $(wildcard kernel/*.asm)
+BOOT_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm#$(wildcard boot/*)
+KERNEL_ASM = kernel/1st_entry.asm kernel/isr_entry.asm#$(wildcard kernel/*.asm)
 KERNEL_C = $(wildcard kernel/*.c kernel/hw/*.c)
 LIB_C = $(wildcard lib/*.c)
 LIB_OBJ = $(notdir $(LIB_C:.c=.o))
