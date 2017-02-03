@@ -16,7 +16,7 @@ typedef int (*disp_condition)(int num);
 typedef int (*dispatcher_func_t)(Intframe *iframe);
 
 typedef struct
-{s
+{
 	dispatcher_func_t func;
 	disp_condition cond;
 } LocalController;
