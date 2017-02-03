@@ -4,6 +4,7 @@
 #include <inc/common.h>
 
 int kstrcmp(const char *s1, const char *s2);
+int kstrlen(const char *s);
 void kmemset(void *s0, int val, uint32_t size);
 void kmemcpy(char *dest, char *src, int size);
 uint32_t kstoi(const char *s);

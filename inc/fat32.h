@@ -70,6 +70,14 @@ typedef struct LFNEntry
 	uint16_t name_high[2];
 } __attribute__ ((packed)) LFNEntry;
 
+typedef struct FAT32FileInfo
+{
+	uint32_t start_cluster;
+	uint32_t start_fat_entry;
+} FAT32FileInfo;
+
 int init_fat32(void);
+int fat32_open_file(char *path, int *size, FAT32FileInfo *info);
+int fat32_read(FAT32FileInfo *info, int offset, int count);
 
 #endif /* INC_FAT32_H_ */
