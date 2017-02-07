@@ -88,11 +88,22 @@ void ata_complete_readsector(void)
 {
 	inb(PRIMARY_BASE_START + 7);
 	bsy = 1;
-	uint16_t *out = ata_read_buffer + cur_buf_ind * SECTOR_SIZE;
-	for(int i = 0; i < SECTOR_SIZE; i++) {
+	uint16_t *out = ata_read_buffer + cur_buf_ind * (SECTOR_SIZE / READ_BUFFER_MULT);
+	for(int i = 0; i < SECTOR_SIZE / READ_BUFFER_MULT; i++) {
 		*(out + i) = inw(PRIMARY_BASE_START);
 	}
 	cur_buf_ind++;
 	bsy = 0;
 	pic_sendEOI(14);
+}
+
+int ata_read(int start_lba, int count, int dev, uint8_t *out)
+{
+	set_cur_ind(0);
+	uint32_t prev_ind = get_cur_ind();
+	ata_request_readsector(start_lba, count, dev);
+	while(is_bsy() && get_cur_ind() - prev_ind < count);
+
+	kmemcpy(out, (char *)get_ata_buffer(), count * SECTOR_SIZE);
+	return 0;
 }

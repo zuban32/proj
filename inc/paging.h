@@ -15,7 +15,7 @@
 #define POFF(addr) ((addr) & ~(PGSIZE - 1))
 
 #define USTACKTOP 0xF000000
-#define PROCSTACKTOP(proc) (USTACKTOP - (proc->id * PGSIZE))
+#define PROCSTACKTOP(proc) (USTACKTOP - ((proc->id * 2) * PGSIZE))
 
 void init_pages(void);
 void handle_pagefault(Intframe *iframe);

@@ -13,9 +13,10 @@ enum {
 	PRIMARY_CONTROL_PORT = 0x3F6,
 	SECONDARY_CONTROL_PORT = PRIMARY_CONTROL_PORT - PR_SEC_DIFF,
 
-	SECTOR_SIZE = 256,	// 256 word-size values
-	READ_BUFFER_SEC_NUM = 16,
-	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
+	SECTOR_SIZE = 512,	// 256 word-size values
+	READ_BUFFER_SECT_NUM = 8,
+	READ_BUFFER_SIZE = READ_BUFFER_SECT_NUM * SECTOR_SIZE,
+	READ_BUFFER_MULT = 2
 };
 
 void init_ata(void);
@@ -27,5 +28,6 @@ uint8_t is_bsy(void);
 uint32_t get_cur_ind(void);
 void set_cur_ind(uint32_t ind);
 uint16_t *get_ata_buffer(void);
+int ata_read(int start_lba, int count, int dev, uint8_t *out);
 
 #endif
