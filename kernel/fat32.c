@@ -5,6 +5,7 @@
 #include <inc/fs.h>
 
 static uint8_t vbr[512];
+static uint8_t sect_buf[SECTOR_SIZE];
 
 static BiosParamBlock *bpb = (BiosParamBlock *)vbr;
 static ExtBootRecord *ext_br = (ExtBootRecord *)((uintptr_t)vbr + sizeof(*bpb));
@@ -18,7 +19,39 @@ static int cluster_to_lba(int cluster)
 
 static int cluster_to_fatsect(int cluster)
 {
-	return bpb->res_sectors + (cluster * 4) / (SECTOR_SIZE * 2);
+	return bpb->res_sectors + (cluster * 4) / (SECTOR_SIZE);
+}
+
+static int fat32_read_dir(char *path)
+{
+	if(*path != '/') {
+		return -1;
+	}
+	uint32_t dir_cluster = ext_br->root_cluster;
+
+	char dir_name[MAX_PATH];
+	char *cur_p = path + 1;
+	while(*cur_p) {
+		char *cur_dname = dir_name;
+		while(*cur_p && *cur_p != '/') {
+			*cur_dname++ = *cur_p++;
+		}
+		*cur_dname = 0;
+		kprintf("Cur dir name = %s\n", dir_name);
+
+		ata_read(cluster_to_lba(dir_cluster), 1, 1, sect_buf);
+		DirectoryEntry *dir = (DirectoryEntry *)sect_buf, *cur_dir = dir;
+		while(cur_dir->name[0] != 0xE5 || cur_dir->name[0] != 0x05) {
+
+		}
+
+		if(!*cur_p) {
+			break;
+		} else {
+			cur_p++;
+		}
+	}
+	return 0;
 }
 
 // dummy FAT32 test
@@ -28,8 +61,7 @@ int init_fat32(void)
 	ata_request_readsector(0, 1, 1);
 	while(is_bsy() || get_cur_ind() < 1);
 
-	kmemcpy((char*)vbr, (char*)get_ata_buffer(), 512);
-
+	kmemcpy((char *)vbr, (char *)get_ata_buffer(), SECTOR_SIZE);
 
 	kprintf("FAT32 Volume: fats=%d, dirs=%d, root_cluster=%d\n", bpb->fats_number, bpb->dirs_number, ext_br->root_cluster);
 
