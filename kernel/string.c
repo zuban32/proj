@@ -17,6 +17,16 @@ int kisletter(const char c)
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+int kstrlen(const char *s)
+{
+	if(!s) {
+		return -1;
+	}
+	const char *start = s;
+	while(*s++);
+	return s - start;
+}
+
 int kstrcmp(const char *s1, const char *s2)
 {
 	while (*s1 == *s2 && *s1 && *s2 && !kisspace(*s1) && !kisspace(*s2))
