@@ -17,12 +17,8 @@ ASBOOTFLAGS = -D KERNEL_SIZE=$(shell stat -c%s kernel.bin) \
 ASKERNFLAGS = -felf32
 OBJDIR = obj/
 TESTDIR = test/
-<<<<<<< HEAD
 BOOT1_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm
 BOOT2_SRCS = boot/boot2.c
-=======
-BOOT_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm
->>>>>>> fs_fat
 KERNEL_ASM = kernel/1st_entry.asm kernel/isr_entry.asm#$(wildcard kernel/*.asm)
 KERNEL_C = $(wildcard kernel/*.c kernel/hw/*.c)
 LIB_C = $(wildcard lib/*.c)
@@ -35,14 +31,6 @@ TEST_SRC = test/hello.c
 TEST_ELF = test/hello
 TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
-<<<<<<< HEAD
-=======
-all: kernel.bin boot.bin user
-	@cat boot.bin kernel.bin > os.disk
-	@dd if=/dev/zero bs=1 count=$$((0x7000 - 512 - $(shell stat -c%s kernel.bin))) >> os.disk
-	@cat $(TEST_ELF) >> os.disk
-	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
->>>>>>> fs_fat
 
 all: kernel.bin boot1.bin boot2.bin user
 	cat boot1.bin boot2.bin > os.disk
