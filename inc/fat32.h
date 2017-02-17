@@ -2,6 +2,7 @@
 #define INC_FAT32_H_
 
 #include <inc/common.h>
+#include <inc/ata.h>
 
 typedef struct BiosParamBlock
 {
@@ -75,6 +76,12 @@ typedef struct FAT32FileInfo
 	uint32_t start_cluster;
 	uint32_t start_fat_entry;
 } FAT32FileInfo;
+
+enum {
+	FAT32_EOC = 0xFFFFFF8,
+	DIR_BUF_NUM = SECTOR_SIZE / sizeof(DirectoryEntry) + 1,
+	DIR_BUF_SIZE = DIR_BUF_NUM * sizeof(DirectoryEntry)
+};
 
 int init_fat32(void);
 int fat32_open_file(char *path, int *size, FAT32FileInfo *info);

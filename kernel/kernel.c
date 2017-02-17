@@ -56,8 +56,8 @@ int kernel_main(uintptr_t gdt_start)
 	}
 
 	init_fat32();
-	File *f = file_open("/test_dir/fat32_test.txt", F_READ);
-	kprintf("File name = %s\n", f->name);
+//	File *f = file_open("/test_dir/fat32_test.txt", F_READ);
+//	kprintf("File name = %s\n", f->name);
 
 	enable_sched();
 	sched_yield();

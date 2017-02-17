@@ -2,6 +2,7 @@
 #include <inc/console.h>
 #include <inc/pic.h>
 #include <inc/controller.h>
+#include <inc/string.h>
 
 //static int ata_identify(int base)
 //{
@@ -99,11 +100,13 @@ void ata_complete_readsector(void)
 
 int ata_read(int start_lba, int count, int dev, uint8_t *out)
 {
+//	this is just for now to debug FAT32
 	set_cur_ind(0);
+
 	uint32_t prev_ind = get_cur_ind();
 	ata_request_readsector(start_lba, count, dev);
-	while(is_bsy() && get_cur_ind() - prev_ind < count);
+	while(is_bsy() || get_cur_ind() - prev_ind < count);
 
-	kmemcpy(out, (char *)get_ata_buffer(), count * SECTOR_SIZE);
+	kmemcpy((char *)out, (char *)get_ata_buffer() + prev_ind * SECTOR_SIZE, count * SECTOR_SIZE);
 	return 0;
 }
