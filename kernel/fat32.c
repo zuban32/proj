@@ -6,7 +6,7 @@
 
 static uint8_t vbr[512];
 static uint8_t dir_buf[DIR_BUF_SIZE];
-//static uint8_t fat_tbl_buf[SECTOR_SIZE];
+static uint8_t fat_tbl_buf[SECTOR_SIZE];
 
 static BiosParamBlock *bpb = (BiosParamBlock *)vbr;
 static ExtBootRecord *ext_br = (ExtBootRecord *)((uintptr_t)vbr + sizeof(*bpb));
@@ -23,10 +23,10 @@ static int cluster_to_lba(int cluster)
 	return first_usable_sector + (cluster - 2) * bpb->sects_per_cluster;
 }
 
-//static int cluster_to_fatsect(int cluster)
-//{
-//	return bpb->res_sectors + (cluster * 4) / SECTOR_SIZE;
-//}
+static int cluster_to_fatsect(int cluster)
+{
+	return bpb->res_sectors + (cluster * 4) / SECTOR_SIZE;
+}
 
 static int fat32_directory_cluster(DirectoryEntry *dir)
 {
@@ -38,44 +38,11 @@ static inline int fat32_valid(uint32_t fat32_entry)
 	return fat32_entry > 1 && fat32_entry < FAT32_EOC;
 }
 
-//static int fat32_read_one_dir(DirectoryEntry *start)
-//{
-//	DirectoryEntry *dir = start;
-//	if(dir->attrib == 0x0F) {
-//	//		kprintf("LFN start found\n");
-//			while(dir->attrib == 0x0f) {
-//				dir++;
-//			}
-//	//		kprintf("LFN end found\n");
-//			char cur_name[13];
-//			kprintf("Dir name = ");
-//			LFNEntry *lfn_cur = (LFNEntry *) dir-1;
-//			do {
-//				char *cur = cur_name;
-//				for(int i = 0; i < 5; i++)
-//					*cur++ = (char)lfn_cur->name_low[i];
-//				for(int i = 0; i < 6; i++)
-//					*cur++ = (char)lfn_cur->name_mid[i];
-//				for(int i = 0; i < 2; i++)
-//					*cur++ = (char)lfn_cur->name_high[i];
-//
-//				kprintf("%s", cur_name);
-//			} while(!((lfn_cur--)->order & 0x40));
-//			kprintf("\n");
-//		} else {
-//			kprintf("Dir name = %s\n", dir->name);
-//		}
-//
-//	ata_read(cluster_to_fatsect(fat32_get_directory_cluster(start)), 1, 1, fat_tbl_buf);
-//	uint32_t *fat_start = (uint32_t *)fat_tbl_buf;
-//	while(fat32_valid(*fat_start)) {
-//
-//	}
-//	return 0;
-//}
-
-static int fat32_read_dir(char *path)
+static int fat32_read_dir(char *path, FAT32_DirInfo *out)
 {
+	if(!path || !out) {
+		return -2;
+	}
 	uint32_t dir_cluster = ext_br->root_cluster;
 
 	char path_dir_name[MAX_PATH];
@@ -108,12 +75,21 @@ static int fat32_read_dir(char *path)
 
 			if(cur_dir->attrib == 0x0F) {
 				kprintf("LFN start found\n");
-				while(cur_dir->attrib == 0x0F && cur_dir < (DirectoryEntry *)dir_buf + DIR_BUF_NUM) {
+				while(cur_dir->attrib == 0x0F) {
 					cur_dir++;
-				}
-				if(cur_dir >= (DirectoryEntry *)dir_buf + DIR_BUF_NUM) {
-					// read the next directory cluster from FAT table
-					// and then read its contents from disk
+					if(cur_dir >= (DirectoryEntry *)dir_buf + DIR_BUF_NUM) {
+						// read the next directory cluster from FAT table
+						// and then read its contents from disk
+						int fat_sect = cluster_to_fatsect(dir_cluster + 1);
+						ata_read(fat_sect, 1, 1, fat_tbl_buf);
+						uint32_t *cur_entry = (uint32_t *)fat_tbl_buf + fat_sect % SECTOR_SIZE;
+						if(fat32_valid(*cur_entry)) {
+							ata_read(cluster_to_lba(*cur_entry), 1, 1, dir_buf);
+							cur_dir = (DirectoryEntry *)dir_buf;
+						} else {
+							return -1;
+						}
+					}
 				}
 				kprintf("LFN end found\n");
 				LFNEntry *lfn_cur = (LFNEntry *) cur_dir-1;
@@ -132,15 +108,17 @@ static int fat32_read_dir(char *path)
 			}
 			kprintf("Read dir name = %s\n", read_dir_name);
 
-			if(!(cur_dir->attrib & 0x10)) {
-				cur_dir++;
-				kprintf("Not a dir - skip\n");
-				continue;
-			}
+//			if(!(cur_dir->attrib & 0x10)) {
+//				cur_dir++;
+//				kprintf("Not a dir - skip\n");
+//				continue;
+//			}
 
 			if(kstrcmp(path_dir_name, read_dir_name) == 0) {
 				kprintf("Folder [%s] found: [%s]\n", path_dir_name, read_dir_name);
 				dir_cluster = fat32_directory_cluster(cur_dir);
+				kmemcpy(out->name, read_dir_name, MAX_PATH);
+				out->lba = cluster_to_lba(fat32_directory_cluster(cur_dir));
 //				kmemset(read_dir_name, 0, MAX_PATH);
 //				kprintf("Next dir cluster: %d\n", dir_cluster);
 				break;
@@ -163,6 +141,28 @@ static int fat32_read_dir(char *path)
 }
 
 // dummy FAT32 test
+static int test_fat32(void)
+{
+	//	int cluster = ext_br->root_cluster;
+	//	int fat_sect = cluster_to_fatsect(cluster);
+	//	int fat_off = cluster % 512;
+
+	int res = 0;
+	FAT32_DirInfo dir;
+	if((res = fat32_read_dir("/test_dir/fat32_test.txt", &dir))) {
+		kprintf("FAT32 read error: %d\n", res);
+		return 1;
+	} else {
+		uint8_t file_str[SECTOR_SIZE];
+		kprintf("File found: sector %d\n", dir.lba);
+		ata_read(dir.lba, 1, 1, file_str);
+
+		kprintf("File contents: %s\n", (char *)file_str);
+		kprintf("FAT32 dummy test: %s\n", (kstrcmp((char *)file_str, "Hello, FAT32 World\n") == 0) ? "OK" : "FAIL");
+		return 0;
+	}
+}
+
 int init_fat32(void)
 {
 	set_cur_ind(0);
@@ -181,12 +181,7 @@ int init_fat32(void)
 
 	set_cur_ind(0);
 
-//	int cluster = ext_br->root_cluster;
-//	int fat_sect = cluster_to_fatsect(cluster);
-//	int fat_off = cluster % 512;
-
-//	fat32_read_dir("/test_dir/another_test_dir/zuban32_dir");
-	fat32_read_dir("/test_dir/secret_folder/z32_folder");
+	test_fat32();
 
 	return 0;
 }

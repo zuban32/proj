@@ -3,6 +3,7 @@
 
 #include <inc/common.h>
 #include <inc/ata.h>
+#include <inc/fs.h>
 
 typedef struct BiosParamBlock
 {
@@ -58,6 +59,12 @@ typedef struct DirectoryEntry
 	uint32_t filesize;
 
 } __attribute__ ((packed)) DirectoryEntry;
+
+typedef struct FAT32_DirInfo
+{
+	uint32_t lba;
+	char name[MAX_PATH];
+} FAT32_DirInfo;
 
 typedef struct LFNEntry
 {
