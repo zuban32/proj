@@ -82,11 +82,11 @@ extern IDT_Unit u_idt;
 extern "C" void global_handler(Intframe *iframe)
 {
 //	IDT_Unit *u_idt = get_idt_unit();
-	if(iframe->intno == ISR_ATA) {
-		kprintf("Handling ATA irq\n");
-		u_idt.handle(u_idt.socks + iframe->intno);
-		return;
-	}
+//	if(iframe->intno == ISR_ATA) {
+//		kprintf("Handling ATA irq\n");
+//		u_idt.handle(u_idt.socks + iframe->intno);
+//		return;
+//	}
 	// if switch from userspace
 	Process *cur_proc = get_cur_process();
 	if((iframe->ret_cs & 3) == 3) {

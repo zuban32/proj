@@ -14,32 +14,13 @@ void addISR(uint8_t ind, uint16_t selector, uint8_t type);
 void load_idt(void);
 int isr_exists(int num);
 
-
-class ISR_Socket: public Socket
+class IDT_Unit: Phys
 {
-	int num;
-
+	Tunnel *tuns[IDTSIZE];
 public:
-	ISR_Socket(): num(-1) {}
-	ISR_Socket(Unit *_u, int &_num): Socket(_u), num(_num) {}
-
-	int init(Unit *_u, int _num);
-	inline int get_num() { return this->num; }
-	int send();
-	int recv();
-};
-
-class IDT_Unit: Unit
-{
-
-public:
-	ISR_Socket socks[IDTSIZE];
-	IDT_Unit() {
-		for(int i = 0; i < IDTSIZE; i++) {
-			socks[i].init(this, i);
-		}
-	}
-	int handle(Socket *s);
+	IDT_Unit(): Phys(PHYS_IRQ) {}
+	int init();
+	int handle(Event e);
 
 };
 

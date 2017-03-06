@@ -35,44 +35,27 @@ void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 	kprintf("Setting ISR addr for #%d: %x\n", ind, idt_tbl[ind].offset1 | (idt_tbl[ind].offset2 << 16));
 }
 
-int ISR_Socket::init(Unit *_u, int _num)
-{
-	this->u = _u;
-	this->num = _num;
-	return 0;
-}
-
-int ISR_Socket::send()
-{
-	*((int *)buf) = num;
-	return 0;
-}
-
-int ISR_Socket::recv()
+int IDT_Unit::init()
 {
 	return 0;
 }
 
-extern ATADriver ata_driver;
-
-int IDT_Unit::handle(Socket *s)
+int IDT_Unit::handle(Event e)
 {
 	int res = 0;
-	Tunnel *t;
-	ISR_Socket *is = static_cast<ISR_Socket *>(s);
-	switch(is->get_num()) {
-	case ISR_ATA:
-		t = create_tunnel(s, &ata_driver.sock, sizeof(is->get_num()));
-		if(t == nullptr) {
-			kprintf("Error creating tunnel at ISR #%d\n", is->get_num());
-			res = -1;
-		} else {
-			res = t->transfer();
-		}
-		break;
-	default:
-		break;
+	uint32_t irq_num = e.get_msg();
+	if(irq_num >= 0 && irq_num < IDTSIZE) {
+// TODO: create new event
+		this->tuns[irq_num]->transfer(this, e);
+	} else {
+		res = -1;
 	}
+//	switch(irq_num) {
+//	case ISR_A
+//		break;
+//	default:
+//		break;
+//	}
 	return res;
 }
 

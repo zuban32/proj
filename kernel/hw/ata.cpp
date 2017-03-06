@@ -35,27 +35,19 @@
 
 ATADriver ata_driver;
 
-
-int ATASocket::send()
-{
-	return 0;
-}
-
-int ATASocket::recv()
-{
-	return this->u->handle(this);
-}
-
-int ATADriver::handle(Socket *s)
-{
-	kprintf("ATA handle\n");
-	ata_complete_readsector();
-	return 0;
-}
-
 ATADriver::~ATADriver()
 {
 	kprintf("Ata destructor\n");
+}
+
+int ATADriver::init()
+{
+	return 0;
+}
+
+int ATADriver::handle(Event e)
+{
+	return 0;
 }
 
 void init_ata(void)
@@ -63,7 +55,7 @@ void init_ata(void)
 //	add_local_dispatcher(&ata_driver);
 	kprintf("ATA dbg = %x\n", ata_driver.dbg);
 	kprintf("ATA inited\n");
-//	add_local_dispatcher(ata_disp_func, ata_condition);
+
 }
 
 uint8_t is_bsy(void)

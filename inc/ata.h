@@ -5,6 +5,8 @@
 #include <inc/common.h>
 
 enum {
+	ATA_TUNNELS_NUM = 1,
+
 	PR_SEC_DIFF = 0x80,
 
 	PRIMARY_BASE_START = 0x1F0,
@@ -19,25 +21,20 @@ enum {
 	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
 };
 
-class ATASocket: public Socket
+class ATADriver: public Driver
 {
 public:
-	ATASocket(Unit *_u): Socket(_u) {}
-	int send();
-	int recv();
-};
+	Tunnel *tunnels[ATA_TUNNELS_NUM];
 
-struct ATADriver: Unit
-{
-	ATASocket sock;
 	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
 	uint8_t cur_buf_ind;
 	uint8_t bsy;
 	int dbg;
 
-	ATADriver(): sock(this), cur_buf_ind(0), bsy(0), dbg(0x32) {}
+	ATADriver(): Driver(DRIVER_ATA), cur_buf_ind(0), bsy(0), dbg(0x32) {}
 
-	int handle(Socket *s);
+	int init();
+	int handle(Event e);
 
 	~ATADriver();
 };
