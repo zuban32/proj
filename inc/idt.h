@@ -5,7 +5,10 @@
 #include <inc/common.h>
 #include <inc/console.h>
 
-#define IDTSIZE 0x81
+enum {
+	IDT_SIZE = 0x81,
+	IDT_TUNS = 128
+};
 
 #define i386_INT 	0x8E
 #define i386_TRAP 	0x8F
@@ -14,12 +17,14 @@ void addISR(uint8_t ind, uint16_t selector, uint8_t type);
 void load_idt(void);
 int isr_exists(int num);
 
-class IDT_Unit: Phys
+class IDT_Unit: Unit
 {
-	Tunnel *tuns[IDTSIZE];
+	Tunnel *tuns[IDT_TUNS];
+	int cur_free_tun = 0;
 public:
-	IDT_Unit(): Phys(PHYS_IRQ) {}
+	IDT_Unit(): Unit(UNIT_PHYS, PHYS_IRQ) {}
 	int init();
+	int connect_from(Tunnel *t);
 	int handle(Event e);
 
 };

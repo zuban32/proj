@@ -4,33 +4,18 @@
 #include <inc/abstract.h>
 
 enum {
-	MAX_API 		= 4,
-	MAX_SUBSYSTEM 	= 16,
-	MAX_DRIVER 		= 32,
-	MAX_PHYS 		= 2	// irq and port
+	MAX_UNITS = 128,
 };
 
 class Registry
 {
-	API *		api_reg[MAX_API];
-	Subsystem *	subsystem_reg[MAX_SUBSYSTEM];
-	Driver *	driver_reg[MAX_DRIVER];
-	Phys *		phys_reg[MAX_PHYS];
-	int cur_api = 0;
-	int cur_ss = 0;
-	int cur_drv = 0;
-	int cur_phys = 0;
+	Unit *reg[MAX_UNITS];
+	int cur_unit = 0;
 
 public:
-	int add_phys(Phys *u);
-	int add_driver(Driver *u);
-	int add_subsystem(Subsystem *u);
-	int add_api(API *u);
+	int add_unit(Unit *u);
 
-	API *		api_lookup(int type);
-	Subsystem *	subsys_lookup(int type);
-	Driver *	driver_lookup(int type, int id);
-	Phys *		phys_lookup(int type);
+	Unit *unit_lookup(unsigned type, unsigned sub_type);
 };
 
 #endif /* INC_REGISTRY_H_ */

@@ -21,7 +21,7 @@ void cmd_isr(void)
 
 void cmd_listisr(void)
 {
-	for (int i = 0; i < IDTSIZE; i++)
+	for (int i = 0; i < IDT_SIZE; i++)
 		if (isr_exists(i))
 			kprintf("%x ", i);
 	kendline();

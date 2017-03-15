@@ -14,17 +14,21 @@
 #define PIC_INIT 0x11
 #define ICW4_80386 0x1
 
-class PICDriver: public Driver
+class PICDriver: public Unit
 {
-	Tunnel *irq_tun;
+	Tunnel *in_tun = nullptr;
+	Tunnel *irq_tun = nullptr;
+	Tunnel *port_tun = nullptr;
 	uint8_t m1, m2;
 
 public:
-	PICDriver(): Driver(DRIVER_PIC), irq_tun(nullptr), m1(0), m2(0) {}
+	PICDriver(): Unit(UNIT_DRIVER, DRIVER_PIC), m1(0), m2(0) {}
 
+	int init();
+	int connect_from(Tunnel *t);
 	int handle(Event e);
 
-	~PICDriver();
+	~PICDriver() {}
 };
 
 void pic_sendEOI(uint8_t irq);

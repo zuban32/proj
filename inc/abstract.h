@@ -71,53 +71,26 @@ class Tunnel;
 
 class Unit
 {
-	UnitType type;
-	int subtype;
+	unsigned type;
+	unsigned subtype;
 public:
-	Unit(UnitType t, int st): type(t), subtype(st) {}
+	Unit(int t, int st);
 	virtual ~Unit() {}
 
-	inline UnitType get_type()
+	inline unsigned get_type()
 	{
 		return this->type;
 	}
-	inline int get_subtype()
+	inline unsigned get_subtype()
 	{
 		return this->subtype;
 	}
 
-//	id is being used only when connecting to Driver.
-//	can use any value otherwise
-	Tunnel *connect_unit(int type, int id);
+	Tunnel *connect_to(int type, int subtype);
+	virtual int connect_from(Tunnel *t) = 0;
 
 	virtual int init() = 0;
 	virtual int handle(Event) = 0;
-};
-
-class API: public Unit
-{
-public:
-	API(APIType t);
-};
-
-class Subsystem: public Unit
-{
-public:
-	Subsystem(SubsystemType t);
-};
-
-class Driver: public Unit
-{
-public:
-	Driver(DriverType t);
-
-//	virtual ~Driver() {}
-};
-
-class Phys: public Unit
-{
-public:
-	Phys(PhysType t);
 };
 
 class Tunnel
@@ -131,8 +104,7 @@ public:
 	Tunnel(int _bytes_num): a(nullptr), b(nullptr), bytes_num(_bytes_num) {}
 	virtual ~Tunnel() {}
 
-	int init(Unit *_in, Unit *_out, int _bytes_num);
-
+	void init(Unit *a, Unit *b);
 	virtual int transfer(Unit *me, Event e);
 };
 

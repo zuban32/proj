@@ -4,6 +4,30 @@
 #define MASK(i, n) (m##i |= 1 << n)
 #define UNMASK(i, n) (m##i &= ~(1 << n))
 
+int PICDriver::init()
+{
+	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT);
+	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ);
+	if(!this->port_tun || !this->irq_tun) {
+		return -1;
+	}
+	return 0;
+}
+
+int PICDriver::connect_from(Tunnel *t)
+{
+	if(!t) {
+		return -1;
+	}
+	this->in_tun = t;
+	return 0;
+}
+
+int PICDriver::handle(Event e)
+{
+	return 0;
+}
+
 void pic_sendEOI(uint8_t irq)
 {
 	if (irq >= 8)

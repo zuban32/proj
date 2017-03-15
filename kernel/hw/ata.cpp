@@ -42,6 +42,20 @@ ATADriver::~ATADriver()
 
 int ATADriver::init()
 {
+	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT);
+	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ);
+	if(!this->port_tun || !this->irq_tun) {
+		return -1;
+	}
+	return 0;
+}
+
+int ATADriver::connect_from(Tunnel *t)
+{
+	if(!t) {
+		return -1;
+	}
+	this->in_tun = t;
 	return 0;
 }
 

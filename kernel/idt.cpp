@@ -9,9 +9,9 @@
 
 extern uintptr_t isr_handlers[];
 
-static struct idt_entry idt_tbl[IDTSIZE];
+static struct idt_entry idt_tbl[IDT_SIZE];
 static struct idt_descr idtr =
-		{ IDTSIZE * sizeof(struct idt_entry), (uint32_t) idt_tbl };
+		{ IDT_SIZE * sizeof(struct idt_entry), (uint32_t) idt_tbl };
 
 int isr_exists(int num)
 {
@@ -40,11 +40,20 @@ int IDT_Unit::init()
 	return 0;
 }
 
+int IDT_Unit::connect_from(Tunnel *t)
+{
+	if(this->cur_free_tun >= IDT_TUNS) {
+		return -1;
+	}
+	this->tuns[this->cur_free_tun++] = t;
+	return 0;
+}
+
 int IDT_Unit::handle(Event e)
 {
 	int res = 0;
 	uint32_t irq_num = e.get_msg();
-	if(irq_num >= 0 && irq_num < IDTSIZE) {
+	if(irq_num >= 0 && irq_num < IDT_SIZE) {
 // TODO: create new event
 		this->tuns[irq_num]->transfer(this, e);
 	} else {
