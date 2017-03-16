@@ -39,21 +39,23 @@ TEST_ELF = test/hello
 TEST_ELF_SIZE = $(shell stat -c%s $(TEST_ELF))
 
 all: kernel.bin boot1.bin boot2.bin user
-	cat boot1.bin boot2.bin > os.disk
-	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
-	cat kernel.bin >> os.disk
-	dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
-	cat $(TEST_ELF) >> os.disk
-	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+	@cat boot1.bin boot2.bin > os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk 2> /dev/null
+	@cat kernel.bin >> os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	@cat $(TEST_ELF) >> os.disk
+	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+	@echo "Build finished"
 
 gdb: kernel.bin boot1.bin boot2.bin user kernel.asm
-	cat boot1.bin boot2.bin > os.disk
-	dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk
-	cat kernel.bin >> os.disk
-	dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
-	cat $(TEST_ELF) >> os.disk
-	dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
+	@cat boot1.bin boot2.bin > os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x200 - $(shell stat -c%s boot2.bin))) >> os.disk 2> /dev/null
+	@cat kernel.bin >> os.disk
+	@dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
+	@cat $(TEST_ELF) >> os.disk
+	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
 	@$(QEMU) $(QEMU_FLAGS) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
+	@echo "Debug build finished"
 
 boot1.bin: $(BOOT1_SRCS)
 	@echo "Compiling bootloader1"
@@ -61,8 +63,8 @@ boot1.bin: $(BOOT1_SRCS)
 	
 boot2.bin:
 	@echo "Compiling bootloader2"
-	gcc $(CBOOT_FLAGS) $(BOOT2_SRCS)
-	$(LD) -nostdlib -melf_i386 -e boot2_main --oformat binary boot2.o -o $@
+	@gcc $(CBOOT_FLAGS) $(BOOT2_SRCS)
+	@$(LD) -nostdlib -melf_i386 -e boot2_main --oformat binary boot2.o -o $@
 #	@objcopy -O binary boot2.out $@
 
 kernel.obj:	$(KERNEL_ASM) $(KERNEL_C)
@@ -79,7 +81,6 @@ kernel.asm: kernel.obj
 
 kernel.bin: kernel.obj
 	@echo "Linking kernel"
-	@echo $(CRTI_OBJ)
 	@$(LD) $(LDFLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ1) $(KERNEL_OBJ2) $(CRTEND_OBJ) $(CRTN_OBJ) $(GCC_LIB)  -o $@
 	
 kernel.bin1:
@@ -87,12 +88,12 @@ kernel.bin1:
 	@$(CC) $(CFLAGS)
 	
 usrlib:
-	$(foreach var, $(LIB_C), $(CC) -c $(CFLAGS) $(USER_CFLAGS) $(var) -o $(notdir $(var:.cpp=.o));)
-	ar r $(LIB_OUT).a $(LIB_OBJ)
+	@$(foreach var, $(LIB_C), $(CC) -c $(CFLAGS) $(USER_CFLAGS) $(var) -o $(notdir $(var:.cpp=.o));)
+	@ar r $(LIB_OUT).a $(LIB_OBJ)
 
 user: usrlib
 	@echo "Compiling user test"
-	$(CC) $(CFLAGS) $(USER_CFLAGS) $(TEST_SRC) $(LIB_OUT).a -o $(TEST_ELF)
+	@$(CC) $(CFLAGS) $(USER_CFLAGS) $(TEST_SRC) $(LIB_OUT).a -o $(TEST_ELF)
 
 clean:
 	@rm -r -f $(OBJDIR)

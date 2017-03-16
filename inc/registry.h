@@ -16,6 +16,7 @@ public:
 	int add_unit(Unit *u);
 
 	Unit *unit_lookup(unsigned type, unsigned sub_type);
+	int init();
 };
 
 #endif /* INC_REGISTRY_H_ */

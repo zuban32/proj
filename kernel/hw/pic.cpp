@@ -6,15 +6,20 @@
 
 int PICDriver::init()
 {
-	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT);
-	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ);
-	if(!this->port_tun || !this->irq_tun) {
+	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
+	if(!this->port_tun) {
 		return -1;
+	}
+	for(int i = 0; i < 16; i++) {
+		this->irq_tuns[i] = this->connect_to(UNIT_PHYS, PHYS_IRQ, 0x20 + i);
+		if(!this->irq_tuns[i]) {
+			return -2;
+		}
 	}
 	return 0;
 }
 
-int PICDriver::connect_from(Tunnel *t)
+int PICDriver::connect_from(Tunnel *t, int data)
 {
 	if(!t) {
 		return -1;

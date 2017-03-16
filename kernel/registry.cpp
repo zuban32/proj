@@ -1,4 +1,5 @@
 #include <inc/registry.h>
+#include <inc/console.h>
 
 Registry common_registry;
 
@@ -24,4 +25,17 @@ Unit *Registry::unit_lookup(unsigned type, unsigned subtype)
 		}
 	}
 	return res;
+}
+
+int Registry::init()
+{
+	for(int i = 0; i < this->cur_unit; i++) {
+		int res = this->reg[i]->init();
+		if(res) {
+			kprintf("Registry: error initing unit (%d, %d)\n",
+					this->reg[i]->get_type(), this->reg[i]->get_subtype());
+			return -1;
+		}
+	}
+	return 0;
 }

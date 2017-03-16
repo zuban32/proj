@@ -6,8 +6,7 @@
 #include <inc/console.h>
 
 enum {
-	IDT_SIZE = 0x81,
-	IDT_TUNS = 128
+	IDT_SIZE = 0x81
 };
 
 #define i386_INT 	0x8E
@@ -19,17 +18,14 @@ int isr_exists(int num);
 
 class IDT_Unit: Unit
 {
-	Tunnel *tuns[IDT_TUNS];
-	int cur_free_tun = 0;
+	Tunnel *tuns[IDT_SIZE];
 public:
 	IDT_Unit(): Unit(UNIT_PHYS, PHYS_IRQ) {}
 	int init();
-	int connect_from(Tunnel *t);
+	int connect_from(Tunnel *t, int data);
 	int handle(Event e);
 
 };
-
-//IDT_Unit *get_idt_unit();
 
 struct idt_entry
 {

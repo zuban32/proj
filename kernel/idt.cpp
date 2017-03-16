@@ -40,17 +40,18 @@ int IDT_Unit::init()
 	return 0;
 }
 
-int IDT_Unit::connect_from(Tunnel *t)
+int IDT_Unit::connect_from(Tunnel *t, int data)
 {
-	if(this->cur_free_tun >= IDT_TUNS) {
-		return -1;
+	if(data < 0 || data > IDT_SIZE) {
+		return 1;
 	}
-	this->tuns[this->cur_free_tun++] = t;
+	this->tuns[data] = t;
 	return 0;
 }
 
 int IDT_Unit::handle(Event e)
 {
+	kprintf("IDT unit: handle [%d]\n", e.get_msg());
 	int res = 0;
 	uint32_t irq_num = e.get_msg();
 	if(irq_num >= 0 && irq_num < IDT_SIZE) {
@@ -69,11 +70,6 @@ int IDT_Unit::handle(Event e)
 }
 
 IDT_Unit u_idt;
-
-//IDT_Unit *get_idt_unit()
-//{
-//	return &u_idt;
-//}
 
 
 void load_idt(void)

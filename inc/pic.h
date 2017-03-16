@@ -17,7 +17,7 @@
 class PICDriver: public Unit
 {
 	Tunnel *in_tun = nullptr;
-	Tunnel *irq_tun = nullptr;
+	Tunnel *irq_tuns[16] = {nullptr};
 	Tunnel *port_tun = nullptr;
 	uint8_t m1, m2;
 
@@ -25,7 +25,7 @@ public:
 	PICDriver(): Unit(UNIT_DRIVER, DRIVER_PIC), m1(0), m2(0) {}
 
 	int init();
-	int connect_from(Tunnel *t);
+	int connect_from(Tunnel *t, int data);
 	int handle(Event e);
 
 	~PICDriver() {}

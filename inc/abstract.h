@@ -59,7 +59,8 @@ class Event
 
 public:
 	Event(): type(EVENT_ERROR) {}
-	Event(int _type): type(_type) {}
+	Event(int _type): type(_type), msg4(0) {}
+	Event(int _type, uint32_t _msg4): type(_type), msg4(_msg4) {}
 
 	inline uint32_t get_msg() {
 		return this->msg4;
@@ -86,8 +87,8 @@ public:
 		return this->subtype;
 	}
 
-	Tunnel *connect_to(int type, int subtype);
-	virtual int connect_from(Tunnel *t) = 0;
+	Tunnel *connect_to(int type, int subtype, int data);
+	virtual int connect_from(Tunnel *t, int data) = 0;
 
 	virtual int init() = 0;
 	virtual int handle(Event) = 0;
@@ -97,17 +98,15 @@ class Tunnel
 {
 	Unit *a;
 	Unit *b;
-	int bytes_num;
 
 public:
-	Tunnel(): a(nullptr), b(nullptr), bytes_num(0) {}
-	Tunnel(int _bytes_num): a(nullptr), b(nullptr), bytes_num(_bytes_num) {}
+	Tunnel(): a(nullptr), b(nullptr) {}
 	virtual ~Tunnel() {}
 
 	void init(Unit *a, Unit *b);
 	virtual int transfer(Unit *me, Event e);
 };
 
-Tunnel *create_tunnel(Unit *in, Unit *out, int bytes_num);
+Tunnel *create_tunnel(Unit *in, Unit *out);
 
 #endif /* INC_ABSTRACT_H_ */

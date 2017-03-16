@@ -36,7 +36,7 @@ public:
 	int init();
 	int handle(Event e);
 
-	int connect_from(Tunnel *t);
+	int connect_from(Tunnel *t, int data);
 
 	~ATADriver();
 };

@@ -10,6 +10,7 @@
 #include <inc/process.h>
 #include <inc/x86_mem.h>
 #include <inc/gdt.h>
+#include <inc/registry.h>
 
 
 void idle(void)
@@ -18,6 +19,8 @@ void idle(void)
 	while (1)
 		cmd();
 }
+
+extern Registry common_registry;
 
 extern "C" int kernel_main(uint32_t gdt_start)
 {
@@ -34,6 +37,8 @@ extern "C" int kernel_main(uint32_t gdt_start)
 		uint32_t a = (uint32_t)p;
 		(*(void (**)(void))a)();
 	}
+
+	common_registry.init();
 
 	load_idt();
 	init_ata();

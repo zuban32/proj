@@ -42,15 +42,15 @@ ATADriver::~ATADriver()
 
 int ATADriver::init()
 {
-	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT);
-	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ);
+	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
+	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ, 0x2E);
 	if(!this->port_tun || !this->irq_tun) {
 		return -1;
 	}
 	return 0;
 }
 
-int ATADriver::connect_from(Tunnel *t)
+int ATADriver::connect_from(Tunnel *t, int data)
 {
 	if(!t) {
 		return -1;
@@ -61,6 +61,8 @@ int ATADriver::connect_from(Tunnel *t)
 
 int ATADriver::handle(Event e)
 {
+	kprintf("\t!!! ATA handle!!!\n");
+	ata_complete_readsector();
 	return 0;
 }
 

@@ -2,9 +2,6 @@
 #define ISR_H_INCLUDED
 
 #include <inc/common.h>
-
-#define MAX_ISR 0x40
-
 enum
 {
 	// exceptions
@@ -34,7 +31,8 @@ enum
 	ISR_KBD = 0x21,
 	ISR_COM1 = 0x24,
 	ISR_ATA = 0x2E,
-	ISR_SYSCALL = 0x80
+	ISR_SYSCALL = 0x80,
+	MAX_ISR
 };
 
 typedef struct
@@ -62,8 +60,6 @@ typedef struct
 } Intframe;
 
 void printf_intframe(Intframe *iframe);
-
-extern "C" void global_handler(Intframe *iframe);
 
 void divz_hndl(void);
 void kbd_hndl(void);
