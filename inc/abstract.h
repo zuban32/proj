@@ -62,6 +62,10 @@ public:
 	Event(int _type): type(_type), msg4(0) {}
 	Event(int _type, uint32_t _msg4): type(_type), msg4(_msg4) {}
 
+	inline int get_type() {
+		return this->type;
+	}
+
 	inline uint32_t get_msg() {
 		return this->msg4;
 	}

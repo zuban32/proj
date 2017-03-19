@@ -7,6 +7,7 @@ int Registry::add_unit(Unit *u)
 {
 	int res = 0;
 	if(this->cur_unit < MAX_UNITS) {
+		kprintf("REG: adding unit (%d, %d)\n", u->get_type(), u->get_subtype());
 		this->reg[this->cur_unit++] = u;
 	} else {
 		res = -1;

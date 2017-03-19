@@ -40,12 +40,6 @@ extern "C" int kernel_main(uint32_t gdt_start)
 
 	common_registry.init();
 
-	load_idt();
-	init_ata();
-
-	init_kbd();
-	init_pic(0x20, 0x28);
-	init_serial();
 	init_pages();
 	kprintf("GDT start: %x\n", gdt_start);
 	init_user_gdt((gdt_entry *)gdt_start);
@@ -57,7 +51,6 @@ extern "C" int kernel_main(uint32_t gdt_start)
 	// test ATA read
 	ata_request_readsector(0x10000/512, 3);
 	while(is_bsy() || get_cur_ind() < 3);
-
 
 	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
 			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),

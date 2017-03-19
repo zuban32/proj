@@ -7,7 +7,7 @@
 #include <inc/string.h>
 #include <inc/ata.h>
 #include <inc/process.h>
-#include <inc/string.h>
+//#include <inc/string.h>
 #include <inc/syscall.h>
 
 #include <inc/idt.h>
@@ -82,8 +82,8 @@ extern IDT_Unit u_idt;
 extern "C" void global_handler(Intframe *iframe)
 {
 //	IDT_Unit *u_idt = get_idt_unit();
-	if(iframe->intno == ISR_ATA) {
-		kprintf("ATA IRQ came\n");
+	if(iframe->intno == ISR_ATA || iframe->intno == ISR_COM1 || iframe->intno == ISR_KBD) {
+//		kprintf("PIC IRQ came\n");
 		u_idt.handle(Event(0, iframe->intno));
 		return;
 	}
@@ -105,9 +105,9 @@ extern "C" void global_handler(Intframe *iframe)
 	case ISR_PF:
 		handle_pagefault(iframe);
 		break;
-	case ISR_KBD:
-		kbd_hndl();
-		break;
+//	case ISR_KBD:
+//		kbd_hndl();
+//		break;
 	case ISR_DF:
 		df_hndl();
 		break;
@@ -117,12 +117,12 @@ extern "C" void global_handler(Intframe *iframe)
 	case ISR_PIT:
 		timer_hndl();
 		break;
-	case ISR_ATA:
-		ata_complete_readsector();
-		break;
-	case ISR_COM1:
-		com_hndl();
-		break;
+//	case ISR_ATA:
+//		ata_complete_readsector();
+//		break;
+//	case ISR_COM1:
+//		com_hndl();
+//		break;
 	case ISR_SYSCALL:
 //		kprintf("Syscall #%d\n", iframe->eax);
 		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
@@ -138,45 +138,6 @@ void divz_hndl(void)
 	kprintf("Division by zero\n");
 }
 
-void kbd_hndl(void)
-{
-	uint8_t sc = inb(0x60);
-	char *cur_buf = kbd_get_cur_buf();
-	char *kbd_buf = kbd_get_buf();
-
-	if (sc > 0 && sc < 0x40) {
-		char letter = get_scancode(sc);
-		if (input_is_on()) {
-			if (cur_buf - kbd_buf == BUF_SIZE) {
-				set_cur_buf(kbd_buf);
-			}
-			if (sc != 0x1c) {
-				if (sc != 0xe) {
-					*cur_buf = letter;
-					set_cur_buf(++cur_buf);
-				}
-			} else {
-				*cur_buf = 0;
-				set_cur_buf(++cur_buf);
-				set_input_status(0);
-			}
-		}
-
-		switch (sc) {
-		case 0x1c:
-			kendline();
-			break;
-		case 0xe:
-			kprintf("Backspace\n");
-			kbackspace();
-			break;
-		default:
-			kputc(letter, 0);
-		}
-	}
-	pic_sendEOI(1);
-}
-
 void df_hndl(void)
 {
 	kprintf("Double fault\n");
@@ -187,39 +148,5 @@ void gpf_hndl(void)
 {
 	 kprintf("GP fault: go into infinite loop now\n");
 	 while(1);
-}
-
-void com_hndl(void)
-{
-	uint8_t c = read_serial();
-	char *cur_buf = kbd_get_cur_buf();
-	char *kbd_buf = kbd_get_buf();
-	if (input_is_on()) {
-		if (cur_buf - kbd_buf == BUF_SIZE)
-			set_cur_buf(kbd_buf);
-		if (c != '\n' && c != '\r') {
-			if (c != 0x7f && (kisdigit(c) || kisletter(c) || kisspace(c))) {
-				*cur_buf = c;
-				set_cur_buf(++cur_buf);
-			}
-		} else {
-			*cur_buf = 0;
-			set_cur_buf(++cur_buf);
-			set_input_status(0);
-		}
-		switch (c) {
-		case '\r':
-		case '\n':
-			kendline();
-			break;
-		case 0x7f:
-			kbackspace();
-			break;
-		default:
-			kputc(c, 0);
-
-		}
-		pic_sendEOI(4);
-	}
 }
 

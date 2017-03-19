@@ -1,12 +1,25 @@
 #ifndef KBD_H_INCLUDED
 #define KBD_H_INCLUDED
 
+#include <inc/abstract.h>
+
 #define BUF_SIZE 4096
 
 #define KEY_NUM 0x60
 #define KEY_LEN 0x4
 
-void init_kbd(void);
+class KbdDriver: public Unit
+{
+	Tunnel *in = nullptr;
+	Tunnel *out = nullptr;
+public:
+	KbdDriver(): Unit(UNIT_DRIVER, DRIVER_KBD) {}
+
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e);
+};
+
 void clear_buf(void);
 
 char get_scancode(uint8_t sc);

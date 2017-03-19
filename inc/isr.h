@@ -62,11 +62,9 @@ typedef struct
 void printf_intframe(Intframe *iframe);
 
 void divz_hndl(void);
-void kbd_hndl(void);
 void df_hndl(void);
 void gpf_hndl(void);
 void pf_hndl(Intframe *iframe);
-void com_hndl(void);
 
 #endif
 

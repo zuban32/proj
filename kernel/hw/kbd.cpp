@@ -6,6 +6,8 @@ static uint8_t input_on = 0;
 static char kbd_buf[BUF_SIZE];
 static char *cur_buf = kbd_buf;
 
+static KbdDriver kdb_driver;
+
 static const char scancodes[] = {
 NULL, 0x1B, '1', '2', '3', '4', '5',
 		'6',	// 0x00
@@ -19,10 +21,22 @@ NULL, 0x1B, '1', '2', '3', '4', '5',
 		NULL, '*',	//0x30
 		NULL, ' ' };
 
-void init_kbd(void)
+int KbdDriver::init()
 {
-//	kprintf("kbd_buf: %x -- %x\n", kbd_buf, kbd_buf + BUF_SIZE);		//just debug output
-//	kprintf("scancodes: %x -- %x\n", scancodes, scancodes + KEY_NUM);
+	this->in = this->connect_to(UNIT_DRIVER, DRIVER_PIC, 1);
+	if(!this->in) {
+		return 1;
+	}
+	return 0;
+}
+
+int KbdDriver::connect_from(Tunnel *t, int data)
+{
+	if(this->out) {
+		return 1;
+	}
+	this->out = t;
+	return 0;
 }
 
 char get_scancode(uint8_t sc)
@@ -62,4 +76,50 @@ char *kbd_get_buf(void)
 void set_cur_buf(char *buf)
 {
 	cur_buf = buf;
+}
+
+static void kbd_hndl(void)
+{
+	uint8_t sc = inb(0x60);
+//	char *cur_buf = kbd_get_cur_buf();
+//	char *kbd_buf = kbd_get_buf();
+
+	if (sc > 0 && sc < 0x40) {
+		char letter = get_scancode(sc);
+		if (input_is_on()) {
+			if (cur_buf - kbd_buf == BUF_SIZE) {
+				set_cur_buf(kbd_buf);
+			}
+			if (sc != 0x1c) {
+				if (sc != 0xe) {
+					*cur_buf = letter;
+					set_cur_buf(++cur_buf);
+				}
+			} else {
+				*cur_buf = 0;
+				set_cur_buf(++cur_buf);
+				set_input_status(0);
+			}
+		}
+
+		switch (sc) {
+		case 0x1c:
+			kendline();
+			break;
+		case 0xe:
+			kprintf("Backspace\n");
+			kbackspace();
+			break;
+		default:
+			kputc(letter, 0);
+		}
+	}
+//	pic_sendEOI(1);
+}
+
+int KbdDriver::handle(Event e)
+{
+	kbd_hndl();
+	this->in->transfer(this, Event(1, 0x1));
+	return 0;
 }

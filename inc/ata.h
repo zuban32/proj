@@ -22,8 +22,9 @@ enum {
 class ATADriver: public Unit
 {
 public:
-	Tunnel *port_tun = nullptr;
-	Tunnel *irq_tun = nullptr;
+//	Tunnel *port_tun = nullptr;
+	Tunnel *irq_p_tun = nullptr;
+	Tunnel *irq_s_tun = nullptr;
 	Tunnel *in_tun = nullptr;
 
 	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
@@ -40,8 +41,6 @@ public:
 
 	~ATADriver();
 };
-
-void init_ata(void);
 
 void ata_request_readsector(int lba, uint8_t count);
 void ata_complete_readsector(void);

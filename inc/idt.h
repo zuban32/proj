@@ -12,8 +12,6 @@ enum {
 #define i386_INT 	0x8E
 #define i386_TRAP 	0x8F
 
-void addISR(uint8_t ind, uint16_t selector, uint8_t type);
-void load_idt(void);
 int isr_exists(int num);
 
 class IDT_Unit: Unit

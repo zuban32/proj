@@ -2,21 +2,18 @@
 #include <inc/cmd.h>
 #include <inc/string.h>
 #include <inc/idt.h>
-#include <inc/isr.h>
 #include <inc/paging.h>
 
 extern char *cmd_names[];
-extern struct idt_entry idt_tbl[];
 extern uint32_t params[];
 
-const char *cmd_helps[CMD_NUM] = { "create ISR #param0",
+const char *cmd_helps[CMD_NUM] = { "create ISR #param0 [DEPR!]",
 		"list all existing ISRs", "clear screen",
 		"show this help" };
 
 void cmd_isr(void)
 {
-	kprintf("isr #%d will be created\n", params[0]);
-	addISR(params[0], 0x8, i386_INT);
+	kprintf("[DEPRECATED!] isr #%d will be created\n", params[0]);
 }
 
 void cmd_listisr(void)

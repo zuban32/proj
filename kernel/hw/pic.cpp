@@ -4,32 +4,28 @@
 #define MASK(i, n) (m##i |= 1 << n)
 #define UNMASK(i, n) (m##i &= ~(1 << n))
 
-int PICDriver::init()
-{
-	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
-	if(!this->port_tun) {
-		return -1;
-	}
-	for(int i = 0; i < 16; i++) {
-		this->irq_tuns[i] = this->connect_to(UNIT_PHYS, PHYS_IRQ, 0x20 + i);
-		if(!this->irq_tuns[i]) {
-			return -2;
-		}
-	}
-	return 0;
-}
+static PICDriver pic_driver;
 
 int PICDriver::connect_from(Tunnel *t, int data)
 {
-	if(!t) {
+	if(!t || (data < 0 || data > PIC_IRQ_MAX)) {
 		return -1;
 	}
-	this->in_tun = t;
+	this->out_tuns[data] = t;
 	return 0;
 }
 
 int PICDriver::handle(Event e)
 {
+//	kprintf("PIC IRQ: (%d, %d)\n", e.get_type(), e.get_msg());
+	switch(e.get_type()) {
+	case PIC_EVENT_IRQ:
+		this->out_tuns[e.get_msg() - 0x20]->transfer(this, e);
+		break;
+	case PIC_EVENT_EOI:
+		pic_sendEOI(e.get_msg());
+		break;
+	}
 	return 0;
 }
 
@@ -46,7 +42,7 @@ static void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
 	outb(PIC_S_DATA, mask_s);
 }
 
-void init_pic(uint8_t off1, uint8_t off2)
+static void init_pic(uint8_t off1, uint8_t off2)
 {
 	__asm__("cli");
 	uint8_t m1, m2;
@@ -79,5 +75,21 @@ void init_pic(uint8_t off1, uint8_t off2)
 
 //	kprintf("PIC inited\n");
 	__asm__("sti");
+}
+
+int PICDriver::init()
+{
+//	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
+//	if(!this->port_tun) {
+//		return -1;
+//	}
+	for(int i = 0; i < 16; i++) {
+		this->in_tuns[i] = this->connect_to(UNIT_PHYS, PHYS_IRQ, 0x20 + i);
+		if(!this->in_tuns[i]) {
+			return -2;
+		}
+	}
+	init_pic(0x20, 0x28);
+	return 0;
 }
 

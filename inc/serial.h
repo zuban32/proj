@@ -1,10 +1,23 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
+#include <inc/abstract.h>
+
 #define COM1 0x3F8
 #define SER_DIV 3
 
-void init_serial(void);
+class SerialDriver: public Unit
+{
+	Tunnel *in = nullptr;
+	Tunnel *out = nullptr;
+public:
+	SerialDriver(): Unit(UNIT_DRIVER, DRIVER_SERIAL) {}
+
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e);
+};
+
 int serial_received(void);
 char read_serial(void);
 int is_transmit_empty(void);

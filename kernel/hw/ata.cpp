@@ -33,7 +33,7 @@
 //	return 0;
 //}
 
-ATADriver ata_driver;
+static ATADriver ata_driver;
 
 ATADriver::~ATADriver()
 {
@@ -42,9 +42,10 @@ ATADriver::~ATADriver()
 
 int ATADriver::init()
 {
-	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
-	this->irq_tun = this->connect_to(UNIT_PHYS, PHYS_IRQ, 0x2E);
-	if(!this->port_tun || !this->irq_tun) {
+//	this->port_tun = this->connect_to(UNIT_PHYS, PHYS_PORT, 0);
+	this->irq_p_tun = this->connect_to(UNIT_DRIVER, DRIVER_PIC, 0xE);
+	this->irq_s_tun = this->connect_to(UNIT_DRIVER, DRIVER_PIC, 0xF);
+	if(!this->irq_p_tun || !this->irq_s_tun) {
 		return -1;
 	}
 	return 0;
@@ -61,17 +62,11 @@ int ATADriver::connect_from(Tunnel *t, int data)
 
 int ATADriver::handle(Event e)
 {
-	kprintf("\t!!! ATA handle!!!\n");
+	// kprintf("\t!!! ATA handle!!!\n");
 	ata_complete_readsector();
+//	Send EOI
+	this->irq_p_tun->transfer(this, Event(1, 0xE));
 	return 0;
-}
-
-void init_ata(void)
-{
-//	add_local_dispatcher(&ata_driver);
-	kprintf("ATA dbg = %x\n", ata_driver.dbg);
-	kprintf("ATA inited\n");
-
 }
 
 uint8_t is_bsy(void)
@@ -97,7 +92,7 @@ void ata_request_readsector(int lba, uint8_t count)
 	outb(PRIMARY_BASE_START + 4, (lba >> 8) & 0xFF);
 	outb(PRIMARY_BASE_START + 5, (lba >> 16) & 0xFF);
 	outb(PRIMARY_BASE_START + 7, 0x20);
-	kprintf("READ SECTOR request\n");
+	// kprintf("READ SECTOR request\n");
 }
 
 void ata_complete_readsector(void)
@@ -110,5 +105,5 @@ void ata_complete_readsector(void)
 	}
 	ata_driver.cur_buf_ind++;
 	ata_driver.bsy = 0;
-	pic_sendEOI(14);
+//	pic_sendEOI(14);
 }

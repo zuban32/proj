@@ -24,7 +24,7 @@ void Tunnel::init(Unit *_a, Unit *_b)
 
 int Tunnel::transfer(Unit *me, Event e)
 {
-	kprintf("Tunnel transfer: [%d]\n", e.get_msg());
+//	kprintf("Tunnel transfer: [%d]\n", e.get_msg());
 	if(me == this->a) {
 		return this->b->handle(e);
 	} else if(me == this->b) {

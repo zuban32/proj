@@ -18,7 +18,7 @@ int isr_exists(int num)
 	return idt_tbl[num].offset1 || idt_tbl[num].offset2;
 }
 
-void addISR(uint8_t ind, uint16_t selector, uint8_t type)
+static void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 {
 	uintptr_t addr = isr_handlers[ind];
 	kprintf("Setting ISR addr [%x] for #%d: %x\n", idt_tbl + ind, ind, addr);
@@ -35,27 +35,24 @@ void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 	kprintf("Setting ISR addr for #%d: %x\n", ind, idt_tbl[ind].offset1 | (idt_tbl[ind].offset2 << 16));
 }
 
-int IDT_Unit::init()
-{
-	return 0;
-}
-
 int IDT_Unit::connect_from(Tunnel *t, int data)
 {
 	if(data < 0 || data > IDT_SIZE) {
 		return 1;
 	}
+	kprintf("IDT: tunnel[%d] created = %x\n", data, t);
 	this->tuns[data] = t;
 	return 0;
 }
 
 int IDT_Unit::handle(Event e)
 {
-	kprintf("IDT unit: handle [%d]\n", e.get_msg());
+//	kprintf("IDT: handle [%d]\n", e.get_msg());
 	int res = 0;
 	uint32_t irq_num = e.get_msg();
 	if(irq_num >= 0 && irq_num < IDT_SIZE) {
 // TODO: create new event
+//		kprintf("IDT: Using tunnel %x\n", this->tuns[irq_num]);
 		this->tuns[irq_num]->transfer(this, e);
 	} else {
 		res = -1;
@@ -72,7 +69,7 @@ int IDT_Unit::handle(Event e)
 IDT_Unit u_idt;
 
 
-void load_idt(void)
+static void load_idt(void)
 {
 	kprintf("u_idt: %x -- %x\n", &u_idt, &u_idt + 1);
 	addISR(ISR_DE, 0x8, i386_INT);
@@ -96,4 +93,10 @@ void load_idt(void)
 			idt_tbl[ISR_KBD].offset1 | (idt_tbl[ISR_KBD].offset2 << 16));
 	kprintf("isrATA_start: %x\n",
 				idt_tbl[ISR_ATA].offset1 | (idt_tbl[ISR_ATA].offset2 << 16));
+}
+
+int IDT_Unit::init()
+{
+	load_idt();
+	return 0;
 }
