@@ -1,14 +1,13 @@
 #include <inc/console.h>
 #include <inc/cmd.h>
 #include <inc/string.h>
-#include <inc/idt.h>
 #include <inc/paging.h>
 
 extern char *cmd_names[];
 extern uint32_t params[];
 
 const char *cmd_helps[CMD_NUM] = { "create ISR #param0 [DEPR!]",
-		"list all existing ISRs", "clear screen",
+		"list all existing ISRs [DEPR!]", "clear screen",
 		"show this help" };
 
 void cmd_isr(void)
@@ -18,10 +17,7 @@ void cmd_isr(void)
 
 void cmd_listisr(void)
 {
-	for (int i = 0; i < IDT_SIZE; i++)
-		if (isr_exists(i))
-			kprintf("%x ", i);
-	kendline();
+	kprintf("[DEPRECATED!]\n");
 }
 
 void cmd_clear(void)

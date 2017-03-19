@@ -89,7 +89,7 @@ kernel.bin1:
 	
 usrlib:
 	@$(foreach var, $(LIB_C), $(CC) -c $(CFLAGS) $(USER_CFLAGS) $(var) -o $(notdir $(var:.cpp=.o));)
-	@ar r $(LIB_OUT).a $(LIB_OBJ)
+	@ar r $(LIB_OUT).a $(LIB_OBJ) 2> /dev/null
 
 user: usrlib
 	@echo "Compiling user test"

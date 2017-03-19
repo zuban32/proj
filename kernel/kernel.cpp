@@ -24,9 +24,6 @@ extern Registry common_registry;
 
 extern "C" int kernel_main(uint32_t gdt_start)
 {
-//	init_vesa();
-//	kclear_screen();
-
 //	Call global constructors
 	extern char *__init_array_start;
 	extern char *__init_array_end;

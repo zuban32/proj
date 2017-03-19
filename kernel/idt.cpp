@@ -13,10 +13,7 @@ static struct idt_entry idt_tbl[IDT_SIZE];
 static struct idt_descr idtr =
 		{ IDT_SIZE * sizeof(struct idt_entry), (uint32_t) idt_tbl };
 
-int isr_exists(int num)
-{
-	return idt_tbl[num].offset1 || idt_tbl[num].offset2;
-}
+IDT_Unit u_idt;
 
 static void addISR(uint8_t ind, uint16_t selector, uint8_t type)
 {
@@ -65,8 +62,6 @@ int IDT_Unit::handle(Event e)
 //	}
 	return res;
 }
-
-IDT_Unit u_idt;
 
 
 static void load_idt(void)
