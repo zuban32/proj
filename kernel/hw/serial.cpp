@@ -40,12 +40,12 @@ int SerialDriver::init()
 	return 0;
 }
 
-int serial_received()
+static int serial_received()
 {
 	return inb(COM1 + 5) & 1;
 }
 
-char read_serial()
+static char read_serial()
 {
 	if (serial_received() == 0)
 		return -1;
@@ -54,7 +54,7 @@ char read_serial()
 	return res;
 }
 
-int is_transmit_empty()
+static int is_transmit_empty()
 {
 	return inb(COM1 + 5) & 0x20;
 }
