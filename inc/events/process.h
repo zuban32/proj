@@ -1,0 +1,9 @@
+#ifndef INC_EVENTS_PROCESS_H_
+#define INC_EVENTS_PROCESS_H_
+
+enum {
+	E_PROC_CREATE,
+	E_PROC_GETCUR
+};
+
+#endif /* INC_EVENTS_PROCESS_H_ */

@@ -1,6 +1,6 @@
-#include <inc/ata.h>
-#include <inc/console.h>
-#include <inc/pic.h>
+#include <hw/ata.h>
+#include <hw/pic.h>
+#include <console.h>
 
 //static int ata_identify(int base)
 //{
@@ -60,12 +60,12 @@ int ATADriver::connect_from(Tunnel *t, int data)
 	return 0;
 }
 
-int ATADriver::handle(Event e)
+int ATADriver::handle(Event e, void *ret)
 {
 	// kprintf("\t!!! ATA handle!!!\n");
 	ata_complete_readsector();
 //	Send EOI
-	this->irq_p_tun->transfer(this, Event(1, 0xE));
+	this->irq_p_tun->transfer(this, Event(1, 0xE), nullptr);
 	return 0;
 }
 

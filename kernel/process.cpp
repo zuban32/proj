@@ -1,16 +1,50 @@
-#include <inc/common.h>
-#include <inc/process.h>
-#include <inc/console.h>
-#include <inc/string.h>
-#include <inc/paging.h>
+#include <process.h>
+#include <console.h>
+#include <util/string.h>
+#include <events/mmu.h>
+#include <mmu.h>
+#include <events/process.h>
 
 #define GD_UT 0x18
 #define GD_UD 0x20
 
 static int cur_max_pid = 0;
 static int sched_status = 0;
-static Process *cur_proc = NULL;
+static Process *cur_proc = nullptr;
 static Process process_table[MAX_PROCESS_NUM];
+
+static ProcessManager proc_mgr;
+
+int ProcessManager::init()
+{
+	this->to_mmu = this->connect_to(UNIT_DRIVER, DRIVER_MMU, 0);
+	if(!this->to_mmu) {
+		return 1;
+	}
+	return 0;
+}
+
+int ProcessManager::connect_from(Tunnel *t, int data)
+{
+	return 0;
+}
+
+int ProcessManager::handle(Event e, void *ret)
+{
+	switch(e.get_type()) {
+	case E_PROC_CREATE:
+//		*ret = create_process(e.get_msg())
+		break;
+	case E_PROC_GETCUR: {
+		Process **dst = (Process **)e.get_msg();
+		*dst = cur_proc;
+		break;
+	}
+	default:
+		break;
+	}
+	return 0;
+}
 
 int sched_enabled(void)
 {
@@ -30,7 +64,7 @@ void disable_sched(void)
 static Process *init_process(void)
 {
 	Process *cur = process_table, *end = cur + MAX_PROCESS_NUM;
-	Process *prev = NULL;
+	Process *prev = nullptr;
 	while(cur < end) {
 		if(cur->status == PROC_FREE) {
 			// found right place
@@ -52,14 +86,14 @@ static Process *init_process(void)
 	}
 	if(cur == end) {
 		kprintf("Panic: can't create new process - not enought space\n");
-		return NULL;
+		return nullptr;
 	}
 
 	Process *res = cur;
 	res->status = PROC_FREE;
 	res->id = cur_max_pid++;
 	kprintf("Creating proc: %d\n", res->id);
-	res->code_start = NULL;
+	res->code_start = nullptr;
 
 	return res;
 }
@@ -76,7 +110,8 @@ Process *create_kernel_process(void (*code)(void))
 	Process *proc = init_process();
 	proc->status = PROC_TAKEN;
 	proc->iframe.ret_eip = (uint32_t)code;
-	page_alloc(proc->iframe.ret_eip, 0);
+//	page_alloc(proc->iframe.ret_eip, 0);
+
 	proc->iframe.ret_cs = 0x8;
 	proc->iframe.ds = 0x10;
 	proc->iframe.es = 0x10;
@@ -112,7 +147,7 @@ Process *get_process_table(void)
 //	return &process_table[pid];
 //}
 
-void set_cur_process(Process *proc)
+static void set_cur_process(Process *proc)
 {
 	cur_proc = proc;
 }
@@ -141,7 +176,7 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	for(int i = 0; i < file->e_phnum; i++) {
 		Elf32_Phdr *cur_ph = ph + i;
 		if(cur_ph->p_type == 1) {
-			page_alloc(cur_ph->p_vaddr, 1);
+//			page_alloc(cur_ph->p_vaddr, 1);
 			kmemset((void *)cur_ph->p_vaddr, 0, cur_ph->p_memsz);
 			kmemcpy((char *)cur_ph->p_vaddr, (char *)file + cur_ph->p_offset, cur_ph->p_filesz);
 		}
@@ -154,8 +189,8 @@ int load_process_code(Elf32_Ehdr *file, Process *proc)
 	proc->iframe.es = GD_UD | 3;
 	proc->iframe.ss = GD_UD | 3;
 	uint32_t stack_top = PROCSTACKTOP(proc);
-	page_alloc(stack_top - 4096 * 2, 1);
-	page_alloc(stack_top - 4096, 1);
+//	page_alloc(stack_top - 4096 * 2, 1);
+//	page_alloc(stack_top - 4096, 1);
 	proc->iframe.esp = stack_top;
 	proc->iframe.ret_cs = GD_UT | 3;
 	// Enable interrupts while in user mode.

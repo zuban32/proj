@@ -1,6 +1,6 @@
-#include <inc/common.h>
-#include <inc/console.h>
-#include <inc/kbd.h>
+#include <hw/kbd.h>
+#include <console.h>
+#include <util/port.h>
 
 static uint8_t input_on = 0;
 static char kbd_buf[BUF_SIZE];
@@ -9,17 +9,17 @@ static char *cur_buf = kbd_buf;
 static KbdDriver kdb_driver;
 
 static const char scancodes[] = {
-NULL, 0x1B, '1', '2', '3', '4', '5',
+		0, 0x1B, '1', '2', '3', '4', '5',
 		'6',	// 0x00
 		'7', '8', '9', '0', '-', '=', '\b', '\t', 'q', 'w', 'e', 'r', 't', 'y',
 		'u',
 		'i',	// 0x10
-		'o', 'p', '[', ']', '\n', NULL, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k',
+		'o', 'p', '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k',
 		'l',
 		';',	// 0x20
-		'\'', '`', NULL, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-		NULL, '*',	//0x30
-		NULL, ' ' };
+		'\'', '`', 0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+		0, '*',	//0x30
+		0, ' ' };
 
 int KbdDriver::init()
 {
@@ -104,11 +104,11 @@ static void kbd_hndl(void)
 
 		switch (sc) {
 		case 0x1c:
-			kendline();
+//			kendline();
 			break;
 		case 0xe:
 			kprintf("Backspace\n");
-			kbackspace();
+//			kbackspace();
 			break;
 		default:
 			kputc(letter, 0);
@@ -117,9 +117,9 @@ static void kbd_hndl(void)
 //	pic_sendEOI(1);
 }
 
-int KbdDriver::handle(Event e)
+int KbdDriver::handle(Event e, void *ret)
 {
 	kbd_hndl();
-	this->in->transfer(this, Event(1, 0x1));
+	this->in->transfer(this, Event(1, 0x1), nullptr);
 	return 0;
 }

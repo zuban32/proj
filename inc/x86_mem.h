@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include <inc/console.h>
+#include <console.h>
 
 typedef struct
 {

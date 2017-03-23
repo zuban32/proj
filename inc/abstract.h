@@ -1,7 +1,7 @@
 #ifndef INC_ABSTRACT_H_
 #define INC_ABSTRACT_H_
 
-#include <inc/common.h>
+#include <util/port.h>
 
 enum {
 	MAX_TUNNELS_NUM 	= 128,
@@ -28,7 +28,7 @@ enum SubsystemType
 	SS_PROCESS,
 	SS_GRAPHICS,
 	SS_FILE,
-	SS_CHAR
+	SS_CONSOLE
 };
 
 enum DriverType
@@ -82,6 +82,8 @@ public:
 	Unit(int t, int st);
 	virtual ~Unit() {}
 
+	bool inited = false;
+
 	inline unsigned get_type()
 	{
 		return this->type;
@@ -95,7 +97,7 @@ public:
 	virtual int connect_from(Tunnel *t, int data) = 0;
 
 	virtual int init() = 0;
-	virtual int handle(Event) = 0;
+	virtual int handle(Event, void*) = 0;
 };
 
 class Tunnel
@@ -108,7 +110,7 @@ public:
 	virtual ~Tunnel() {}
 
 	void init(Unit *a, Unit *b);
-	virtual int transfer(Unit *me, Event e);
+	virtual int transfer(Unit *me, Event e, void *ret);
 };
 
 Tunnel *create_tunnel(Unit *in, Unit *out);

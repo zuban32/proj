@@ -1,7 +1,7 @@
 #ifndef KBD_H_INCLUDED
 #define KBD_H_INCLUDED
 
-#include <inc/abstract.h>
+#include <abstract.h>
 
 #define BUF_SIZE 4096
 
@@ -17,7 +17,7 @@ public:
 
 	int init();
 	int connect_from(Tunnel *t, int data);
-	int handle(Event e);
+	int handle(Event e, void *ret);
 };
 
 void clear_buf(void);

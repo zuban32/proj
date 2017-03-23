@@ -1,9 +1,8 @@
-#include <inc/console.h>
-#include <inc/cmd.h>
-#include <inc/string.h>
-#include <inc/kbd.h>
-#include <inc/idt.h>
-#include <inc/isr.h>
+#include <hw/kbd.h>
+#include <console.h>
+#include <cmd.h>
+#include <util/string.h>
+#include <idt.h>
 
 char cmd_name[CMD_NAME_LEN + 1];
 uint32_t params[2];

@@ -1,8 +1,8 @@
-#ifndef INC_ATA_H_
-#define INC_ATA_H_
+#ifndef INC_HW_ATA_H_
+#define INC_HW_ATA_H_
 
-#include <inc/abstract.h>
-#include <inc/common.h>
+#include <abstract.h>
+#include <util/port.h>
 
 enum {
 	PR_SEC_DIFF = 0x80,
@@ -35,9 +35,8 @@ public:
 	ATADriver(): Unit(UNIT_DRIVER, DRIVER_ATA), cur_buf_ind(0), bsy(0), dbg(0x32) {}
 
 	int init();
-	int handle(Event e);
-
 	int connect_from(Tunnel *t, int data);
+	int handle(Event e, void *ret);
 
 	~ATADriver();
 };

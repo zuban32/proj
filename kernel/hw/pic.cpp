@@ -1,5 +1,6 @@
-#include <inc/pic.h>
-#include <inc/console.h>
+#include <hw/pic.h>
+#include <events/pic.h>
+#include <console.h>
 
 #define MASK(i, n) (m##i |= 1 << n)
 #define UNMASK(i, n) (m##i &= ~(1 << n))
@@ -15,25 +16,25 @@ int PICDriver::connect_from(Tunnel *t, int data)
 	return 0;
 }
 
-int PICDriver::handle(Event e)
-{
-//	kprintf("PIC IRQ: (%d, %d)\n", e.get_type(), e.get_msg());
-	switch(e.get_type()) {
-	case PIC_EVENT_IRQ:
-		this->out_tuns[e.get_msg() - 0x20]->transfer(this, e);
-		break;
-	case PIC_EVENT_EOI:
-		pic_sendEOI(e.get_msg());
-		break;
-	}
-	return 0;
-}
-
-void pic_sendEOI(uint8_t irq)
+static void pic_sendEOI(uint8_t irq)
 {
 	if (irq >= 8)
 		outb(PIC_S_CMD, PIC_EOI);
 	outb(PIC_M_CMD, PIC_EOI);
+}
+
+int PICDriver::handle(Event e, void *ret)
+{
+//	kprintf("PIC IRQ: (%d, %d)\n", e.get_type(), e.get_msg());
+	switch(e.get_type()) {
+	case E_PIC_IRQ:
+		this->out_tuns[e.get_msg() - 0x20]->transfer(this, e, nullptr);
+		break;
+	case E_PIC_EOI:
+		pic_sendEOI(e.get_msg());
+		break;
+	}
+	return 0;
 }
 
 static void pic_set_mask(uint8_t mask_m, uint8_t mask_s)
@@ -67,7 +68,7 @@ static void init_pic(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6B);
 	outb(PIC_S_CMD, 0x6B);
 
-	UNMASK(1, 0);
+//	UNMASK(1, 0);
 	UNMASK(1, 4);
 	UNMASK(1, 14);
 
@@ -90,6 +91,7 @@ int PICDriver::init()
 		}
 	}
 	init_pic(0x20, 0x28);
+	this->inited = true;
 	return 0;
 }
 

@@ -1,25 +1,25 @@
 #ifndef IDT_H_INCLUDED
 #define IDT_H_INCLUDED
 
-#include <inc/abstract.h>
-#include <inc/common.h>
-#include <inc/console.h>
+#include <abstract.h>
+#include <util/port.h>
 
 enum {
-	IDT_SIZE = 0x81
+	IDT_SIZE 	= 0x81,
+
+	i386_INT 	= 0x8E,
+	i386_TRAP 	= 0x8F
 };
 
-#define i386_INT 	0x8E
-#define i386_TRAP 	0x8F
 
-class IDT_Unit: Unit
+class InterruptUnit: Unit
 {
 	Tunnel *tuns[IDT_SIZE];
 public:
-	IDT_Unit(): Unit(UNIT_PHYS, PHYS_IRQ) {}
+	InterruptUnit(): Unit(UNIT_PHYS, PHYS_IRQ) {}
 	int init();
 	int connect_from(Tunnel *t, int data);
-	int handle(Event e);
+	int handle(Event e, void *ret);
 
 };
 

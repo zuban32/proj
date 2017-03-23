@@ -1,26 +1,12 @@
-#include <inc/console.h>
-#include <inc/idt.h>
-#include <inc/pic.h>
-#include <inc/cmd.h>
-#include <inc/serial.h>
-#include <inc/paging.h>
-#include <inc/kbd.h>
-#include <inc/graphics.h>
-#include <inc/ata.h>
-#include <inc/process.h>
-#include <inc/x86_mem.h>
-#include <inc/gdt.h>
-#include <inc/registry.h>
-
-
-void idle(void)
-{
-	disable_sched();
-	while (1)
-		cmd();
-}
-
-extern Registry common_registry;
+#include <hw/ata.h>
+#include <console.h>
+#include <cmd.h>
+#include <process.h>
+#include <x86_mem.h>
+#include <gdt.h>
+#include <registry.h>
+#include <mmu.h>
+#include <debug.h>
 
 extern "C" int kernel_main(uint32_t gdt_start)
 {
@@ -35,33 +21,38 @@ extern "C" int kernel_main(uint32_t gdt_start)
 		(*(void (**)(void))a)();
 	}
 
-	common_registry.init();
+	int res = get_common_registry()->init();
 
-	init_pages();
-	kprintf("GDT start: %x\n", gdt_start);
-	init_user_gdt((gdt_entry *)gdt_start);
-	RAMMap *map = (RAMMap *)0x500;
+//	kprintf("GDT start: %x\n", gdt_start);
+//	init_user_gdt((gdt_entry *)gdt_start);
+//	RAMMap *map = (RAMMap *)0x500;
 //	dump_map(map);
-	kprintf("RAM size: %d\n", get_memory_size(map));
-	kprintf("Init finished\n");
-
-	// test ATA read
-	ata_request_readsector(0x10000/512, 3);
-	while(is_bsy() || get_cur_ind() < 3);
-
-	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
-			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
-			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
-	Process *shell = create_kernel_process(idle);
-	int ret = (shell == NULL) || (pr1 == NULL) || (pr2 == NULL) || (pr3 == NULL);
-	if(ret) {
-		kprintf("Error loading process\n");
+//	kprintf("RAM size: %d\n", get_memory_size(map));
+	if(!res) {
+//		dprintf("Init finished\n");
+		kprintf("Init finished\n");
 	} else {
-		kprintf("Processes loaded and created successfully\n");
+		dprintf("Init failed\n");
 	}
 
-	enable_sched();
-	sched_yield();
+	while(1);
+//
+//	// test ATA read
+//	ata_request_readsector(0x10000/512, 3);
+//	while(is_bsy() || get_cur_ind() < 3);
+//
+//	Process *pr1 = create_process((Elf32_Ehdr *)get_ata_buffer()),
+//			*pr2 = create_process((Elf32_Ehdr *)get_ata_buffer()),
+//			*pr3 = create_process((Elf32_Ehdr *)get_ata_buffer());
+//	int ret = (pr1 == nullptr) || (pr2 == nullptr) || (pr3 == nullptr);
+//	if(ret) {
+//		kprintf("Error loading process\n");
+//	} else {
+//		kprintf("Processes loaded and created successfully\n");
+//	}
+//
+//	enable_sched();
+//	sched_yield();
 
 	return 0;
 }

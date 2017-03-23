@@ -1,5 +1,5 @@
-#include <inc/cxxabi.h>
-#include <inc/console.h>
+#include <cxxabi.h>
+#include <console.h>
 
 //void *__dso_handle;
 

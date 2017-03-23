@@ -1,0 +1,9 @@
+#ifndef INC_EVENTS_SERIAL_H_
+#define INC_EVENTS_SERIAL_H_
+
+enum {
+	E_SERIAL_IRQ,
+	E_SERIAL_WRITE
+};
+
+#endif /* INC_EVENTS_SERIAL_H_ */

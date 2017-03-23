@@ -3,24 +3,32 @@
 
 #include <stdint.h>
 
+#include <abstract.h>
+
 typedef __builtin_va_list va_list;
-
 #define va_start(ap, last) __builtin_va_start(ap, last)
-
 #define va_arg(ap, type) __builtin_va_arg(ap, type)
-
 #define va_end(ap) __builtin_va_end(ap)
 
-int get_curx(void);
-int get_cury(void);
-void set_curx(int val);
-void set_cury(int val);
+enum {
+	MAX_CONSOLE_TUNS = 8
+};
 
-void kendline(void);
-void kclear_screen(void);
-void kbackspace(void);
 void kputc(char c, char move_bound);
 void kprintf(const char *fstr, ...);
+
+class Console: public Unit
+{
+	Tunnel *print_tun = nullptr;
+	Tunnel *in_tuns[MAX_CONSOLE_TUNS] = {nullptr};
+	int cur_in = 0;
+public:
+	Console(): Unit(UNIT_SUBSYSTEM, SS_CONSOLE) {}
+
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e, void *ret);
+};
 
 #endif
 

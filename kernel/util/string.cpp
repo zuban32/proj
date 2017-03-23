@@ -1,6 +1,6 @@
-#include <inc/string.h>
-#include <inc/console.h>
-#include <inc/common.h>
+#include <util/string.h>
+#include <console.h>
+#include <util/port.h>
 
 int kisspace(const char c)
 {

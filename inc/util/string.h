@@ -1,7 +1,7 @@
 #ifndef STRING_H_INCLUDED
 #define STRING_H_INCLUDED
 
-#include <inc/common.h>
+#include <util/port.h>
 
 int kstrcmp(const char *s1, const char *s2);
 void kmemset(void *s0, int val, uint32_t size);

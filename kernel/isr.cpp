@@ -1,30 +1,39 @@
-#include <inc/isr.h>
-#include <inc/pic.h>
-#include <inc/console.h>
-#include <inc/serial.h>
-#include <inc/paging.h>
-#include <inc/kbd.h>
-#include <inc/string.h>
-#include <inc/ata.h>
-#include <inc/process.h>
-//#include <inc/string.h>
-#include <inc/syscall.h>
+#include <isr.h>
+#include <mmu.h>
+#include <console.h>
+#include <util/string.h>
+#include <process.h>
+#include <syscall.h>
+#include <idt.h>
 
-#include <inc/idt.h>
+const char *exception_names[] = {
+		"Divide error",
+		"Debug Exception",
+		"NMI Interrupt",
+		"Breakpoint",
+		"Overflow",
+		"BOUND Range Exceeded",
+		"Invalide Opcode",
+		"Coprocessor Not Available",
+		"Double Fault",
+		"Coprocessor segment overrun",
+		"Invalid TSS",
+		"Segment Not Present",
+		"Stack-Segment Fault",
+		"General Protection",
+		"Page Fault",
+		"x87 FPU Floating-Point Error",
+		"Alignment Check",
+		"Machine Check",
+		"SIMD Floating-Point Exception",
+		"Virtualization Exception"
+};
 
-const char *exception_names[] = { "Divide error", "Debug Exception",
-		"NMI Interrupt", "Breakpoint", "Overflow", "BOUND Range Exceeded",
-		"Invalide Opcode", "Coprocessor Not Available", "Double Fault",
-		"Coprocessor segment overrun", "Invalid TSS", "Segment Not Present",
-		"Stack-Segment Fault", "General Protection", "Page Fault",
-		"x87 FPU Floating-Point Error", "Alignment Check", "Machine Check",
-		"SIMD Floating-Point Exception", "Virtualization Exception" };
+const char *eflags_flagnames[] = { "CF", nullptr, "PF", nullptr, "AF",
+nullptr, "ZF", "SF", "TF", "IF", "DF", "OF", "IOPL1", "IOPL2", "NT",
+nullptr, "RF", "VM", "AC", "VIF", "VIP", "ID" };
 
-const char *eflags_flagnames[] = { "CF", NULL, "PF", NULL, "AF",
-NULL, "ZF", "SF", "TF", "IF", "DF", "OF", "IOPL1", "IOPL2", "NT",
-NULL, "RF", "VM", "AC", "VIF", "VIP", "ID" };
-
-void print_intframe(Intframe *iframe)
+static void print_intframe(Intframe *iframe)
 {
 	if (iframe->intno >= 0x20) // print only exceptions
 		return;
@@ -71,20 +80,30 @@ void print_intframe(Intframe *iframe)
 	kprintf("\n-------------------------\n\n");
 }
 
-static void timer_hndl(void)
+static void divz_hndl(void)
 {
-	pic_sendEOI(0);
-	sched_yield();
+	kprintf("Division by zero\n");
 }
 
-extern IDT_Unit u_idt;
+static void df_hndl(void)
+{
+	kprintf("Double fault\n");
+	while(1);
+}
+
+static void gpf_hndl(void)
+{
+	 kprintf("GP fault: go into infinite loop now\n");
+	 while(1);
+}
+
+extern InterruptUnit u_idt;
 
 extern "C" void global_handler(Intframe *iframe)
 {
-//	IDT_Unit *u_idt = get_idt_unit();
-	if(iframe->intno == ISR_ATA || iframe->intno == ISR_COM1 || iframe->intno == ISR_KBD) {
-//		kprintf("PIC IRQ came\n");
-		u_idt.handle(Event(0, iframe->intno));
+	if(iframe->intno == ISR_ATA || iframe->intno == ISR_COM1 || iframe->intno == ISR_KBD
+			|| iframe->intno == ISR_PF || iframe->intno == ISR_SYSCALL || iframe->intno == ISR_PIT) {
+		u_idt.handle(Event(0, (uint32_t)iframe), nullptr);
 		return;
 	}
 	// if switch from userspace
@@ -102,51 +121,18 @@ extern "C" void global_handler(Intframe *iframe)
 	case ISR_DE:
 		divz_hndl();
 		break;
-	case ISR_PF:
-		handle_pagefault(iframe);
-		break;
-//	case ISR_KBD:
-//		kbd_hndl();
-//		break;
 	case ISR_DF:
 		df_hndl();
 		break;
 	case ISR_GP:
 		gpf_hndl();
 		break;
-	case ISR_PIT:
-		timer_hndl();
-		break;
-//	case ISR_ATA:
-//		ata_complete_readsector();
+//	case ISR_SYSCALL:
+//		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
 //		break;
-//	case ISR_COM1:
-//		com_hndl();
-//		break;
-	case ISR_SYSCALL:
-//		kprintf("Syscall #%d\n", iframe->eax);
-		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
-		break;
 	default:
 		kprintf("ISR for int num %d doesn't exist\n", iframe->intno);
 		break;
 	}
-}
-
-void divz_hndl(void)
-{
-	kprintf("Division by zero\n");
-}
-
-void df_hndl(void)
-{
-	kprintf("Double fault\n");
-	while(1);
-}
-
-void gpf_hndl(void)
-{
-	 kprintf("GP fault: go into infinite loop now\n");
-	 while(1);
 }
 

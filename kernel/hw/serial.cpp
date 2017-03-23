@@ -1,8 +1,10 @@
-#include <inc/serial.h>
-#include <inc/common.h>
-#include <inc/console.h>
-#include <inc/kbd.h>
-#include <inc/string.h>
+#include <hw/kbd.h>
+#include <hw/serial.h>
+#include <events/serial.h>
+#include <events/pic.h>
+#include <console.h>
+#include <util/string.h>
+#include <util/port.h>
 
 static SerialDriver serial_driver;
 
@@ -25,15 +27,12 @@ static void init_serial()
 	outb(COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
 	outb(COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 	outb(COM1 + 1, 0x1);
-
-	kprintf("Serial inited\n");
 }
 
 int SerialDriver::init()
 {
-//	init_serial();
-	this->in = this->connect_to(UNIT_DRIVER, DRIVER_PIC, 4);
-	if(!this->in) {
+	this->pic = this->connect_to(UNIT_DRIVER, DRIVER_PIC, 4);
+	if(!this->pic) {
 		return 1;
 	}
 	init_serial();
@@ -86,10 +85,10 @@ static int com_hndl(void)
 		switch (c) {
 		case '\r':
 		case '\n':
-			kendline();
+//			kendline();
 			break;
 		case 0x7f:
-			kbackspace();
+//			kbackspace();
 			break;
 		default:
 			kputc(c, 0);
@@ -101,10 +100,20 @@ static int com_hndl(void)
 	return 1;
 }
 
-int SerialDriver::handle(Event e)
+int SerialDriver::handle(Event e, void *ret)
 {
-	if(!com_hndl()) {
-		this->in->transfer(this, Event(1, 0x4));
+	switch(e.get_type()) {
+	case E_SERIAL_IRQ:
+		if(!com_hndl()) {
+			this->pic->transfer(this, Event(E_PIC_EOI, 0x4), nullptr);
+		}
+		// return read character
+		break;
+	case E_SERIAL_WRITE:
+		write_serial(e.get_msg());
+		break;
+	default:
+		break;
 	}
 	return 0;
 }

@@ -1,5 +1,5 @@
-#include <inc/console.h>
-#include <inc/process.h>
+#include <console.h>
+#include <process.h>
 
 void sched_yield(void)
 {
@@ -8,7 +8,7 @@ void sched_yield(void)
 		Process *proc_table = get_process_table();
 		Process *cur = cur_proc? cur_proc + 1:proc_table;
 		Process *proc_end = proc_table + get_max_pid();
-		Process *ker_proc = NULL;
+		Process *ker_proc = nullptr;
 		while(cur != cur_proc) {
 			if(cur >= proc_end) {
 				cur = proc_table;

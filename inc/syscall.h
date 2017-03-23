@@ -1,15 +1,26 @@
 #ifndef INC_SYSCALL_H_
 #define INC_SYSCALL_H_
 
+#include <abstract.h>
+#include <process.h>
+#include <events/syscall.h>
+
 enum {
 	SYS_PUTS,
 	SYS_GETPID,
 	SYS_EXIT
 };
 
-#include <inc/process.h>
+class SyscallMgr: public Unit
+{
+	Tunnel *irq_tun = nullptr;
+	Tunnel *proc_tun = nullptr;
+public:
+	SyscallMgr(): Unit(UNIT_API, API_SYSCALL) {}
 
-// maybe should add par6(ebp) to be Linux compatible
-uint32_t syscall(Process *proc, uint32_t num, uint32_t par1, uint32_t par2, uint32_t par3, uint32_t par4, uint32_t par5);
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e, void *ret);
+};
 
 #endif /* INC_SYSCALL_H_ */

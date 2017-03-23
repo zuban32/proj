@@ -1,11 +1,13 @@
 #ifndef INC_PROCESS_H_
 #define INC_PROCESS_H_
 
-#include <inc/elf.h>
-#include <inc/isr.h>
+#include <elf.h>
+#include <isr.h>
+#include <abstract.h>
 
 enum {
-	MAX_PROCESS_NUM = 256
+	MAX_PROCESS_NUM = 256,
+	PROCESS_TUNS = 16
 };
 
 enum {
@@ -32,7 +34,7 @@ Process *create_kernel_process(void (*code)(void));
 Process *get_process_table(void);
 void free_process(Process *proc);
 
-void set_cur_process(Process *proc);
+//void set_cur_process(Process *proc);
 Process *get_cur_process(void);
 
 int get_max_pid(void);
@@ -44,5 +46,17 @@ void enable_sched(void);
 void disable_sched(void);
 
 void sched_yield(void);
+
+class ProcessManager: public Unit
+{
+	Tunnel *to_mmu = nullptr;
+	Tunnel *in_tuns[PROCESS_TUNS] = {nullptr};
+public:
+	ProcessManager(): Unit(UNIT_SUBSYSTEM, SS_PROCESS) {}
+
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e, void *ret);
+};
 
 #endif /* INC_PROCESS_H_ */

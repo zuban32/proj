@@ -1,7 +1,8 @@
 #ifndef ISR_H_INCLUDED
 #define ISR_H_INCLUDED
 
-#include <inc/common.h>
+#include <stdint.h>
+
 enum
 {
 	// exceptions
@@ -58,13 +59,6 @@ typedef struct
 	uintptr_t esp;
 	uint32_t ss;
 } Intframe;
-
-void printf_intframe(Intframe *iframe);
-
-void divz_hndl(void);
-void df_hndl(void);
-void gpf_hndl(void);
-void pf_hndl(Intframe *iframe);
 
 #endif
 

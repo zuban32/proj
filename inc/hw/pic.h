@@ -1,8 +1,8 @@
 #ifndef PIC_H_INCLUDED
 #define PIC_H_INCLUDED
 
-#include <inc/common.h>
-#include <inc/abstract.h>
+#include <abstract.h>
+#include <util/port.h>
 
 #define PIC_M_CMD 0x20
 #define PIC_M_DATA 0x21
@@ -13,11 +13,6 @@
 
 #define PIC_INIT 0x11
 #define ICW4_80386 0x1
-
-enum {
-	PIC_EVENT_IRQ,
-	PIC_EVENT_EOI
-};
 
 enum {
 	PIC_PIT = 0x0,
@@ -51,13 +46,10 @@ public:
 
 	int init();
 	int connect_from(Tunnel *t, int data);
-	int handle(Event e);
+	int handle(Event e, void *ret);
 
 	~PICDriver() {}
 };
-
-void pic_sendEOI(uint8_t irq);
-//void pic_set_mask(uint8_t mask_m, uint8_t mask_s);
 
 #endif
 

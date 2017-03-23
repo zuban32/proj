@@ -7,7 +7,7 @@ QEMU_FLAGS = -m 4G -d guest_errors
 CFLAGS = -m32 -std=c++0x -Os -ffreestanding -fno-stack-protector\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -fno-exceptions\
  -fno-rtti
-CBOOT_FLAGS = -m32 -std=c99 -c -Os -fno-builtin -ffreestanding -I../proj\
+CBOOT_FLAGS = -m32 -std=c99 -c -Os -fno-builtin -ffreestanding -I../proj/inc/\
 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Werror -nostdlib
 
 CRTI_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crti.o)
@@ -15,7 +15,7 @@ CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtbegin.o)
 CRTEND_OBJ:=$(shell $(CC) $(CFLAGS) -print-file-name=crtend.o)
 CRTN_OBJ=$(shell $(CC) $(CFLAGS) -print-file-name=crtn.o)
 
-KERNEL_CFLAGS = -c -I../proj
+KERNEL_CFLAGS = -c -I../proj/inc/
 USER_CFLAGS =  -nostdlib -I../proj/lib -Wl,-eusermain
 LDFLAGS = -melf_i386 -e kern_start -Ttext=0x100000 -nostdlib
 DLDFLAGS = -melf_i386 -e kern_start -Ttext=0x100000 -nostdlib
@@ -27,7 +27,7 @@ TESTDIR = test/
 BOOT1_SRCS = boot/boot.asm boot/gdt.asm boot/switch_pm.asm
 BOOT2_SRCS = boot/boot2.c
 KERNEL_ASM = kernel/1st_entry.asm kernel/isr_entry.asm#$(wildcard kernel/*.asm)
-KERNEL_C = $(wildcard kernel/*.cpp kernel/hw/*.cpp)
+KERNEL_C = $(shell find kernel/ -type f -name '*.cpp')
 LIB_C = $(wildcard lib/*.cpp)
 LIB_OBJ = $(notdir $(LIB_C:.cpp=.o))
 LIB_OUT = usrlib

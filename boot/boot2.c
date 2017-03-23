@@ -1,5 +1,5 @@
-#include <inc/common.h>
-#include <inc/elf.h>
+#include <elf.h>
+#include <util/port.h>
 
 static void kmemcpy(char *dest, char *src, int size)
 {

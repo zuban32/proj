@@ -1,6 +1,6 @@
-#include <inc/gdt.h>
-#include <inc/string.h>
-#include <inc/console.h>
+#include <gdt.h>
+#include <util/string.h>
+#include <console.h>
 
 static void write_tss(void)
 {

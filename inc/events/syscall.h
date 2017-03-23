@@ -1,0 +1,8 @@
+#ifndef INC_EVENTS_SYSCALL_H_
+#define INC_EVENTS_SYSCALL_H_
+
+enum {
+	E_SYSCALL_IRQ
+};
+
+#endif /* INC_EVENTS_SYSCALL_H_ */
