@@ -3,6 +3,7 @@
 
 #include <util/port.h>
 
+int kstrlen(const char *s);
 int kstrcmp(const char *s1, const char *s2);
 void kmemset(void *s0, int val, uint32_t size);
 void kmemcpy(char *dest, char *src, int size);

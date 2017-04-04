@@ -34,7 +34,6 @@ Process *create_kernel_process(void (*code)(void));
 Process *get_process_table(void);
 void free_process(Process *proc);
 
-//void set_cur_process(Process *proc);
 Process *get_cur_process(void);
 
 int get_max_pid(void);

@@ -29,14 +29,33 @@ const char *exception_names[] = {
 		"Virtualization Exception"
 };
 
-const char *eflags_flagnames[] = { "CF", nullptr, "PF", nullptr, "AF",
-nullptr, "ZF", "SF", "TF", "IF", "DF", "OF", "IOPL1", "IOPL2", "NT",
-nullptr, "RF", "VM", "AC", "VIF", "VIP", "ID" };
+const char *eflags_flagnames[] = {
+		"CF",
+		nullptr,
+		"PF",
+		nullptr,
+		"AF",
+		nullptr,
+		"ZF",
+		"SF",
+		"TF",
+		"IF",
+		"DF",
+		"OF",
+		"IOPL1",
+		"IOPL2",
+		"NT",
+		nullptr,
+		"RF",
+		"VM",
+		"AC",
+		"VIF",
+		"VIP",
+		"ID"
+};
 
 static void print_intframe(Intframe *iframe)
 {
-	if (iframe->intno >= 0x20) // print only exceptions
-		return;
 	kprintf("\n-------------------------\n");
 	kprintf("INTFRAME\n%d - ", iframe->intno);
 	if (iframe->intno < 21 && iframe->intno != 9
@@ -114,8 +133,9 @@ extern "C" void global_handler(Intframe *iframe)
 //		iframe = &cur_proc->iframe;
 	}
 
-	if(iframe->intno != 0x20)
+	if(iframe->intno < 0x20) {
 		print_intframe(iframe);
+	}
 
 	switch (iframe->intno) {
 	case ISR_DE:
