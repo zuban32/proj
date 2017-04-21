@@ -16,23 +16,43 @@ enum {
 
 	SECTOR_SIZE = 256,	// 256 word-size values
 	READ_BUFFER_SEC_NUM = 16,
-	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE
+	READ_BUFFER_SIZE = READ_BUFFER_SEC_NUM * SECTOR_SIZE,
+
+	MAX_ATA_DEVICES = 4
+};
+
+class ATADevice
+{
+	bool master = true;
+	int ctrl_port = PRIMARY_CONTROL_PORT;
+	int base_port = PRIMARY_BASE_START;
+	int max_lba = 0;
+
+	uint16_t read_buffer[READ_BUFFER_SIZE];
+	uint8_t cur_buf_ind = 0;
+	uint8_t bsy = 0;
+
+public:
+	ATADevice(bool _master, int _ctrl_port, int _base_port, int _max_lba):
+		master(_master),
+		ctrl_port(_ctrl_port),
+		base_port(_base_port),
+		max_lba(_max_lba)
+	{}
+
+	int read(int start_lba, int count, uint8_t *out);
 };
 
 class ATADriver: public Unit
 {
 public:
-//	Tunnel *port_tun = nullptr;
 	Tunnel *irq_p_tun = nullptr;
 	Tunnel *irq_s_tun = nullptr;
 	Tunnel *in_tun = nullptr;
 
-	uint16_t ata_read_buffer[READ_BUFFER_SIZE];
-	uint8_t cur_buf_ind;
-	uint8_t bsy;
-	int dbg;
+	ATADevice devs[MAX_ATA_DEVICES];
 
-	ATADriver(): Unit(UNIT_DRIVER, DRIVER_ATA), cur_buf_ind(0), bsy(0), dbg(0x32) {}
+	ATADriver(): Unit(UNIT_DRIVER, DRIVER_ATA) {}
 
 	int init();
 	int connect_from(Tunnel *t, int data);
