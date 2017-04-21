@@ -30,26 +30,40 @@ Unit *Registry::unit_lookup(unsigned type, unsigned subtype)
 			break;
 		}
 	}
-	if(res) {
-		dprintf("Registry %x: looking for unit (%d, %d): +\n", this, type, subtype);
-	} else {
-		dprintf("Registry %x: looking for unit (%d, %d): -\n", this, type, subtype);
-	}
+//	if(res) {
+//		dprintf("Registry %x: looking for unit (%d, %d): +\n", this, type, subtype);
+//	} else {
+//		dprintf("Registry %x: looking for unit (%d, %d): -\n", this, type, subtype);
+//	}
 	return res;
 }
 
 int Registry::init()
 {
-	for(int i = 0; i < this->cur_unit; i++) {
-		if(this->reg[i]->inited) {
-			continue;
-		}
-		dprintf("REG: initing unit (%d, %d)\n", this->reg[i]->get_type(), this->reg[i]->get_subtype());
-		int res = this->reg[i]->init();
-		if(res) {
-			dprintf("Registry: error initing unit (%d, %d)\n",
-					this->reg[i]->get_type(), this->reg[i]->get_subtype());
-			return -1;
+	bool skipped = true;
+	while(skipped) {
+		skipped = false;
+		for(int i = 0; i < this->cur_unit; i++) {
+			if(this->reg[i]->inited) {
+				continue;
+			}
+			bool deps_inited = true;
+			for(int j = 0; j < this->reg[i]->deps_num; j++) {
+				deps_inited &= this->unit_lookup(this->reg[i]->deps[j][0], this->reg[i]->deps[j][1])->inited;
+			}
+			if(!deps_inited) {
+				skipped = true;
+				continue;
+			}
+			dprintf("REG: initing unit (%d, %d)\n", this->reg[i]->get_type(), this->reg[i]->get_subtype());
+			int res = this->reg[i]->init();
+			if(res) {
+				dprintf("Registry: error initing unit (%d, %d)\n",
+						this->reg[i]->get_type(), this->reg[i]->get_subtype());
+				return -1;
+			}
+			this->reg[i]->set_inited();
+			dprintf("REG: unit (%d, %d) inited\n", this->reg[i]->get_type(), this->reg[i]->get_subtype());
 		}
 	}
 	return 0;

@@ -60,11 +60,12 @@ typedef struct DirectoryEntry
 
 } __attribute__ ((packed)) DirectoryEntry;
 
-typedef struct FAT32_DirInfo
+struct FAT32DirInfo
 {
-	uint32_t lba;
+	uint32_t cluster;
+	uint32_t filesize;
 	char name[MAX_PATH];
-} FAT32_DirInfo;
+};
 
 typedef struct LFNEntry
 {
@@ -78,26 +79,30 @@ typedef struct LFNEntry
 	uint16_t name_high[2];
 } __attribute__ ((packed)) LFNEntry;
 
-typedef struct FAT32FileInfo
-{
-	uint32_t start_cluster;
-	uint32_t start_fat_entry;
-} FAT32FileInfo;
-
 enum {
 	FAT32_EOC = 0xFFFFFF8,
 	DIR_BUF_NUM = SECTOR_SIZE / sizeof(DirectoryEntry) + 1,
 	DIR_BUF_SIZE = DIR_BUF_NUM * sizeof(DirectoryEntry)
 };
 
-int init_fat32(void);
-int fat32_open_file(char *path, int *size, FAT32FileInfo *info);
-int fat32_read(FAT32FileInfo *info, int offset, int count);
-
 class FAT32Unit: public Unit
 {
 public:
-	FAT32Unit(): Unit(UNIT_DRIVER, DRIVER_FAT32) {}
+	FAT32Unit(): Unit(UNIT_DRIVER, DRIVER_FAT32) {
+		deps[deps_num][0] = UNIT_DRIVER;
+		deps[deps_num][1] = DRIVER_ATA;
+		deps_num++;
+	}
+	bool check_fs(ATADevice *dev);
+
+	int open_file(const char *path, File *f);
+	int read_file(File *f, int offset, int count, uint8_t *buf);
+
+	int init();
+	int connect_from(Tunnel *t, int data);
+	int handle(Event e, void *ret);
+
+	int test();
 };
 
 #endif /* INC_FAT32_H_ */

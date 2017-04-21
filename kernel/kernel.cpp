@@ -7,6 +7,7 @@
 #include <registry.h>
 #include <mmu.h>
 #include <debug.h>
+#include <fio.h>
 
 extern "C" int kernel_main(uint32_t gdt_start)
 {
@@ -29,13 +30,25 @@ extern "C" int kernel_main(uint32_t gdt_start)
 //	dump_map(map);
 //	kprintf("RAM size: %d\n", get_memory_size(map));
 	if(!res) {
-//		dprintf("Init finished\n");
-		kprintf("Init finished\n");
+		while(1);
+		dprintf("Init finished\n");
 	} else {
 		dprintf("Init failed\n");
 	}
 
-	while(1);
+//	for(int i = 0; i < 1000 * 1000 * 1000; i++);
+
+//	char buf[20];
+//	File *f = fopen("/b/test_dir/fat32_test.txt");
+//	if(!f) {
+//		kprintf("File wasn't opened\n");
+//	} else {
+//		kprintf("File opened succesfully\n");
+//		fread(f, 0, 6, (uint8_t *)buf);
+//		buf[6] = 0;
+//		kprintf("File data: [%s]\n", buf);
+//	}
+
 //
 //	// test ATA read
 //	ata_request_readsector(0x10000/512, 3);

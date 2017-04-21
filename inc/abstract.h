@@ -2,11 +2,13 @@
 #define INC_ABSTRACT_H_
 
 #include <util/port.h>
+#include <registry.h>
 
 enum {
 	MAX_TUNNELS_NUM 	= 128,
 	MAX_EVENT_STRING 	= 32,
-	EVENT_ERROR 		= -1
+	EVENT_ERROR 		= -1,
+	MAX_DEPS			= 8
 };
 
 enum UnitType
@@ -73,11 +75,20 @@ public:
 };
 
 class Tunnel;
+class Registry;
 
 class Unit
 {
+	friend class Registry;
 	unsigned type;
 	unsigned subtype;
+
+
+protected:
+	int deps[MAX_DEPS][2];
+	int deps_num = 0;
+	Registry *reg;
+
 public:
 	Unit(int t, int st);
 	virtual ~Unit() {}
@@ -93,11 +104,16 @@ public:
 		return this->subtype;
 	}
 
+	inline void set_inited()
+	{
+		this->inited = true;
+	}
+
 	Tunnel *connect_to(int type, int subtype, int data);
 	virtual int connect_from(Tunnel *t, int data) = 0;
 
 	virtual int init() = 0;
-	virtual int handle(Event, void*) = 0;
+	virtual int handle(Event e, void *ret) = 0;
 };
 
 class Tunnel

@@ -1,5 +1,4 @@
 #include <abstract.h>
-#include <registry.h>
 #include <string.h>
 #include <console.h>
 
@@ -38,7 +37,15 @@ Unit::Unit(int t, int st)
 {
 	this->type = t;
 	this->subtype = st;
-	get_common_registry()->add_unit(this);
+	this->reg = get_common_registry();
+
+	this->reg->add_unit(this);
+
+	if(!(t == UNIT_PHYS && st == PHYS_IRQ)) {
+		deps[0][0] = UNIT_PHYS;
+		deps[0][1] = PHYS_IRQ;
+		deps_num++;
+	}
 }
 
 Tunnel *Unit::connect_to(int u_type, int u_subtype, int data)

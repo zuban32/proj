@@ -22,8 +22,13 @@ class Console: public Unit
 	Tunnel *print_tun = nullptr;
 	Tunnel *in_tuns[MAX_CONSOLE_TUNS] = {nullptr};
 	int cur_in = 0;
+
 public:
-	Console(): Unit(UNIT_SUBSYSTEM, SS_CONSOLE) {}
+	Console(): Unit(UNIT_SUBSYSTEM, SS_CONSOLE) {
+		deps[0][0] = UNIT_DRIVER;
+		deps[0][1] = DRIVER_SERIAL;
+		deps_num = 1;
+	}
 
 	int init();
 	int connect_from(Tunnel *t, int data);

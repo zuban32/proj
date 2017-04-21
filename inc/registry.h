@@ -7,6 +7,8 @@ enum {
 	MAX_UNITS = 128,
 };
 
+class Unit;
+
 // !!! _NO_ fields initialization: it's constructor must be called before any other,
 //	BUT it can't be done in such a way, that's why everything is 0 at start by using _static_
 class Registry

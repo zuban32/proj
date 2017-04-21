@@ -102,4 +102,4 @@ clean:
 
 run: all
 	@echo ------------------------------------------------------
-	@${QEMU} $(QEMU_FLAGS) -hda os.disk -serial stdio
+	@${QEMU} $(QEMU_FLAGS) -hda os.disk -hdb fat32.img -serial stdio

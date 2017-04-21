@@ -46,7 +46,7 @@ static void dprintint(int64_t c, uint32_t base, char is_u, int lz)
 void dprintf(const char *fstr, ...)
 {
 	if (!fstr)
-		kprintf("Format string empty\n");       //return error code
+		dprintf("Format string empty\n");       //return error code
 	va_list p;
 	va_start(p, fstr);
 	int d;
