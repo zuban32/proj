@@ -8,7 +8,7 @@ static FileIO fio;
 
 int MountPoint::init(char l, FSType fs, ATAId id)
 {
-	this->letter = letter;
+	this->letter = l;
 	this->fs_type = fs;
 	this->dev_id = id;
 
@@ -51,8 +51,13 @@ int FileIO::init()
 		ATADevice *dev = ata->get_device(i);
 		if(dev) {
 			if(fat_fs->check_fs(dev)) {
-				this->next_free_mp++->init('a' + i, FAT32, dev->get_id());
-				dprintf("MP[%c] created: dev (%d, %d)\n", 'a' + i, dev->get_id().bus, dev->get_id().slave);
+				this->next_free_mp->init('a' + i, FAT32, dev->get_id());
+				dprintf("MP[%c] for FS [%d] created: dev (%d, %d)\n",
+						this->next_free_mp->get_name(),
+						this->next_free_mp->get_fs_type(),
+						this->next_free_mp->get_dev_id().bus,
+						this->next_free_mp->get_dev_id().slave);
+				this->next_free_mp++;
 			}
 		} else {
 			break;
@@ -75,6 +80,7 @@ int FileIO::handle(Event e, void *ret)
 
 MountPoint *FileIO::find_mp(const char *full_path)
 {
+	kprintf("Looking for MP: %s [%c]\n", full_path, full_path[1]);
 	for(MountPoint *mp = this->mp_table; mp < this->next_free_mp; mp++) {
 		if(mp->get_name() == full_path[1]) {
 			return mp;
@@ -86,8 +92,12 @@ MountPoint *FileIO::find_mp(const char *full_path)
 File *FileIO::file_open(const char *path, FileMode mode)
 {
 	MountPoint *mp = this->find_mp(path);
+	if(!mp) {
+		kprintf("Mount point for path [%s] not found!\n", path);
+		return nullptr;
+	}
 	if(mp->get_fs_type() != FAT32) {
-		kprintf("File open: Unsupported file system!\n");
+		kprintf("File open: Unsupported file system [%d]!\n", mp->get_fs_type());
 		return nullptr;
 	}
 	File *res = nullptr;
@@ -115,7 +125,7 @@ int FileIO::file_close(File *f)
 	return 0;
 }
 
-File *fopen(char *path)
+File *fopen(const char *path)
 {
 	return fio.file_open(path, F_READ);
 }

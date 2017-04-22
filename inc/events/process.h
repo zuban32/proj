@@ -2,7 +2,7 @@
 #define INC_EVENTS_PROCESS_H_
 
 enum {
-	E_PROC_CREATE,
+	E_PROC_IRQ,
 	E_PROC_GETCUR
 };
 

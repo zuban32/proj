@@ -1,6 +1,7 @@
 #include <console.h>
 #include <mmu.h>
 #include <util/port.h>
+#include <debug.h>
 
 static MMU mmu;
 
@@ -56,13 +57,25 @@ int MMU::handle(Event e, void *ret)
 	Intframe *iframe = (Intframe *)e.get_msg();
 	uint32_t err_addr = 0;
 	__asm__ __volatile__("movl %%cr2, %%eax\n\t":"=a"(err_addr));
-	kprintf("Allocating page for addr %x\n", err_addr);
-	pgdir[PDX(err_addr)] |= PAGE_P | PAGE_W;
-	pgtbl[PDX(err_addr)][PTX(err_addr)] |= PAGE_P | PAGE_W;
-
-	if(iframe->err_code & PAGE_U) {
-		pgdir[PDX(err_addr)] |= PAGE_U;
-		pgtbl[PDX(err_addr)][PTX(err_addr)] |= PAGE_U;
-	}
+	kprintf("PF: %x(%s)\n", err_addr, (iframe->err_code & PAGE_U) ? "user" : "kernel");
+	this->page_alloc(err_addr, iframe->err_code & PAGE_U);
 	return 0;
 }
+
+void MMU::page_alloc(uint32_t vaddr, int user)
+{
+	dprintf("Allocating page for addr %x\n", vaddr);
+	pgdir[PDX(vaddr)] |= PAGE_P | PAGE_W;
+	pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_P | PAGE_W;
+
+	if(user) {
+		pgdir[PDX(vaddr)] |= PAGE_U;
+		pgtbl[PDX(vaddr)][PTX(vaddr)] |= PAGE_U;
+	}
+}
+
+void page_alloc(uint32_t vaddr, int user)
+{
+	mmu.page_alloc(vaddr, user);
+}
+

@@ -6,6 +6,7 @@
 #include <abstract.h>
 #include <mmu.h>
 #include <debug.h>
+#include <process.h>
 
 extern uintptr_t isr_handlers[];
 
@@ -46,21 +47,18 @@ int InterruptUnit::handle(Event e, void *ret)
 {
 	int res = 0;
 	Intframe *ifr = (Intframe *)e.get_msg();
-	dprintf("IDT: handle [%d]\n", ifr->intno);
 	uint32_t irq_num = ifr->intno;
 	if(irq_num >= 0 && irq_num < IDT_SIZE) {
-// TODO: create new event
-		dprintf("IDT: Using tunnel %x\n", this->tuns[irq_num]);
-		this->tuns[irq_num]->transfer(this, Event(E_PIC_IRQ, ifr->intno), nullptr);
+		ProcessManager *proc_mgr = (ProcessManager *)this->reg->unit_lookup(UNIT_SUBSYSTEM, SS_PROCESS);
+		proc_mgr->handle_irq(ifr);
+		if(irq_num < ISR_PF) {
+			while(1);
+		} else {
+			this->tuns[irq_num]->transfer(this, Event(0, (uint32_t)ifr), nullptr);
+		}
 	} else {
 		res = -1;
 	}
-//	switch(irq_num) {
-//	case ISR_A
-//		break;
-//	default:
-//		break;
-//	}
 	return res;
 }
 

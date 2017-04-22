@@ -1,6 +1,7 @@
 #include <hw/pic.h>
 #include <events/pic.h>
 #include <console.h>
+#include <isr.h>
 #include <debug.h>
 
 #define MASK(i, n) (m##i |= 1 << n)
@@ -26,13 +27,13 @@ static void pic_sendEOI(uint8_t irq)
 
 int PICDriver::handle(Event e, void *ret)
 {
-	dprintf("PIC IRQ: (%d, %x)\n", e.get_type(), e.get_msg());
+	Intframe *ifr = (Intframe *)e.get_msg();
 	switch(e.get_type()) {
 	case E_PIC_IRQ:
-		this->out_tuns[e.get_msg() - 0x20]->transfer(this, e, nullptr);
+		this->out_tuns[ifr->intno - 0x20]->transfer(this, e, nullptr);
 		break;
 	case E_PIC_EOI:
-		pic_sendEOI(e.get_msg());
+		pic_sendEOI(ifr->intno);
 		break;
 	}
 	return 0;
@@ -69,7 +70,7 @@ static void init_pic(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6B);
 	outb(PIC_S_CMD, 0x6B);
 
-	MASK(1, 0);
+	UNMASK(1, 0);
 	UNMASK(1, 4);
 	UNMASK(2, 7);
 

@@ -99,60 +99,15 @@ static void print_intframe(Intframe *iframe)
 	kprintf("\n-------------------------\n\n");
 }
 
-static void divz_hndl(void)
-{
-	kprintf("Division by zero\n");
-}
-
-static void df_hndl(void)
-{
-	kprintf("Double fault\n");
-	while(1);
-}
-
-static void gpf_hndl(void)
-{
-	 kprintf("GP fault: go into infinite loop now\n");
-	 while(1);
-}
-
 extern InterruptUnit u_idt;
 
 extern "C" void global_handler(Intframe *iframe)
 {
-	if(iframe->intno == ISR_ATA || iframe->intno == ISR_COM1 || iframe->intno == ISR_KBD
-			|| iframe->intno == ISR_PF || iframe->intno == ISR_SYSCALL || iframe->intno == ISR_PIT) {
-		u_idt.handle(Event(0, (uint32_t)iframe), nullptr);
-		return;
-	}
-	// if switch from userspace
-	Process *cur_proc = get_cur_process();
-	if((iframe->ret_cs & 3) == 3) {
-		kmemcpy((char *)&cur_proc->iframe, (char *)iframe, sizeof(*iframe));
-		cur_proc->status = PROC_READY;
-//		iframe = &cur_proc->iframe;
-	}
-
-	if(iframe->intno < 0x20) {
+	if(iframe->intno < ISR_PF) {
 		print_intframe(iframe);
 	}
 
-	switch (iframe->intno) {
-	case ISR_DE:
-		divz_hndl();
-		break;
-	case ISR_DF:
-		df_hndl();
-		break;
-	case ISR_GP:
-		gpf_hndl();
-		break;
-//	case ISR_SYSCALL:
-//		iframe->eax = syscall(cur_proc, iframe->eax, iframe->ebx, iframe->ecx, iframe->edx, iframe->esi, iframe->edi);
-//		break;
-	default:
-		kprintf("ISR for int num %d doesn't exist\n", iframe->intno);
-		break;
-	}
+	u_idt.handle(Event(0, (uint32_t)iframe), nullptr);
+
 }
 

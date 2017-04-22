@@ -18,6 +18,6 @@ movd xmm2, eax
 pop eax
 extern _init
 call _init
-extern kernel_main
-call kernel_main
+extern init_main
+call init_main
 ret

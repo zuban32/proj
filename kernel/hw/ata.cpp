@@ -63,7 +63,6 @@ int ATADriver::connect_from(Tunnel *t, int data)
 
 int ATADriver::handle(Event e, void *ret)
 {
-	dprintf("ATA driver irq\n");
 	this->cur_dev->handle_irq();
 //	Send EOI
 	this->irq_p_tun->transfer(this, Event(1, 0xE), nullptr);
@@ -77,7 +76,6 @@ int ATADriver::device_select(ATAId id)
 		return 1;
 	}
 	this->cur_dev = this->devs + ind;
-	dprintf("Devoce %d %d selected\n", cur_dev->get_id().bus, cur_dev->get_id().slave);
 	return 0;
 }
 
@@ -98,20 +96,16 @@ int ATADevice::read(int start_lba, int count, uint8_t *out)
 	int prev_ind = this->cur_buf_ind;
 	int out_off = 0;
 
-	dprintf("ATA read: %d %d\n", start_lba, count);
-
 	outb(this->base_port + 6, 0xE0 | ((this->id.slave & 1) << 4) | ((start_lba >> 24) & 0x0F));
 	outb(this->base_port + 2, count);
 	outb(this->base_port + 3, start_lba & 0xFF);
 	outb(this->base_port + 4, (start_lba >> 8) & 0xFF);
 	outb(this->base_port + 5, (start_lba >> 16) & 0xFF);
 	outb(this->base_port + 7, 0x20);
-	dprintf("Sent to ports\n");
 
 	int read = 0;
 	while(this->bsy || read < count) {
 		if(this->cur_buf_ind > prev_ind) {
-			dprintf("Read sector\n");
 			prev_ind = this->cur_buf_ind;
 			kmemcpy((char *)out + out_off, (char *)this->read_buffer, SECTOR_SIZE);
 			out_off += SECTOR_SIZE;
@@ -125,7 +119,6 @@ int ATADevice::read(int start_lba, int count, uint8_t *out)
 
 void ATADevice::handle_irq()
 {
-	dprintf("ATA Irq\n");
 	inb(this->base_port + 7);
 	this->bsy = 1;
 	uint16_t *out = this->read_buffer + this->cur_buf_ind * SECTOR_SIZE / 2;

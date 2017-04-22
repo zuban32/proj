@@ -54,7 +54,7 @@ gdb: kernel.bin boot1.bin boot2.bin user kernel.asm
 	@dd if=/dev/zero bs=1 count=$$((0x10000 - 0x400 - $(shell stat -c%s kernel.bin))) >> os.disk 2> /dev/null
 	@cat $(TEST_ELF) >> os.disk
 	@dd if=/dev/zero bs=1 count=$$((($(TEST_ELF_SIZE)/512 + 1) * 512 - $(TEST_ELF_SIZE))) >> os.disk 2> /dev/null
-	@$(QEMU) $(QEMU_FLAGS) -hda os.disk -S -gdb tcp::1234 -serial stdio -vga std
+	@$(QEMU) $(QEMU_FLAGS) -hda os.disk -hdb fat32.img -S -gdb tcp::1234 -serial stdio -vga std
 	@echo "Debug build finished"
 
 boot1.bin: $(BOOT1_SRCS)

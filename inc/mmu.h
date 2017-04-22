@@ -19,7 +19,7 @@ enum {
 #define POFF(addr) ((addr) & ~(PGSIZE - 1))
 
 #define USTACKTOP 0xF000000
-#define PROCSTACKTOP(proc) (USTACKTOP - (proc->id * PGSIZE))
+#define PROCSTACKTOP(pid) (USTACKTOP - (pid * PGSIZE))
 
 class MMU: public Unit
 {
@@ -36,7 +36,11 @@ public:
 	int init();
 	int connect_from(Tunnel *t, int data);
 	int handle(Event e, void *ret);
+
+	void page_alloc(uint32_t vaddr, int user);
 };
+
+void page_alloc(uint32_t vaddr, int user);
 
 #endif
 

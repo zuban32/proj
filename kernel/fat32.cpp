@@ -62,10 +62,10 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 			*cur_dname++ = *cur_p++;
 		}
 		*cur_dname = 0;
-		kprintf("Cur path dir name = %s\n", path_dir_name);
+//		kprintf("Cur path dir name = %s\n", path_dir_name);
 
 		ata->read(cluster_to_lba(dir_cluster), 1, dir_buf);
-		kprintf("Cur dir cluster = %d, LBA = %d\n", dir_cluster, cluster_to_lba(dir_cluster));
+//		kprintf("Cur dir cluster = %d, LBA = %d\n", dir_cluster, cluster_to_lba(dir_cluster));
 		DirectoryEntry *dir = (DirectoryEntry *)dir_buf, *cur_dir = dir;
 		while(cur_dir->name[0]) {
 			cur_dname = read_dir_name;
@@ -77,7 +77,7 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 			}
 
 			if(cur_dir->attrib == 0x0F) {
-				kprintf("LFN start found\n");
+//				kprintf("LFN start found\n");
 				while(cur_dir->attrib == 0x0F) {
 					cur_dir++;
 					if(cur_dir >= (DirectoryEntry *)dir_buf + DIR_BUF_NUM) {
@@ -94,7 +94,7 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 						}
 					}
 				}
-				kprintf("LFN end found\n");
+//				kprintf("LFN end found\n");
 				LFNEntry *lfn_cur = (LFNEntry *) cur_dir-1;
 				do {
 					for(int i = 0; i < 5; i++)
@@ -109,7 +109,7 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 				kmemcpy(read_dir_name, cur_dir->name, 8);
 				*(read_dir_name + 8) = 0;
 			}
-			kprintf("Read dir name = %s\n", read_dir_name);
+//			kprintf("Read dir name = %s\n", read_dir_name);
 
 //			if(!(cur_dir->attrib & 0x10)) {
 //				cur_dir++;
@@ -118,7 +118,7 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 //			}
 
 			if(kstrcmp(path_dir_name, read_dir_name) == 0) {
-				kprintf("Folder [%s] found: [%s]\n", path_dir_name, read_dir_name);
+//				kprintf("Folder [%s] found: [%s]\n", path_dir_name, read_dir_name);
 				dir_cluster = fat32_directory_cluster(cur_dir);
 				kmemcpy(out->name, read_dir_name, MAX_PATH);
 				out->cluster = fat32_directory_cluster(cur_dir);
@@ -127,7 +127,7 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 //				kprintf("Next dir cluster: %d\n", dir_cluster);
 				break;
 			} else {
-				kprintf("Wrong folder [%s]: wanna find [%s]\n", read_dir_name, path_dir_name);
+//				kprintf("Wrong folder [%s]: wanna find [%s]\n", read_dir_name, path_dir_name);
 				cur_dir++;
 			}
 		}
@@ -177,7 +177,6 @@ int FAT32Unit::init(void)
 		dprintf("Device select error\n");
 		return 1;
 	}
-	dprintf("Selected ok\n");
 
 	if((error = ata->read(0, 1, (unsigned char *)vbr))) {
 		dprintf("Superblock read error %x\n", error);
@@ -226,7 +225,7 @@ int FAT32Unit::read_file(File *f, int offset, int count, uint8_t *buf)
 	ata->read(cluster_to_fatsect(cur_cluster), 1, fat_tbl_buf);
 	uint32_t *cur_entry = (uint32_t *)(fat_tbl_buf + (cur_cluster * 4) % SECTOR_SIZE);
 
-	while(cur_off < offset + SECTOR_SIZE) {
+	while(cur_off + SECTOR_SIZE < offset) {
 		if((unsigned)((uint8_t *)cur_entry - fat_tbl_buf) >= SECTOR_SIZE / sizeof(*cur_entry)) {
 			ata->read(cluster_to_fatsect(cur_cluster), 1, fat_tbl_buf);
 			cur_entry = (uint32_t *)(fat_tbl_buf + (cur_cluster * 4) % SECTOR_SIZE);
@@ -239,10 +238,11 @@ int FAT32Unit::read_file(File *f, int offset, int count, uint8_t *buf)
 		cur_off += SECTOR_SIZE;
 	}
 
+	cur_off = offset % SECTOR_SIZE;
 	uint8_t file_buf[SECTOR_SIZE];
 	while(cur_read < count) {
 		ata->read(cluster_to_lba(cur_cluster), 1, file_buf);
-		kmemcpy((char *)buf + cur_read, (char *)file_buf, MIN(count - cur_read, SECTOR_SIZE));
+		kmemcpy((char *)buf + cur_read, (char *)file_buf + cur_off, MIN(count - cur_read, SECTOR_SIZE));
 		cur_read += MIN(count - cur_read, SECTOR_SIZE);
 
 		if((unsigned)((uint8_t *)cur_entry - fat_tbl_buf) >= SECTOR_SIZE / sizeof(*cur_entry)) {
@@ -250,11 +250,11 @@ int FAT32Unit::read_file(File *f, int offset, int count, uint8_t *buf)
 			cur_entry = (uint32_t *)(fat_tbl_buf + (cur_cluster * 4) % SECTOR_SIZE);
 		}
 		if(!fat32_valid(*cur_entry)) {
-			kprintf("FAT32 file read: error (invalid FAT entry)!\n");
-			return 1;
+			// cluster chain end
+			break;
 		}
 		cur_cluster = *cur_entry & 0x0FFFFFFF;
-		cur_off += SECTOR_SIZE;
+		cur_off = 0;
 	}
 
 	return 0;
