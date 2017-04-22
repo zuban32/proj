@@ -1,10 +1,11 @@
 #include <hw/ata.h>
-#include <hw/pic.h>
+#include <events/pic.h>
 #include <idt.h>
 #include <isr.h>
 #include <console.h>
 #include <abstract.h>
 #include <mmu.h>
+#include <debug.h>
 
 extern uintptr_t isr_handlers[];
 
@@ -43,14 +44,14 @@ int InterruptUnit::connect_from(Tunnel *t, int data)
 
 int InterruptUnit::handle(Event e, void *ret)
 {
-//	kprintf("IDT: handle [%d]\n", e.get_msg());
 	int res = 0;
 	Intframe *ifr = (Intframe *)e.get_msg();
+	dprintf("IDT: handle [%d]\n", ifr->intno);
 	uint32_t irq_num = ifr->intno;
 	if(irq_num >= 0 && irq_num < IDT_SIZE) {
 // TODO: create new event
-//		kprintf("IDT: Using tunnel %x\n", this->tuns[irq_num]);
-		this->tuns[irq_num]->transfer(this, e, nullptr);
+		dprintf("IDT: Using tunnel %x\n", this->tuns[irq_num]);
+		this->tuns[irq_num]->transfer(this, Event(E_PIC_IRQ, ifr->intno), nullptr);
 	} else {
 		res = -1;
 	}

@@ -172,8 +172,17 @@ int FAT32Unit::test(void)
 int FAT32Unit::init(void)
 {
 	ATADriver *ata = (ATADriver *)this->reg->unit_lookup(UNIT_DRIVER, DRIVER_ATA);
-	ata->device_select(ATAId(1, 0));
-	ata->read(0, 1, (unsigned char *)vbr);
+	int error = 0;
+	if(ata->device_select(ATAId(0, 1))) {
+		dprintf("Device select error\n");
+		return 1;
+	}
+	dprintf("Selected ok\n");
+
+	if((error = ata->read(0, 1, (unsigned char *)vbr))) {
+		dprintf("Superblock read error %x\n", error);
+		return 1;
+	}
 
 	dprintf("FAT32 Volume: fats=%d, dirs=%d, root_cluster=%d\n", bpb->fats_number, bpb->dirs_number, ext_br->root_cluster);
 

@@ -44,7 +44,6 @@ class ATADevice
 	ATAId id;
 	int ctrl_port = PRIMARY_CONTROL_PORT;
 	int base_port = PRIMARY_BASE_START;
-	int slave = 0;
 	int max_lba = 0;
 
 	uint16_t read_buffer[READ_BUFFER_SIZE];
@@ -64,7 +63,10 @@ public:
 		return this->id;
 	}
 
-	void set_max_lba(int max_lba);
+	inline void set_max_lba(int val)
+	{
+		this->max_lba = val;
+	}
 
 	int read(int start_lba, int count, uint8_t *out);
 	void handle_irq();
