@@ -105,7 +105,7 @@ int SerialDriver::handle(Event e, void *ret)
 	switch(e.get_type()) {
 	case E_SERIAL_IRQ:
 		if(!com_hndl()) {
-			this->pic->transfer(this, Event(E_PIC_EOI, 0x4), nullptr);
+			this->pic->transfer(this, Event(E_PIC_EOI, e.get_msg()), nullptr);
 		}
 		// return read character
 		break;

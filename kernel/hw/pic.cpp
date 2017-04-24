@@ -4,8 +4,8 @@
 #include <isr.h>
 #include <debug.h>
 
-#define MASK(i, n) (m##i |= 1 << n)
-#define UNMASK(i, n) (m##i &= ~(1 << n))
+#define MASK(m, n) (m |= 1 << n)
+#define UNMASK(m, n) (m &= ~(1 << n))
 
 static PICDriver pic_driver;
 
@@ -70,13 +70,13 @@ static void init_pic(uint8_t off1, uint8_t off2)
 	outb(PIC_M_CMD, 0x6B);
 	outb(PIC_S_CMD, 0x6B);
 
-	UNMASK(1, 0);
-	UNMASK(1, 4);
-	UNMASK(2, 7);
+	UNMASK(m1, 0);
+	UNMASK(m1, 4);
+	UNMASK(m2, 6);
+	UNMASK(m2, 7);
 
 	pic_set_mask(m1, m2);
 
-//	kprintf("PIC inited\n");
 	__asm__("sti");
 }
 

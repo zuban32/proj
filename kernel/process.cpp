@@ -46,7 +46,7 @@ int ProcessManager::handle(Event e, void *ret)
 {
 	switch(e.get_type()) {
 	case E_PROC_IRQ:
-		this->to_pic->transfer(this, Event(E_PIC_EOI), ret);
+		this->to_pic->transfer(this, Event(E_PIC_EOI, e.get_msg()), ret);
 		if(this->sched_enabled) {
 			this->sched();
 		}

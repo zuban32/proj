@@ -31,7 +31,8 @@ enum
 	ISR_PIT = 0x20,
 	ISR_KBD = 0x21,
 	ISR_COM1 = 0x24,
-	ISR_ATA = 0x2E,
+	ISR_ATA_PR = 0x2E,
+	ISR_ATA_SEC = 0x2F,
 	ISR_SYSCALL = 0x80,
 	MAX_ISR
 };

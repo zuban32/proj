@@ -73,7 +73,8 @@ static void load_idt(void)
 	addISR(ISR_PF, 0x8, i386_INT);
 	addISR(ISR_GP, 0x8, i386_INT);
 	addISR(ISR_PIT, 0x8, i386_TRAP);
-	addISR(ISR_ATA, 0x8, i386_TRAP);
+	addISR(ISR_ATA_PR, 0x8, i386_TRAP);
+	addISR(ISR_ATA_SEC, 0x8, i386_TRAP);
 	addISR(ISR_SYSCALL, 0x8, i386_INT | 0x60);
 
 	uint32_t p = (uint32_t) &idtr;

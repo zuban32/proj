@@ -5,6 +5,7 @@
 #include <process.h>
 #include <syscall.h>
 #include <idt.h>
+#include <debug.h>
 
 const char *exception_names[] = {
 		"Divide error",
@@ -56,47 +57,47 @@ const char *eflags_flagnames[] = {
 
 static void print_intframe(Intframe *iframe)
 {
-	kprintf("\n-------------------------\n");
-	kprintf("INTFRAME\n%d - ", iframe->intno);
+	dprintf("\n-------------------------\n");
+	dprintf("INTFRAME\n%d - ", iframe->intno);
 	if (iframe->intno < 21 && iframe->intno != 9
 			&& iframe->intno != 15)
-		kprintf("%s\n", exception_names[iframe->intno]);
+		dprintf("%s\n", exception_names[iframe->intno]);
 	else
-		kprintf("User-Defined Interrupt\n");
-	kprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\n", iframe->ret_eip,
+		dprintf("User-Defined Interrupt\n");
+	dprintf("ret_eip = %x\nret_cs = %x\neflags = %00b\n", iframe->ret_eip,
 			iframe->ret_cs, iframe->eflags);
 
 	if(iframe->intno == ISR_GP) {
-		kprintf("ds = %x\n", iframe->ds);
-		kprintf("es = %x\n", iframe->es);
-		kprintf("ss = %x\n", iframe->ss);
+		dprintf("ds = %x\n", iframe->ds);
+		dprintf("es = %x\n", iframe->es);
+		dprintf("ss = %x\n", iframe->ss);
 	}
 
-	kprintf("[ ");   //just like gdb shows enable flags
+	dprintf("[ ");   //just like gdb shows enable flags
 	for (int i = 0; i < 22; i++) {
 		if (i == 12) {
-			kprintf("IOPL=%d ",
+			dprintf("IOPL=%d ",
 					2 * (iframe->eflags & (1 << 13))
 							+ (iframe->eflags & (1 << 12)));
 			i++;
 		}
 		if (eflags_flagnames[i] && (iframe->eflags & (1 << i)))
-			kprintf("%s ", eflags_flagnames[i]);
+			dprintf("%s ", eflags_flagnames[i]);
 	}
-	kprintf("]\n");
+	dprintf("]\n");
 
-	kprintf("err_code = %03b\n", iframe->err_code & 0x7);
+	dprintf("err_code = %03b\n", iframe->err_code & 0x7);
 	if (iframe->intno == ISR_PF) {
-		kprintf((!(iframe->err_code & PAGE_U)) ? "kernel " : "user ");
-		kprintf((!(iframe->err_code & PAGE_W)) ? "read " : "write ");
-		kprintf((!(iframe->err_code & PAGE_P)) ? "non-present\n" : "present\n");
+		dprintf((!(iframe->err_code & PAGE_U)) ? "kernel " : "user ");
+		dprintf((!(iframe->err_code & PAGE_W)) ? "read " : "write ");
+		dprintf((!(iframe->err_code & PAGE_P)) ? "non-present\n" : "present\n");
 
 		uint32_t err_addr = 0;
 		__asm__ __volatile__("movl %%cr2, %%eax\n\t":"=a"(err_addr));
-		kprintf("fault addr = %x\n", err_addr);
+		dprintf("fault addr = %x\n", err_addr);
 	}
 
-	kprintf("\n-------------------------\n\n");
+	dprintf("\n-------------------------\n\n");
 }
 
 extern InterruptUnit u_idt;

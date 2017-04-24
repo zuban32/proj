@@ -3,6 +3,7 @@
 #include <console.h>
 #include <util/string.h>
 #include <debug.h>
+#include <events/pic.h>
 
 //static void dump_status(char byte)
 //{
@@ -82,7 +83,11 @@ int ATADriver::handle(Event e, void *ret)
 {
 	this->cur_dev->handle_irq();
 //	Send EOI
-	this->irq_p_tun->transfer(this, Event(1, 0xE), nullptr);
+	if(this->cur_dev->get_id().bus == 0) {
+		this->irq_p_tun->transfer(this, Event(E_PIC_EOI, e.get_msg()), nullptr);
+	} else {
+		this->irq_p_tun->transfer(this, Event(E_PIC_EOI, e.get_msg()), nullptr);
+	}
 	return 0;
 }
 

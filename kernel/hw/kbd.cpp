@@ -120,6 +120,6 @@ static void kbd_hndl(void)
 int KbdDriver::handle(Event e, void *ret)
 {
 	kbd_hndl();
-	this->in->transfer(this, Event(1, 0x1), nullptr);
+	this->in->transfer(this, Event(1, e.get_msg()), nullptr);
 	return 0;
 }
