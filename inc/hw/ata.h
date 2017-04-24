@@ -42,6 +42,8 @@ struct ATAId
 class ATADevice
 {
 	ATAId id;
+	bool valid = false;
+
 	int ctrl_port = PRIMARY_CONTROL_PORT;
 	int base_port = PRIMARY_BASE_START;
 	int max_lba = 0;
@@ -63,11 +65,12 @@ public:
 		return this->id;
 	}
 
-	inline void set_max_lba(int val)
+	inline bool exists()
 	{
-		this->max_lba = val;
+		return this->valid;
 	}
 
+	bool identify();
 	int read(int start_lba, int count, uint8_t *out);
 	void handle_irq();
 };
@@ -84,7 +87,6 @@ class ATADriver: public Unit
 			ATADevice(ATAId(1, 0), SECONDARY_CONTROL_PORT, SECONDARY_BASE_START),
 			ATADevice(ATAId(1, 1), SECONDARY_CONTROL_PORT, SECONDARY_BASE_START)
 	};
-	int device_num = 0;
 	ATADevice *cur_dev = nullptr;
 
 public:
@@ -94,17 +96,16 @@ public:
 	int connect_from(Tunnel *t, int data);
 	int handle(Event e, void *ret);
 
-	inline int get_device_num()
-	{
-		return this->device_num;
-	}
-
 	inline ATADevice *get_device(int ind)
 	{
-		if(ind < 0 || ind >= this->device_num) {
+		if(ind < 0 || ind >= MAX_ATA_DEVICES) {
 			return nullptr;
 		}
-		return &this->devs[ind];
+		if(this->devs[ind].exists()) {
+			return &this->devs[ind];
+		} else {
+			return nullptr;
+		}
 	}
 
 	inline ATADevice *get_device(ATAId id)

@@ -101,8 +101,6 @@ public:
 	int init();
 	int connect_from(Tunnel *t, int data);
 	int handle(Event e, void *ret);
-
-	int test();
 };
 
 #endif /* INC_FAT32_H_ */

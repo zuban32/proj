@@ -46,8 +46,7 @@ int FileIO::init()
 
 	this->fs[FAT32] = fat_fs;
 
-	dprintf("dev_num = %d\n", ata->get_device_num());
-	for(int i = 0; i < ata->get_device_num(); i++) {
+	for(int i = 0; i < MAX_ATA_DEVICES; i++) {
 		ATADevice *dev = ata->get_device(i);
 		if(dev) {
 			if(fat_fs->check_fs(dev)) {

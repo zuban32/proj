@@ -144,31 +144,6 @@ static int fat32_read_dir(const char *path, FAT32DirInfo *out, ATADriver *ata)
 	return 0;
 }
 
-// dummy FAT32 test
-int FAT32Unit::test(void)
-{
-	ATADriver *ata = (ATADriver *)this->reg->unit_lookup(UNIT_DRIVER, DRIVER_ATA);
-	ata->device_select(ATAId(0, 1));
-	//	int cluster = ext_br->root_cluster;
-	//	int fat_sect = cluster_to_fatsect(cluster);
-	//	int fat_off = cluster % 512;
-
-	int res = 0;
-	FAT32DirInfo dir;
-	if((res = fat32_read_dir("/test_dir/fat32_test.txt", &dir, ata))) {
-		kprintf("FAT32 read error: %d\n", res);
-		return 1;
-	} else {
-		uint8_t file_str[SECTOR_SIZE];
-		kprintf("File found: sector %d\n", cluster_to_lba(dir.cluster));
-		ata->read(cluster_to_lba(dir.cluster), 1, (uint8_t *)file_str);
-
-		kprintf("File contents: %s\n", (char *)file_str);
-		kprintf("FAT32 dummy test: %s\n", (kstrcmp((char *)file_str, "Hello, FAT32 World\n") == 0) ? "OK" : "FAIL");
-		return 0;
-	}
-}
-
 int FAT32Unit::init(void)
 {
 	ATADriver *ata = (ATADriver *)this->reg->unit_lookup(UNIT_DRIVER, DRIVER_ATA);
@@ -193,9 +168,10 @@ int FAT32Unit::init(void)
 	return 0;
 }
 
+// in current dev environment only primary slave contains fat32 fs
 bool FAT32Unit::check_fs(ATADevice *dev)
 {
-	return true;
+	return dev->get_id().bus == 0 && dev->get_id().slave == 1;
 }
 
 int FAT32Unit::open_file(const char *path, File *f)

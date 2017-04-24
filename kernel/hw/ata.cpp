@@ -4,36 +4,50 @@
 #include <util/string.h>
 #include <debug.h>
 
-//static int ata_identify(int base)
+//static void dump_status(char byte)
 //{
-//	outb(base + 0x200 + 6, 2);
-//	outb(base + 6, 0xA0);
-//	outb(base + 2, 0);
-//	outb(base + 3, 0);
-//	outb(base + 4, 0);
-//	outb(base + 5, 0);
-//	outb(base + 7, 0xEC);
-//
-//	uint8_t status = 0;
-//
-//	status = inb(base + 7);
-//	status = inb(base + 7);
-//	status = inb(base + 7);
-//	status = inb(base + 7);
-//	status = inb(base + 7);
-//
-//	int i = 0;
-//	for(i = 0; i < 8; i++) {
-//		kprintf("[%d] = %d\n", i, (status & (1 << i)) >> i);
-//	}
-//
-//	while((status & 1) || ((status & (1 << 7)) >> 7))
-//		status = inb(base + 7);
-//	for(i = 0; i < 8; i++) {
-//		kprintf("[%d] = %d\n", i, (status & (1 << i)) >> i);
-//	}
-//	return 0;
+//	dprintf("-------------------\n");
+//	dprintf("Raw val = %x\n", byte);
+//	dprintf("Err = %x, DRQ = %x, SRV = %x, ", byte & 7, (byte & 8) >> 3, (byte & 16) >> 4);
+//	dprintf("DF = %x, RDY = %x, BSY = %x\n", (byte & 32) >> 5, (byte & 64) >> 6, (byte & 128) >> 7);
 //}
+
+bool ATADevice::identify()
+{
+	outb(this->base_port + 6, 0xA0 | (this->id.slave << 4));
+	outb(this->base_port + 2, 0);
+	outb(this->base_port + 3, 0);
+	outb(this->base_port + 4, 0);
+	outb(this->base_port + 5, 0);
+	outb(this->base_port + 7, 0xEC);
+
+	int res = inb(this->base_port + 7);
+	if(!res) {
+		return false;
+	}
+	while(inb(this->base_port + 7) & 0x80);
+	if(inb(this->base_port + 4) || inb(this->base_port + 5)) {
+		return false;
+	}
+	int status;
+	do {
+		status = inb(this->base_port + 7);
+	} while(!((status | 8) || (status | 1)));
+	if(!(status & 1)) {
+		uint16_t *out = this->read_buffer + this->cur_buf_ind * SECTOR_SIZE / 2;
+		for(unsigned i = 0; i < SECTOR_SIZE / 2; i++) {
+			*(out + i) = inw(this->base_port);
+		}
+		uint32_t *dev_lba = (uint32_t *)(this->read_buffer + this->cur_buf_ind + 60);
+		this->max_lba = *dev_lba;
+		this->cur_buf_ind++;
+	} else {
+		return false;
+	}
+
+	this->valid = true;
+	return true;
+}
 
 static ATADriver ata_driver;
 
@@ -45,9 +59,12 @@ int ATADriver::init()
 	if(!this->irq_p_tun || !this->irq_s_tun) {
 		return -1;
 	}
-	this->device_num = 2;
-	this->devs[0].set_max_lba(INT32_MAX);
-	this->devs[1].set_max_lba(INT32_MAX);
+	for(int i = 0; i < MAX_ATA_DEVICES; i++) {
+		this->devs[i].identify();
+		if(this->devs[i].exists()) {
+			dprintf("ATA device on bus %d %s found\n", this->devs[i].get_id().bus, this->devs[i].get_id().slave ? "slave" : "master");
+		}
+	}
 	this->device_select(ATAId(0, 1));
 	return 0;
 }
@@ -71,8 +88,8 @@ int ATADriver::handle(Event e, void *ret)
 
 int ATADriver::device_select(ATAId id)
 {
-	int ind = (id.bus << 1) | id.slave;
-	if(ind >= this->device_num) {
+	unsigned ind = (id.bus << 1) | id.slave;
+	if(ind >= MAX_ATA_DEVICES || !this->devs[ind].exists()) {
 		return 1;
 	}
 	this->cur_dev = this->devs + ind;
