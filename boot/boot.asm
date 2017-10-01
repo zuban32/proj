@@ -66,17 +66,15 @@ error:
     mov ah, 0x42
     mov dl, BOOT_DRIVE
     int 0x13
-    ;jc error
+    jc error
     ret
     
 [bits 32]
-;0x7d07
 begin_PM:
     ;sti
 
 	push gdt_start
 	push KERN_OFF
-	;0x7d0d
     call BOOT2_OFF
     
     jmp $
